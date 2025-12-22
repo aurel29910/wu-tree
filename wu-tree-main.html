@@ -255,7 +255,11 @@
         /* Section branches */
         .branches-section {
             display: flex;
-            gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            padding: 0 10px;
             margin-bottom: 80px;
             animation: fadeIn 1.4s ease;
         }
@@ -263,7 +267,11 @@
         /* Section racines */
         .roots-section {
             display: flex;
-            gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            padding: 0 10px;
             animation: fadeIn 1.6s ease;
         }
 
@@ -559,7 +567,7 @@
     <script>
         // Données des emojis par ID
         const branchEmojis = {
-            business: '💼',
+            business: '💰',
             music: '🎵',
             culture: '📚',
             sport_branch: '💪',
@@ -631,23 +639,55 @@
             branchesSection.innerHTML = '';
             rootsSection.innerHTML = '';
 
-            // Créer les cercles pour les branches sélectionnées
-            config.branches.forEach((branchId, index) => {
-                const circle = document.createElement('div');
-                circle.className = 'circle-button branch-circle';
-                circle.style.animationDelay = `${index * 1.3}s`;
-                circle.onclick = () => openBranch(branchId);
-                
-                // Calculer les tâches prioritaires pour cette branche
+            // Calculer la priorité globale de chaque branche
+            const branchPriorities = [];
+            config.branches.forEach(branchId => {
                 const tasks = loadTasksFromStorage(branchId);
                 const urgentCount = tasks.filter(t => t.status !== 'completed' && t.priority === 'high').length;
                 const importantCount = tasks.filter(t => t.status !== 'completed' && t.priority === 'medium').length;
+                const normalCount = tasks.filter(t => t.status !== 'completed' && t.priority === 'normal').length;
+                
+                // Score de priorité : urgent = 100, important = 10, normal = 1
+                const score = (urgentCount * 100) + (importantCount * 10) + normalCount;
+                
+                branchPriorities.push({
+                    id: branchId,
+                    score: score,
+                    urgentCount: urgentCount,
+                    importantCount: importantCount
+                });
+            });
+
+            // Trier par score décroissant
+            branchPriorities.sort((a, b) => b.score - a.score);
+
+            // Définir les tailles selon le rang
+            const sizes = [
+                { width: 110, height: 110, fontSize: 42 },  // Plus grosse (priorité 1)
+                { width: 95, height: 95, fontSize: 36 },    // Moyenne haute
+                { width: 85, height: 85, fontSize: 32 },    // Moyenne
+                { width: 75, height: 75, fontSize: 28 },    // Petite
+                { width: 70, height: 70, fontSize: 26 }     // Plus petite
+            ];
+
+            // Créer les cercles pour les branches sélectionnées (TRIÉS par priorité)
+            branchPriorities.forEach((branch, index) => {
+                const branchId = branch.id;
+                const size = sizes[Math.min(index, sizes.length - 1)];
+                
+                const circle = document.createElement('div');
+                circle.className = 'circle-button branch-circle';
+                circle.style.width = `${size.width}px`;
+                circle.style.height = `${size.height}px`;
+                circle.style.fontSize = `${size.fontSize}px`;
+                circle.style.animationDelay = `${index * 1.3}s`;
+                circle.onclick = () => openBranch(branchId);
                 
                 let badge = '';
-                if (urgentCount > 0) {
-                    badge = `<div class="priority-badge badge-high">${urgentCount}</div>`;
-                } else if (importantCount > 0) {
-                    badge = `<div class="priority-badge badge-medium">${importantCount}</div>`;
+                if (branch.urgentCount > 0) {
+                    badge = `<div class="priority-badge badge-high">${branch.urgentCount}</div>`;
+                } else if (branch.importantCount > 0) {
+                    badge = `<div class="priority-badge badge-medium">${branch.importantCount}</div>`;
                 }
                 
                 circle.innerHTML = `
@@ -658,7 +698,7 @@
                 branchesSection.appendChild(circle);
             });
 
-            // Créer les cercles pour les racines sélectionnées
+            // Créer les cercles pour les racines sélectionnées (taille normale)
             config.roots.forEach((rootId, index) => {
                 const circle = document.createElement('div');
                 circle.className = 'circle-button root-circle';
