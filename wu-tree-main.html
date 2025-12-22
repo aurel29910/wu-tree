@@ -93,6 +93,149 @@
             background: rgba(255,255,255,0.35);
         }
 
+        .manage-button {
+            position: fixed;
+            bottom: 30px;
+            right: calc(50% - 167px);
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8BC34A 0%, #7CB342 100%);
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(139,195,74,0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .manage-button:active {
+            transform: scale(0.9);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 375px;
+            height: 812px;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-height: 80%;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .modal-title {
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal-section {
+            margin-bottom: 25px;
+        }
+
+        .modal-section-title {
+            color: rgba(255,255,255,0.9);
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .item-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .item {
+            background: rgba(255,255,255,0.25);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 12px 15px;
+            border: 1.5px solid rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .item-label {
+            color: white;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .delete-btn {
+            background: rgba(255,0,0,0.3);
+            border: 1px solid rgba(255,0,0,0.5);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .delete-btn:active {
+            transform: scale(0.95);
+        }
+
+        .add-btn {
+            width: 100%;
+            background: rgba(255,255,255,0.3);
+            border: 2px dashed rgba(255,255,255,0.5);
+            color: white;
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 15px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .add-btn:active {
+            transform: scale(0.98);
+        }
+
+        .modal-close {
+            width: 100%;
+            background: linear-gradient(135deg, #FF69B4, #FF1493);
+            border: none;
+            color: white;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .modal-close:active {
+            transform: scale(0.98);
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -335,6 +478,30 @@
                 "L'arbre qui plie ne rompt pas.<br>Ton bonsaï grandit à son rythme."
             </div>
         </div>
+
+        <!-- Bouton de gestion -->
+        <button class="manage-button" onclick="openManageModal()">✏️</button>
+
+        <!-- Modal de gestion -->
+        <div class="modal" id="manageModal">
+            <div class="modal-content">
+                <h2 class="modal-title">Gérer mes branches & racines</h2>
+                
+                <div class="modal-section">
+                    <div class="modal-section-title">🌿 Mes Objectifs</div>
+                    <div class="item-list" id="branchesList"></div>
+                    <button class="add-btn" onclick="addNewBranch()">+ Ajouter un objectif</button>
+                </div>
+
+                <div class="modal-section">
+                    <div class="modal-section-title">🌱 Mon Bien-être</div>
+                    <div class="item-list" id="rootsList"></div>
+                    <button class="add-btn" onclick="addNewRoot()">+ Ajouter une pratique</button>
+                </div>
+
+                <button class="modal-close" onclick="closeManageModal()">Fermer</button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -343,7 +510,7 @@
             business: '💼',
             music: '🎵',
             culture: '📚',
-            fitness: '💪',
+            sport: '💪',
             creativity: '🎨',
             relationships: '❤️',
             finance: '💰',
@@ -356,7 +523,7 @@
             business: 'Business',
             music: 'Musique',
             culture: 'Culture',
-            fitness: 'Fitness',
+            sport: 'Sport',
             creativity: 'Créativité',
             relationships: 'Relations',
             finance: 'Finances',
@@ -449,6 +616,144 @@
 
         function openSettings() {
             window.location.href = 'wu-tree-settings.html';
+        }
+
+        function openManageModal() {
+            const modal = document.getElementById('manageModal');
+            modal.classList.add('active');
+            
+            // Charger les branches et racines actuelles
+            const config = JSON.parse(localStorage.getItem('wutree_config'));
+            
+            if (config) {
+                renderBranchesList(config.branches);
+                renderRootsList(config.roots);
+            }
+        }
+
+        function closeManageModal() {
+            const modal = document.getElementById('manageModal');
+            modal.classList.remove('active');
+            
+            // Recharger l'interface
+            const config = JSON.parse(localStorage.getItem('wutree_config'));
+            if (config) {
+                loadUserInterface(config);
+            }
+        }
+
+        function renderBranchesList(branches) {
+            const list = document.getElementById('branchesList');
+            list.innerHTML = '';
+            
+            branches.forEach(branchId => {
+                const item = document.createElement('div');
+                item.className = 'item';
+                item.innerHTML = `
+                    <div class="item-label">
+                        <span style="font-size: 20px;">${branchEmojis[branchId] || '🌿'}</span>
+                        <span>${branchLabels[branchId] || branchId}</span>
+                    </div>
+                    <button class="delete-btn" onclick="removeBranch('${branchId}')">Supprimer</button>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function renderRootsList(roots) {
+            const list = document.getElementById('rootsList');
+            list.innerHTML = '';
+            
+            roots.forEach(rootId => {
+                const item = document.createElement('div');
+                item.className = 'item';
+                item.innerHTML = `
+                    <div class="item-label">
+                        <span style="font-size: 20px;">${rootEmojis[rootId] || '🌱'}</span>
+                        <span>${rootLabels[rootId] || rootId}</span>
+                    </div>
+                    <button class="delete-btn" onclick="removeRoot('${rootId}')">Supprimer</button>
+                `;
+                list.appendChild(item);
+            });
+        }
+
+        function removeBranch(branchId) {
+            if (!confirm(`Supprimer "${branchLabels[branchId]}" ?\n\nToutes les tâches associées seront conservées.`)) {
+                return;
+            }
+            
+            const config = JSON.parse(localStorage.getItem('wutree_config'));
+            config.branches = config.branches.filter(b => b !== branchId);
+            localStorage.setItem('wutree_config', JSON.stringify(config));
+            
+            renderBranchesList(config.branches);
+        }
+
+        function removeRoot(rootId) {
+            if (!confirm(`Supprimer "${rootLabels[rootId]}" ?\n\nToutes les pratiques associées seront conservées.`)) {
+                return;
+            }
+            
+            const config = JSON.parse(localStorage.getItem('wutree_config'));
+            config.roots = config.roots.filter(r => r !== rootId);
+            localStorage.setItem('wutree_config', JSON.stringify(config));
+            
+            renderRootsList(config.roots);
+        }
+
+        function addNewBranch() {
+            const availableBranches = Object.keys(branchLabels);
+            const config = JSON.parse(localStorage.getItem('wutree_config'));
+            const remaining = availableBranches.filter(b => !config.branches.includes(b));
+            
+            if (remaining.length === 0) {
+                alert('Toutes les branches disponibles sont déjà ajoutées !');
+                return;
+            }
+            
+            let message = 'Choisissez un objectif :\n\n';
+            remaining.forEach((id, index) => {
+                message += `${index + 1}. ${branchEmojis[id]} ${branchLabels[id]}\n`;
+            });
+            message += '\nTapez le numéro :';
+            
+            const choice = prompt(message);
+            const choiceIndex = parseInt(choice) - 1;
+            
+            if (choiceIndex >= 0 && choiceIndex < remaining.length) {
+                const selectedId = remaining[choiceIndex];
+                config.branches.push(selectedId);
+                localStorage.setItem('wutree_config', JSON.stringify(config));
+                renderBranchesList(config.branches);
+            }
+        }
+
+        function addNewRoot() {
+            const availableRoots = Object.keys(rootLabels);
+            const config = JSON.parse(localStorage.getItem('wutree_config'));
+            const remaining = availableRoots.filter(r => !config.roots.includes(r));
+            
+            if (remaining.length === 0) {
+                alert('Toutes les pratiques disponibles sont déjà ajoutées !');
+                return;
+            }
+            
+            let message = 'Choisissez une pratique :\n\n';
+            remaining.forEach((id, index) => {
+                message += `${index + 1}. ${rootEmojis[id]} ${rootLabels[id]}\n`;
+            });
+            message += '\nTapez le numéro :';
+            
+            const choice = prompt(message);
+            const choiceIndex = parseInt(choice) - 1;
+            
+            if (choiceIndex >= 0 && choiceIndex < remaining.length) {
+                const selectedId = remaining[choiceIndex];
+                config.roots.push(selectedId);
+                localStorage.setItem('wutree_config', JSON.stringify(config));
+                renderRootsList(config.roots);
+            }
         }
 
         // Option pour réinitialiser (longue pression sur le titre par exemple)
