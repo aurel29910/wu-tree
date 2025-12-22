@@ -293,52 +293,6 @@
             breathwork: 'Respiration'
         };
 
-        // Exemples de tâches par racine
-        const defaultRootTasks = {
-            affirmations: {
-                today: [
-                    { title: '5 affirmations du matin', status: 'ongoing' }
-                ],
-                week: [
-                    { title: 'Journal de gratitude quotidien', status: 'completed' }
-                ]
-            },
-            yoga: {
-                today: [
-                    { title: 'Session yoga 20 min', status: 'completed' },
-                    { title: 'Étirements du soir', status: 'ongoing' }
-                ],
-                week: [
-                    { title: '3 sessions cette semaine', status: 'ongoing' }
-                ]
-            },
-            sport: {
-                today: [
-                    { title: 'Marche 30 minutes', status: 'ongoing' }
-                ],
-                week: [
-                    { title: 'Physiothérapie main', status: 'completed' },
-                    { title: '3 sessions cardio', status: 'ongoing' }
-                ]
-            },
-            meditation: {
-                today: [
-                    { title: 'Méditation 15 min matin', status: 'completed' }
-                ],
-                week: [
-                    { title: 'Méditation guidée quotidienne', status: 'ongoing' }
-                ]
-            },
-            gratitude: {
-                today: [
-                    { title: 'Noter 3 gratitudes', status: 'ongoing' }
-                ],
-                week: [
-                    { title: 'Appeler un proche pour remercier', status: 'ongoing' }
-                ]
-            }
-        };
-
         // Charger la racine sélectionnée
         const selectedRoot = localStorage.getItem('selectedRoot');
         
@@ -353,70 +307,100 @@
             document.getElementById('rootName').textContent = 
                 `${rootEmojis[rootId] || '🌱'} ${rootLabels[rootId] || rootId}`;
             
-            // Charger les tâches (depuis defaultRootTasks pour l'instant)
-            const tasks = defaultRootTasks[rootId] || { today: [], week: [] };
-            renderTasks(tasks);
+            // Charger les pratiques depuis le localStorage
+            const practices = loadPracticesFromStorage(rootId);
+            
+            if (practices.length === 0) {
+                document.getElementById('rootSubtitle').textContent = 'Aucune pratique pour le moment';
+                showEmptyState();
+            } else {
+                const completed = practices.filter(p => p.status === 'completed').length;
+                document.getElementById('rootSubtitle').textContent = 
+                    `${practices.length} pratique${practices.length > 1 ? 's' : ''} • ${completed} complétée${completed > 1 ? 's' : ''}`;
+                renderPractices(practices);
+            }
         }
 
-        function renderTasks(tasks) {
+        function loadPracticesFromStorage(rootId) {
+            const storageKey = `wutree_practices_${rootId}`;
+            const practicesJson = localStorage.getItem(storageKey);
+            return practicesJson ? JSON.parse(practicesJson) : [];
+        }
+
+        function savePracticesToStorage(rootId, practices) {
+            const storageKey = `wutree_practices_${rootId}`;
+            localStorage.setItem(storageKey, JSON.stringify(practices));
+        }
+
+        function showEmptyState() {
+            const content = document.getElementById('content');
+            content.innerHTML = `
+                <div class="empty-state">
+                    <div style="font-size: 48px; margin-bottom: 20px;">🌱</div>
+                    <p style="margin-bottom: 10px; font-weight: 500;">Aucune pratique pour le moment</p>
+                    <p style="font-size: 13px; opacity: 0.8;">Appuyez sur + pour ajouter votre première pratique</p>
+                </div>
+            `;
+        }
+
+        function renderPractices(practices) {
             const content = document.getElementById('content');
             content.innerHTML = '';
 
-            // Aujourd'hui
-            if (tasks.today && tasks.today.length > 0) {
-                const section = createTimeSection('🌅 Aujourd\'hui', tasks.today);
-                content.appendChild(section);
-            }
+            // Grouper par période
+            const practicesByPeriod = {
+                today: practices.filter(p => p.period === 'today'),
+                week: practices.filter(p => p.period === 'week')
+            };
 
-            // Cette semaine
-            if (tasks.week && tasks.week.length > 0) {
-                const section = createTimeSection('📅 Cette semaine', tasks.week);
-                content.appendChild(section);
-            }
+            const periodTitles = {
+                today: '🌅 Aujourd\'hui',
+                week: '📅 Cette semaine'
+            };
 
-            // Si aucune tâche
-            if ((!tasks.today || tasks.today.length === 0) && 
-                (!tasks.week || tasks.week.length === 0)) {
-                content.innerHTML = '<div class="empty-state">Aucune pratique pour le moment.<br>Appuyez sur + pour ajouter.</div>';
-            }
+            // Afficher chaque période qui a des pratiques
+            Object.keys(practicesByPeriod).forEach(period => {
+                if (practicesByPeriod[period].length > 0) {
+                    const section = createTimeSection(periodTitles[period], practicesByPeriod[period]);
+                    content.appendChild(section);
+                }
+            });
         }
 
-        function createTimeSection(title, tasksList) {
+        function createTimeSection(title, practicesList) {
             const section = document.createElement('div');
             section.className = 'time-section';
 
-            const completed = tasksList.filter(t => t.status === 'completed').length;
+            const completed = practicesList.filter(p => p.status === 'completed').length;
             
             section.innerHTML = `
                 <div class="time-header">
                     <div class="time-title">${title}</div>
-                    <div class="time-count">${completed}/${tasksList.length}</div>
+                    <div class="time-count">${completed}/${practicesList.length}</div>
                 </div>
             `;
 
-            tasksList.forEach((task, index) => {
-                const card = createTaskCard(task, index);
+            practicesList.forEach((practice) => {
+                const card = createTaskCard(practice);
                 section.appendChild(card);
             });
 
             return section;
         }
 
-        function createTaskCard(task, index) {
+        function createTaskCard(practice) {
             const card = document.createElement('div');
             card.className = 'task-card';
-            card.onclick = () => toggleTaskStatus(card);
+            card.onclick = () => togglePracticeStatus(practice.id);
 
-            const indicatorClass = task.status === 'completed' ? 'flower' : 
-                                   task.status === 'priority' ? 'bud-priority' : 'bud';
-            const emoji = task.status === 'completed' ? '🌸' : 
-                         task.status === 'priority' ? '🟡' : '🌱';
-            const meta = task.status === 'completed' ? 'Complété' : 'En cours';
+            const indicatorClass = practice.status === 'completed' ? 'flower' : 'bud';
+            const emoji = practice.status === 'completed' ? '🌸' : '🌱';
+            const meta = practice.status === 'completed' ? 'Complété' : 'En cours';
 
             card.innerHTML = `
                 <div class="task-indicator ${indicatorClass}">${emoji}</div>
                 <div class="task-content">
-                    <div class="task-title">${task.title}</div>
+                    <div class="task-title">${practice.title}</div>
                     <div class="task-meta">${meta}</div>
                 </div>
             `;
@@ -424,19 +408,14 @@
             return card;
         }
 
-        function toggleTaskStatus(card) {
-            const indicator = card.querySelector('.task-indicator');
-            const meta = card.querySelector('.task-meta');
+        function togglePracticeStatus(practiceId) {
+            const practices = loadPracticesFromStorage(selectedRoot);
+            const practice = practices.find(p => p.id === practiceId);
             
-            if (indicator.classList.contains('flower')) {
-                indicator.classList.remove('flower');
-                indicator.classList.add('bud');
-                indicator.textContent = '🌱';
-                meta.textContent = 'En cours';
-            } else {
-                indicator.className = 'task-indicator flower';
-                indicator.textContent = '🌸';
-                meta.textContent = 'Complété à l\'instant';
+            if (practice) {
+                practice.status = practice.status === 'completed' ? 'ongoing' : 'completed';
+                savePracticesToStorage(selectedRoot, practices);
+                loadRootDetails(selectedRoot);
             }
         }
 
@@ -445,10 +424,34 @@
         }
 
         function addTask() {
-            const taskName = prompt('Nouvelle pratique bien-être :');
-            if (taskName && taskName.trim()) {
-                alert('Fonctionnalité en cours de développement.\nBientôt tu pourras ajouter tes propres pratiques !');
-            }
+            const title = prompt('Nom de la pratique :');
+            if (!title || !title.trim()) return;
+
+            const period = prompt('Fréquence ?\n\n1 = Quotidien\n2 = Hebdomadaire\n\nTapez le numéro :');
+            
+            const periodMap = {
+                '1': 'today',
+                '2': 'week'
+            };
+
+            const selectedPeriod = periodMap[period] || 'today';
+
+            // Créer la nouvelle pratique
+            const newPractice = {
+                id: Date.now(),
+                title: title.trim(),
+                period: selectedPeriod,
+                status: 'ongoing',
+                createdAt: new Date().toISOString()
+            };
+
+            // Sauvegarder
+            const practices = loadPracticesFromStorage(selectedRoot);
+            practices.push(newPractice);
+            savePracticesToStorage(selectedRoot, practices);
+
+            // Recharger l'affichage
+            loadRootDetails(selectedRoot);
         }
     </script>
 </body>
