@@ -416,9 +416,8 @@
         }
 
         function openRoot(rootName) {
-            // Pour l'instant, même comportement que les branches
-            // Plus tard on pourra créer un écran spécifique pour les racines
-            alert(`Section Bien-être : ${rootName}\n(Fonctionnalité à venir)`);
+            localStorage.setItem('selectedRoot', rootName);
+            window.location.href = 'wu-tree-root-detail.html';
         }
 
         // Option pour réinitialiser (longue pression sur le titre par exemple)
