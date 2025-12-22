@@ -400,8 +400,15 @@
         let selectedRoots = [];
 
         function toggleSelection(type, id) {
-            const card = document.querySelector(`#${type}esGrid .selection-card[data-id="${id}"]`);
+            // Correction du sélecteur pour gérer "branch" → "branches" et "root" → "roots"
+            const gridId = type === 'branch' ? 'branchesGrid' : 'rootsGrid';
+            const card = document.querySelector(`#${gridId} .selection-card[data-id="${id}"]`);
             const array = type === 'branch' ? selectedBranches : selectedRoots;
+
+            if (!card) {
+                console.error('Card not found for', type, id);
+                return;
+            }
 
             if (array.includes(id)) {
                 // Désélectionner
