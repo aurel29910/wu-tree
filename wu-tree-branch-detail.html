@@ -262,240 +262,216 @@
         </div>
 
         <div class="content">
-            <!-- Aujourd'hui -->
-            <div class="time-section">
-                <div class="time-header">
-                    <div class="time-title">🌅 Aujourd'hui</div>
-                    <div class="time-count">1/3</div>
-                </div>
-                
-                <div class="task-card" onclick="toggleTask(this)">
-                    <div class="task-indicator flower">🌸</div>
-                    <div class="task-content">
-                        <div class="task-title">Analyse de marché</div>
-                        <div class="task-meta">Complété ce matin</div>
-                    </div>
-                </div>
-
-                <div class="task-card" onclick="toggleTask(this)">
-                    <div class="task-indicator bud-priority">🟡</div>
-                    <div class="task-content">
-                        <div class="task-title">Finaliser plan business Wu Tree</div>
-                        <div class="task-meta">Prioritaire</div>
-                    </div>
-                </div>
-
-                <div class="task-card" onclick="toggleTask(this)">
-                    <div class="task-indicator bud">🌱</div>
-                    <div class="task-content">
-                        <div class="task-title">Recherche concurrence apps bien-être</div>
-                        <div class="task-meta">En cours</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Cette semaine -->
-            <div class="time-section">
-                <div class="time-header">
-                    <div class="time-title">📅 Cette semaine</div>
-                    <div class="time-count">1/2</div>
-                </div>
-
-                <div class="task-card" onclick="toggleTask(this)">
-                    <div class="task-indicator flower">🌸</div>
-                    <div class="task-content">
-                        <div class="task-title">Définir pricing freemium</div>
-                        <div class="task-meta">Complété hier</div>
-                    </div>
-                </div>
-
-                <div class="task-card" onclick="toggleTask(this)">
-                    <div class="task-indicator bud">🌱</div>
-                    <div class="task-content">
-                        <div class="task-title">Contacter 3 développeurs potentiels</div>
-                        <div class="task-meta">2 restants</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Ce mois -->
-            <div class="time-section">
-                <div class="time-header">
-                    <div class="time-title">📆 Ce mois</div>
-                    <div class="time-count">0/1</div>
-                </div>
-
-                <div class="task-card" onclick="toggleTask(this)">
-                    <div class="task-indicator bud">🌱</div>
-                    <div class="task-content">
-                        <div class="task-title">MVP fonctionnel avec bonsaï animé</div>
-                        <div class="task-meta">Deadline: 31 décembre</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3-6 mois -->
-            <div class="time-section">
-                <div class="time-header">
-                    <div class="time-title">🎯 3-6 mois</div>
-                    <div class="time-count">1/1</div>
-                </div>
-
-                <div class="task-card" onclick="toggleTask(this)">
-                    <div class="task-indicator flower">🌸</div>
-                    <div class="task-content">
-                        <div class="task-title">Lancer beta test avec 100 utilisateurs</div>
-                        <div class="task-meta">Mars 2026</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 1 an+ -->
-            <div class="time-section">
-                <div class="time-header">
-                    <div class="time-title">🌟 1 an et +</div>
-                    <div class="time-count">0/2</div>
-                </div>
-
-                <div class="task-card" onclick="toggleTask(this)">
-                    <div class="task-indicator bud">🌱</div>
-                    <div class="task-content">
-                        <div class="task-title">Atteindre 10k utilisateurs actifs</div>
-                        <div class="task-meta">Objectif 2026</div>
-                    </div>
-                </div>
-
-                <div class="task-card" onclick="toggleTask(this)">
-                    <div class="task-indicator bud">🌱</div>
-                    <div class="task-content">
-                        <div class="task-title">Lever fonds série A</div>
-                        <div class="task-meta">Si traction validée</div>
-                    </div>
-                </div>
-            </div>
+            <!-- Les tâches seront chargées dynamiquement -->
         </div>
 
         <button class="add-button" onclick="addTask()">+</button>
     </div>
 
     <script>
-        // Données pour chaque branche
-        const branchData = {
-            business: {
-                emoji: '💼',
-                name: 'Business',
-                tasks: {
-                    today: [
-                        { title: 'Analyse de marché', status: 'completed', meta: 'Complété ce matin' },
-                        { title: 'Finaliser plan business Wu Tree', status: 'priority', meta: 'Prioritaire' },
-                        { title: 'Recherche concurrence apps bien-être', status: 'ongoing', meta: 'En cours' }
-                    ],
-                    week: [
-                        { title: 'Définir pricing freemium', status: 'completed', meta: 'Complété hier' },
-                        { title: 'Contacter 3 développeurs potentiels', status: 'ongoing', meta: '2 restants' }
-                    ],
-                    month: [
-                        { title: 'MVP fonctionnel avec bonsaï animé', status: 'ongoing', meta: 'Deadline: 31 décembre' }
-                    ],
-                    quarter: [
-                        { title: 'Lancer beta test avec 100 utilisateurs', status: 'completed', meta: 'Mars 2026' }
-                    ],
-                    year: [
-                        { title: 'Atteindre 10k utilisateurs actifs', status: 'ongoing', meta: 'Objectif 2026' },
-                        { title: 'Lever fonds série A', status: 'ongoing', meta: 'Si traction validée' }
-                    ]
-                }
-            },
-            music: {
-                emoji: '🎵',
-                name: 'Musique',
-                tasks: {
-                    today: [
-                        { title: 'Pratiquer piano 30 minutes', status: 'completed', meta: 'Complété' },
-                        { title: 'Écouter nouveau mix progressive', status: 'ongoing', meta: 'En cours' }
-                    ],
-                    week: [
-                        { title: 'Terminer mix pour set du weekend', status: 'completed', meta: 'Terminé' },
-                        { title: 'Apprendre nouveau morceau piano', status: 'priority', meta: 'Pour concert' }
-                    ],
-                    month: [
-                        { title: 'Composer un morceau original', status: 'ongoing', meta: '50% avancé' }
-                    ],
-                    quarter: [],
-                    year: [
-                        { title: 'Sortir premier EP vinyl', status: 'ongoing', meta: 'Production en cours' }
-                    ]
-                }
-            },
-            culture: {
-                emoji: '📚',
-                name: 'Culture générale',
-                tasks: {
-                    today: [
-                        { title: 'Lire 30 pages', status: 'ongoing', meta: 'Livre en cours' },
-                        { title: 'Article philosophie', status: 'completed', meta: 'Lu ce matin' }
-                    ],
-                    week: [
-                        { title: 'Écouter podcast histoire', status: 'ongoing', meta: '2 épisodes restants' },
-                        { title: 'Documentaire art japonais', status: 'ongoing', meta: 'Prévu ce soir' }
-                    ],
-                    month: [
-                        { title: 'Terminer livre sur le Wu Wei', status: 'ongoing', meta: '3 chapitres restants' }
-                    ],
-                    quarter: [
-                        { title: 'Visiter 2 musées', status: 'ongoing', meta: 'Louvre prévu' }
-                    ],
-                    year: []
-                }
-            }
+        // Données des emojis et labels
+        const branchEmojis = {
+            business: '💼',
+            music: '🎵',
+            culture: '📚',
+            fitness: '💪',
+            creativity: '🎨',
+            relationships: '❤️',
+            finance: '💰',
+            learning: '🎓',
+            travel: '✈️',
+            spirituality: '🕉️'
+        };
+
+        const branchLabels = {
+            business: 'Business',
+            music: 'Musique',
+            culture: 'Culture',
+            fitness: 'Fitness',
+            creativity: 'Créativité',
+            relationships: 'Relations',
+            finance: 'Finances',
+            learning: 'Apprentissage',
+            travel: 'Voyages',
+            spirituality: 'Spiritualité'
         };
 
         // Charger la branche sélectionnée
-        const selectedBranch = localStorage.getItem('selectedBranch') || 'business';
-        const data = branchData[selectedBranch];
+        const selectedBranch = localStorage.getItem('selectedBranch');
+        
+        if (!selectedBranch) {
+            window.location.href = 'wu-tree-main.html';
+        } else {
+            loadBranchDetails(selectedBranch);
+        }
 
-        // Mettre à jour l'en-tête
-        document.addEventListener('DOMContentLoaded', function() {
+        function loadBranchDetails(branchId) {
+            // Mettre à jour le header
             const branchName = document.querySelector('.branch-name');
             const branchSubtitle = document.querySelector('.branch-subtitle');
             
-            branchName.textContent = `${data.emoji} ${data.name}`;
+            branchName.textContent = `${branchEmojis[branchId] || '🌿'} ${branchLabels[branchId] || branchId}`;
             
-            // Calculer les stats
-            let total = 0;
-            let completed = 0;
-            Object.values(data.tasks).forEach(period => {
-                period.forEach(task => {
-                    total++;
-                    if (task.status === 'completed') completed++;
-                });
+            // Charger les tâches depuis le localStorage
+            const tasks = loadTasksFromStorage(branchId);
+            
+            if (tasks.length === 0) {
+                branchSubtitle.textContent = 'Aucun objectif pour le moment';
+                showEmptyState();
+            } else {
+                const completed = tasks.filter(t => t.status === 'completed').length;
+                branchSubtitle.textContent = `${tasks.length} objectif${tasks.length > 1 ? 's' : ''} • ${completed} complété${completed > 1 ? 's' : ''}`;
+                renderTasks(tasks);
+            }
+        }
+
+        function loadTasksFromStorage(branchId) {
+            const storageKey = `wutree_tasks_${branchId}`;
+            const tasksJson = localStorage.getItem(storageKey);
+            return tasksJson ? JSON.parse(tasksJson) : [];
+        }
+
+        function saveTasksToStorage(branchId, tasks) {
+            const storageKey = `wutree_tasks_${branchId}`;
+            localStorage.setItem(storageKey, JSON.stringify(tasks));
+        }
+
+        function showEmptyState() {
+            const content = document.querySelector('.content');
+            content.innerHTML = `
+                <div class="empty-state">
+                    <div style="font-size: 48px; margin-bottom: 20px;">🌱</div>
+                    <p style="margin-bottom: 10px; font-weight: 500;">Aucun objectif pour le moment</p>
+                    <p style="font-size: 13px; opacity: 0.8;">Appuyez sur + pour ajouter votre premier objectif</p>
+                </div>
+            `;
+        }
+
+        function renderTasks(tasks) {
+            const content = document.querySelector('.content');
+            content.innerHTML = '';
+
+            // Grouper par période
+            const tasksByPeriod = {
+                today: tasks.filter(t => t.period === 'today'),
+                week: tasks.filter(t => t.period === 'week'),
+                month: tasks.filter(t => t.period === 'month'),
+                quarter: tasks.filter(t => t.period === 'quarter'),
+                year: tasks.filter(t => t.period === 'year')
+            };
+
+            const periodTitles = {
+                today: '🌅 Aujourd\'hui',
+                week: '📅 Cette semaine',
+                month: '📆 Ce mois',
+                quarter: '🎯 3-6 mois',
+                year: '🌟 1 an et +'
+            };
+
+            // Afficher chaque période qui a des tâches
+            Object.keys(tasksByPeriod).forEach(period => {
+                if (tasksByPeriod[period].length > 0) {
+                    const section = createTimeSection(periodTitles[period], tasksByPeriod[period], period);
+                    content.appendChild(section);
+                }
             });
+        }
+
+        function createTimeSection(title, tasksList, period) {
+            const section = document.createElement('div');
+            section.className = 'time-section';
+
+            const completed = tasksList.filter(t => t.status === 'completed').length;
             
-            branchSubtitle.textContent = `${total} objectifs • ${completed} complétés`;
-        });
+            section.innerHTML = `
+                <div class="time-header">
+                    <div class="time-title">${title}</div>
+                    <div class="time-count">${completed}/${tasksList.length}</div>
+                </div>
+            `;
+
+            tasksList.forEach((task, index) => {
+                const card = createTaskCard(task, index);
+                section.appendChild(card);
+            });
+
+            return section;
+        }
+
+        function createTaskCard(task, index) {
+            const card = document.createElement('div');
+            card.className = 'task-card';
+            card.onclick = () => toggleTaskStatus(task.id);
+
+            const indicatorClass = task.status === 'completed' ? 'flower' : 
+                                   task.priority === 'high' ? 'bud-priority' : 'bud';
+            const emoji = task.status === 'completed' ? '🌸' : 
+                         task.priority === 'high' ? '🟡' : '🌱';
+            const meta = task.status === 'completed' ? 'Complété' : 
+                        task.priority === 'high' ? 'Prioritaire' : 'En cours';
+
+            card.innerHTML = `
+                <div class="task-indicator ${indicatorClass}">${emoji}</div>
+                <div class="task-content">
+                    <div class="task-title">${task.title}</div>
+                    <div class="task-meta">${meta}</div>
+                </div>
+            `;
+
+            return card;
+        }
+
+        function toggleTaskStatus(taskId) {
+            const tasks = loadTasksFromStorage(selectedBranch);
+            const task = tasks.find(t => t.id === taskId);
+            
+            if (task) {
+                task.status = task.status === 'completed' ? 'ongoing' : 'completed';
+                saveTasksToStorage(selectedBranch, tasks);
+                loadBranchDetails(selectedBranch);
+            }
+        }
 
         function goBack() {
             window.location.href = 'wu-tree-main.html';
         }
 
-        function toggleTask(card) {
-            const indicator = card.querySelector('.task-indicator');
-            const meta = card.querySelector('.task-meta');
-            
-            if (indicator.classList.contains('flower')) {
-                indicator.classList.remove('flower');
-                indicator.classList.add('bud');
-                indicator.innerHTML = '🌱';
-                meta.textContent = 'En cours';
-            } else {
-                indicator.className = 'task-indicator flower';
-                indicator.innerHTML = '🌸';
-                meta.textContent = 'Complété à l\'instant';
-            }
-        }
-
         function addTask() {
-            alert('Ajouter une nouvelle tâche\n(Fonctionnalité à venir)');
+            // Formulaire simple pour ajouter une tâche
+            const title = prompt('Nom de l\'objectif :');
+            if (!title || !title.trim()) return;
+
+            const period = prompt('Période ?\n\n1 = Aujourd\'hui\n2 = Cette semaine\n3 = Ce mois\n4 = 3-6 mois\n5 = 1 an+\n\nTapez le numéro :');
+            
+            const periodMap = {
+                '1': 'today',
+                '2': 'week',
+                '3': 'month',
+                '4': 'quarter',
+                '5': 'year'
+            };
+
+            const selectedPeriod = periodMap[period] || 'today';
+
+            const priority = confirm('Est-ce prioritaire ?') ? 'high' : 'normal';
+
+            // Créer la nouvelle tâche
+            const newTask = {
+                id: Date.now(),
+                title: title.trim(),
+                period: selectedPeriod,
+                priority: priority,
+                status: 'ongoing',
+                createdAt: new Date().toISOString()
+            };
+
+            // Sauvegarder
+            const tasks = loadTasksFromStorage(selectedBranch);
+            tasks.push(newTask);
+            saveTasksToStorage(selectedBranch, tasks);
+
+            // Recharger l'affichage
+            loadBranchDetails(selectedBranch);
         }
     </script>
 </body>
