@@ -311,6 +311,105 @@
     </div>
 
     <script>
+        // Données des emojis par ID
+        const branchEmojis = {
+            business: '💼',
+            music: '🎵',
+            culture: '📚',
+            fitness: '💪',
+            creativity: '🎨',
+            relationships: '❤️',
+            finance: '💰',
+            learning: '🎓',
+            travel: '✈️',
+            spirituality: '🕉️'
+        };
+
+        const branchLabels = {
+            business: 'Business',
+            music: 'Musique',
+            culture: 'Culture',
+            fitness: 'Fitness',
+            creativity: 'Créativité',
+            relationships: 'Relations',
+            finance: 'Finances',
+            learning: 'Apprentissage',
+            travel: 'Voyages',
+            spirituality: 'Spiritualité'
+        };
+
+        const rootEmojis = {
+            affirmations: '✨',
+            yoga: '🧘',
+            sport: '💪',
+            meditation: '🧘‍♂️',
+            sleep: '😴',
+            nutrition: '🥗',
+            gratitude: '🙏',
+            nature: '🌳',
+            reading: '📖',
+            breathwork: '🌬️'
+        };
+
+        const rootLabels = {
+            affirmations: 'Affirmations',
+            yoga: 'Yoga',
+            sport: 'Sport',
+            meditation: 'Méditation',
+            sleep: 'Sommeil',
+            nutrition: 'Nutrition',
+            gratitude: 'Gratitude',
+            nature: 'Nature',
+            reading: 'Lecture',
+            breathwork: 'Respiration'
+        };
+
+        // Charger la configuration ou rediriger vers onboarding
+        let config = localStorage.getItem('wutree_config');
+        
+        if (!config) {
+            // Pas de config = première utilisation → onboarding
+            window.location.href = 'wu-tree-onboarding.html';
+        } else {
+            config = JSON.parse(config);
+            loadUserInterface(config);
+        }
+
+        function loadUserInterface(config) {
+            const branchesSection = document.querySelector('.branches-section');
+            const rootsSection = document.querySelector('.roots-section');
+
+            // Clear les cercles par défaut
+            branchesSection.innerHTML = '';
+            rootsSection.innerHTML = '';
+
+            // Créer les cercles pour les branches sélectionnées
+            config.branches.forEach((branchId, index) => {
+                const circle = document.createElement('div');
+                circle.className = 'circle-button branch-circle';
+                circle.style.animationDelay = `${index * 1.3}s`;
+                circle.onclick = () => openBranch(branchId);
+                circle.innerHTML = `
+                    ${branchEmojis[branchId] || '🌿'}
+                    <div class="circle-label">${branchLabels[branchId] || branchId}</div>
+                `;
+                branchesSection.appendChild(circle);
+            });
+
+            // Créer les cercles pour les racines sélectionnées
+            config.roots.forEach((rootId, index) => {
+                const circle = document.createElement('div');
+                circle.className = 'circle-button root-circle';
+                circle.style.animationDelay = `${index}s`;
+                circle.onclick = () => openRoot(rootId);
+                circle.innerHTML = `
+                    ${rootEmojis[rootId] || '🌱'}
+                    <div class="circle-label">${rootLabels[rootId] || rootId}</div>
+                `;
+                rootsSection.appendChild(circle);
+            });
+        }
+
         function openBranch(branchName) {
             localStorage.setItem('selectedBranch', branchName);
             window.location.href = 'wu-tree-branch-detail.html';
@@ -321,6 +420,21 @@
             // Plus tard on pourra créer un écran spécifique pour les racines
             alert(`Section Bien-être : ${rootName}\n(Fonctionnalité à venir)`);
         }
+
+        // Option pour réinitialiser (longue pression sur le titre par exemple)
+        let pressTimer;
+        document.querySelector('.app-title').addEventListener('mousedown', function() {
+            pressTimer = setTimeout(() => {
+                if (confirm('Réinitialiser la configuration ?')) {
+                    localStorage.removeItem('wutree_config');
+                    window.location.href = 'wu-tree-onboarding.html';
+                }
+            }, 2000);
+        });
+        
+        document.querySelector('.app-title').addEventListener('mouseup', function() {
+            clearTimeout(pressTimer);
+        });
     </script>
 </body>
 </html>
