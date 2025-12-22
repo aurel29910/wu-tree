@@ -282,9 +282,9 @@
                         <div class="emoji">📚</div>
                         <div class="label">Culture</div>
                     </div>
-                    <div class="selection-card" data-id="fitness" onclick="toggleSelection('branch', 'fitness')">
+                    <div class="selection-card" data-id="sport" onclick="toggleSelection('branch', 'sport')">
                         <div class="emoji">💪</div>
-                        <div class="label">Fitness</div>
+                        <div class="label">Sport</div>
                     </div>
                     <div class="selection-card" data-id="creativity" onclick="toggleSelection('branch', 'creativity')">
                         <div class="emoji">🎨</div>
@@ -470,12 +470,22 @@
         }
 
         function saveConfiguration() {
+            const currentUser = JSON.parse(localStorage.getItem('wutree_current_user') || 'null');
+            
             const config = {
                 branches: selectedBranches,
                 roots: selectedRoots,
                 createdAt: new Date().toISOString()
             };
+            
+            // Sauvegarder la config globale
             localStorage.setItem('wutree_config', JSON.stringify(config));
+            
+            // Sauvegarder aussi la config pour cet utilisateur spécifiquement si connecté
+            if (currentUser) {
+                localStorage.setItem(`wutree_config_${currentUser.id}`, JSON.stringify(config));
+            }
+            
             console.log('Configuration sauvegardée:', config);
         }
 
