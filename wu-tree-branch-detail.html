@@ -403,12 +403,25 @@
             card.className = 'task-card';
             card.onclick = () => toggleTaskStatus(task.id);
 
-            const indicatorClass = task.status === 'completed' ? 'flower' : 
-                                   task.priority === 'high' ? 'bud-priority' : 'bud';
-            const emoji = task.status === 'completed' ? '🌸' : 
-                         task.priority === 'high' ? '🟡' : '🌱';
-            const meta = task.status === 'completed' ? 'Complété' : 
-                        task.priority === 'high' ? 'Prioritaire' : 'En cours';
+            let indicatorClass, emoji, meta;
+            
+            if (task.status === 'completed') {
+                indicatorClass = 'flower';
+                emoji = '🌸';
+                meta = 'Complété';
+            } else if (task.priority === 'high') {
+                indicatorClass = 'bud-priority';
+                emoji = '🔴';
+                meta = 'Vital - Prioritaire';
+            } else if (task.priority === 'medium') {
+                indicatorClass = 'bud-priority';
+                emoji = '🟡';
+                meta = 'Important';
+            } else {
+                indicatorClass = 'bud';
+                emoji = '🌱';
+                meta = 'En cours';
+            }
 
             card.innerHTML = `
                 <div class="task-indicator ${indicatorClass}">${emoji}</div>
@@ -441,7 +454,7 @@
             const title = prompt('Nom de l\'objectif :');
             if (!title || !title.trim()) return;
 
-            const period = prompt('Période ?\n\n1 = Aujourd\'hui\n2 = Cette semaine\n3 = Ce mois\n4 = 3-6 mois\n5 = 1 an+\n\nTapez le numéro :');
+            const periodChoice = prompt('Période ?\n\n1 = Aujourd\'hui\n2 = Cette semaine\n3 = Ce mois\n4 = 3-6 mois\n5 = 1 an+\n\nTapez le numéro :');
             
             const periodMap = {
                 '1': 'today',
@@ -451,9 +464,17 @@
                 '5': 'year'
             };
 
-            const selectedPeriod = periodMap[period] || 'today';
+            const selectedPeriod = periodMap[periodChoice] || 'today';
 
-            const priority = confirm('Est-ce prioritaire ?') ? 'high' : 'normal';
+            const priorityChoice = prompt('Priorité ?\n\n1 = Normal\n2 = Important\n3 = Vital (prioritaire)\n\nTapez le numéro :');
+            
+            const priorityMap = {
+                '1': 'normal',
+                '2': 'medium',
+                '3': 'high'
+            };
+
+            const priority = priorityMap[priorityChoice] || 'normal';
 
             // Créer la nouvelle tâche
             const newTask = {
