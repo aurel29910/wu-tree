@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wu Tree</title>
+    <title>Wu Tree - Bienvenue</title>
     <style>
         * {
             margin: 0;
@@ -18,7 +18,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
         }
 
         .phone-frame {
@@ -27,161 +26,102 @@
             background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
             border-radius: 40px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-            position: relative;
             overflow: hidden;
-        }
-
-        .status-bar {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 44px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 20px;
-            color: rgba(255,255,255,0.95);
-            font-size: 14px;
-            font-weight: 500;
-            z-index: 100;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .app-content {
             position: relative;
-            height: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 40px;
         }
 
-        .app-title {
-            color: rgba(255,255,255,0.98);
-            font-size: 36px;
-            font-weight: 300;
-            letter-spacing: 5px;
-            margin-bottom: 8px;
-            text-shadow: 0 3px 10px rgba(0,0,0,0.3);
-            animation: fadeIn 1s ease;
+        .logo {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .subtitle {
-            color: rgba(255,255,255,0.85);
-            font-size: 14px;
-            font-weight: 300;
-            letter-spacing: 2px;
-            margin-bottom: 60px;
-            text-shadow: 0 2px 6px rgba(0,0,0,0.2);
-            animation: fadeIn 1.2s ease;
-        }
-
-        /* Section branches */
-        .branches-section {
-            display: flex;
-            gap: 40px;
-            margin-bottom: 80px;
-            animation: fadeIn 1.4s ease;
-        }
-
-        /* Section racines */
-        .roots-section {
-            display: flex;
-            gap: 40px;
-            animation: fadeIn 1.6s ease;
-        }
-
-        .circle-button {
-            width: 72px;
-            height: 72px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(15px);
-            border: 2px solid rgba(255,255,255,0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            cursor: pointer;
-            transition: all 0.4s ease;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-            position: relative;
-        }
-
-        .circle-button:hover {
-            transform: translateY(-8px) scale(1.05);
-            background: rgba(255, 255, 255, 0.35);
-            box-shadow: 0 12px 35px rgba(0,0,0,0.25);
-        }
-
-        .circle-button:active {
-            transform: translateY(-4px) scale(1.02);
-        }
-
-        /* Animation de flottement pour les branches */
-        .branch-circle {
-            animation: float 4s ease-in-out infinite;
-        }
-
-        .branch-circle:nth-child(1) { animation-delay: 0s; }
-        .branch-circle:nth-child(2) { animation-delay: 1.3s; }
-        .branch-circle:nth-child(3) { animation-delay: 2.6s; }
 
         @keyframes float {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-12px); }
+            50% { transform: translateY(-15px); }
         }
 
-        /* Animation de pulsation pour les racines */
-        .root-circle {
-            animation: pulse 3s ease-in-out infinite;
+        .bonsai-svg {
+            filter: drop-shadow(0 4px 15px rgba(0,0,0,0.2));
         }
 
-        .root-circle:nth-child(1) { animation-delay: 0s; }
-        .root-circle:nth-child(2) { animation-delay: 1s; }
-        .root-circle:nth-child(3) { animation-delay: 2s; }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.08); }
+        .app-title {
+            color: white;
+            font-size: 48px;
+            font-weight: 300;
+            letter-spacing: 8px;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
 
-        /* Label sous les cercles */
-        .circle-label {
-            position: absolute;
-            bottom: -28px;
-            left: 50%;
-            transform: translateX(-50%);
+        .tagline {
             color: rgba(255,255,255,0.9);
-            font-size: 11px;
-            font-weight: 500;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            white-space: nowrap;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            font-size: 16px;
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 80px;
+            text-align: center;
+            line-height: 1.6;
         }
 
-        .circle-button:hover .circle-label {
-            opacity: 1;
+        .buttons {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
-        /* Séparateur visuel */
-        .divider {
-            width: 200px;
-            height: 2px;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.4), transparent);
-            margin: 40px 0;
-            animation: fadeIn 1.5s ease;
+        .btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 14px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
         }
 
-        /* Pétales qui tombent */
+        .btn-primary {
+            background: linear-gradient(135deg, #FF69B4, #FF1493);
+            color: white;
+            box-shadow: 0 6px 25px rgba(255,105,180,0.4);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.97);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.25);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.4);
+        }
+
+        .btn-secondary:active {
+            transform: scale(0.97);
+            background: rgba(255,255,255,0.35);
+        }
+
+        .petal {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: linear-gradient(135deg, rgba(255, 182, 193, 0.6) 0%, rgba(255, 105, 180, 0.4) 100%);
+            border-radius: 50% 0 50% 0;
+            animation: fall linear infinite;
+            pointer-events: none;
+        }
+
         @keyframes fall {
             0% {
                 transform: translateY(-50px) rotate(0deg);
@@ -193,247 +133,158 @@
             }
         }
 
-        .petal {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background: linear-gradient(135deg, rgba(255, 182, 193, 0.8) 0%, rgba(255, 105, 180, 0.6) 100%);
-            border-radius: 50% 0 50% 0;
-            animation: fall linear infinite;
-            pointer-events: none;
-            z-index: 50;
-        }
-
-        .petal:nth-child(1) { left: 10%; animation-duration: 12s; animation-delay: 0s; width: 8px; height: 8px; }
-        .petal:nth-child(2) { left: 20%; animation-duration: 14s; animation-delay: 2s; width: 10px; height: 10px; }
-        .petal:nth-child(3) { left: 30%; animation-duration: 16s; animation-delay: 4s; width: 9px; height: 9px; }
-        .petal:nth-child(4) { left: 40%; animation-duration: 13s; animation-delay: 1s; width: 11px; height: 11px; }
-        .petal:nth-child(5) { left: 50%; animation-duration: 15s; animation-delay: 3s; width: 8px; height: 8px; }
-        .petal:nth-child(6) { left: 60%; animation-duration: 17s; animation-delay: 5s; width: 10px; height: 10px; }
-        .petal:nth-child(7) { left: 70%; animation-duration: 14s; animation-delay: 6s; width: 9px; height: 9px; }
-        .petal:nth-child(8) { left: 80%; animation-duration: 16s; animation-delay: 7s; width: 11px; height: 11px; }
-        .petal:nth-child(9) { left: 90%; animation-duration: 13s; animation-delay: 8s; width: 8px; height: 8px; }
-        .petal:nth-child(10) { left: 15%; animation-duration: 15s; animation-delay: 9s; width: 10px; height: 10px; }
-
-        /* Citation Wu Wei */
-        .quote {
-            position: absolute;
-            bottom: 35px;
-            left: 50%;
-            transform: translateX(-50%);
-            text-align: center;
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 12px;
-            font-style: italic;
-            font-weight: 300;
-            padding: 0 30px;
-            line-height: 1.5;
-            z-index: 40;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            max-width: 85%;
-            animation: fadeIn 2s ease;
-        }
-
-        .section-title {
-            color: rgba(255,255,255,0.8);
-            font-size: 12px;
-            font-weight: 500;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 25px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
+        .petal:nth-child(1) { left: 15%; animation-duration: 14s; animation-delay: 0s; }
+        .petal:nth-child(2) { left: 35%; animation-duration: 16s; animation-delay: 2s; }
+        .petal:nth-child(3) { left: 55%; animation-duration: 18s; animation-delay: 4s; }
+        .petal:nth-child(4) { left: 75%; animation-duration: 15s; animation-delay: 1s; }
+        .petal:nth-child(5) { left: 25%; animation-duration: 17s; animation-delay: 3s; }
     </style>
 </head>
 <body>
     <div class="phone-frame">
-        <!-- Pétales qui tombent -->
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
         <div class="petal"></div>
         <div class="petal"></div>
         <div class="petal"></div>
         <div class="petal"></div>
         <div class="petal"></div>
 
-        <div class="status-bar">
-            <span>9:41</span>
-            <span>📶 🔋</span>
+        <div class="logo">
+            <svg class="bonsai-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <!-- Pot -->
+                <rect x="70" y="160" width="60" height="25" rx="3" fill="#8B6F47" opacity="0.8"/>
+                <rect x="65" y="185" width="70" height="10" rx="2" fill="#6B5639" opacity="0.8"/>
+                
+                <!-- Tronc principal VRAIMENT tortueux -->
+                <path d="M 100 160 
+                         C 95 150, 92 145, 88 135
+                         C 84 125, 85 115, 92 105
+                         C 99 95, 105 90, 102 80
+                         C 99 70, 92 65, 95 55
+                         C 98 45, 105 42, 108 35" 
+                      stroke="#5D4E37" 
+                      stroke-width="9" 
+                      fill="none" 
+                      stroke-linecap="round"
+                      stroke-linejoin="round"/>
+                
+                <!-- Épaississement base du tronc -->
+                <path d="M 100 160 
+                         C 97 155, 95 152, 92 148" 
+                      stroke="#5D4E37" 
+                      stroke-width="12" 
+                      fill="none" 
+                      stroke-linecap="round"
+                      opacity="0.6"/>
+                
+                <!-- Branche gauche tortueuse -->
+                <path d="M 88 130 
+                         C 78 128, 68 125, 58 120
+                         C 52 117, 48 115, 45 112" 
+                      stroke="#5D4E37" 
+                      stroke-width="5" 
+                      fill="none" 
+                      stroke-linecap="round"/>
+                
+                <!-- Branche droite qui part vers le haut -->
+                <path d="M 98 100 
+                         C 108 98, 118 95, 128 90
+                         C 135 87, 140 85, 145 82" 
+                      stroke="#5D4E37" 
+                      stroke-width="5" 
+                      fill="none" 
+                      stroke-linecap="round"/>
+                
+                <!-- Petite branche gauche haute -->
+                <path d="M 95 70 
+                         C 88 68, 80 66, 72 62
+                         C 68 60, 65 58, 62 56" 
+                      stroke="#5D4E37" 
+                      stroke-width="4" 
+                      fill="none" 
+                      stroke-linecap="round"/>
+                
+                <!-- Branche sommet qui penche -->
+                <path d="M 105 45 
+                         C 110 42, 115 40, 120 38" 
+                      stroke="#5D4E37" 
+                      stroke-width="3" 
+                      fill="none" 
+                      stroke-linecap="round"/>
+                
+                <!-- Feuillage (masses de feuilles vertes organiques) -->
+                
+                <!-- Masse gauche basse -->
+                <ellipse cx="45" cy="112" rx="20" ry="22" fill="#7CB342" opacity="0.7" transform="rotate(-15 45 112)"/>
+                <ellipse cx="50" cy="118" rx="22" ry="20" fill="#8BC34A" opacity="0.75"/>
+                <ellipse cx="42" cy="120" rx="18" ry="19" fill="#9CCC65" opacity="0.85"/>
+                <ellipse cx="48" cy="115" rx="16" ry="17" fill="#AED581" opacity="0.9"/>
+                
+                <!-- Masse droite haute -->
+                <ellipse cx="145" cy="82" rx="22" ry="24" fill="#7CB342" opacity="0.7" transform="rotate(20 145 82)"/>
+                <ellipse cx="138" cy="86" rx="24" ry="22" fill="#8BC34A" opacity="0.75"/>
+                <ellipse cx="143" cy="89" rx="20" ry="21" fill="#9CCC65" opacity="0.85"/>
+                <ellipse cx="140" cy="84" rx="18" ry="19" fill="#AED581" opacity="0.9"/>
+                
+                <!-- Masse sommet (la plus grosse) -->
+                <ellipse cx="108" cy="35" rx="26" ry="28" fill="#7CB342" opacity="0.7" transform="rotate(10 108 35)"/>
+                <ellipse cx="112" cy="40" rx="28" ry="26" fill="#8BC34A" opacity="0.75"/>
+                <ellipse cx="106" cy="38" rx="24" ry="25" fill="#9CCC65" opacity="0.85"/>
+                <ellipse cx="110" cy="36" rx="22" ry="23" fill="#AED581" opacity="0.9"/>
+                <ellipse cx="115" cy="42" rx="20" ry="21" fill="#C5E1A5" opacity="0.95"/>
+                
+                <!-- Petite masse gauche haute -->
+                <ellipse cx="62" cy="56" rx="15" ry="17" fill="#7CB342" opacity="0.7" transform="rotate(-25 62 56)"/>
+                <ellipse cx="66" cy="60" rx="16" ry="15" fill="#8BC34A" opacity="0.8"/>
+                <ellipse cx="63" cy="58" rx="13" ry="14" fill="#9CCC65" opacity="0.9"/>
+                
+                <!-- Détails et texture sur le tronc tortueux -->
+                <path d="M 96 155 C 94 150, 92 148, 90 143" 
+                      stroke="#4A3829" 
+                      stroke-width="1.5" 
+                      fill="none" 
+                      opacity="0.4"/>
+                <path d="M 91 138 C 89 133, 90 128, 93 123" 
+                      stroke="#4A3829" 
+                      stroke-width="1.5" 
+                      fill="none" 
+                      opacity="0.4"/>
+                <path d="M 100 110 C 103 105, 104 100, 102 95" 
+                      stroke="#4A3829" 
+                      stroke-width="1.5" 
+                      fill="none" 
+                      opacity="0.4"/>
+                <path d="M 98 82 C 95 77, 93 72, 95 67" 
+                      stroke="#4A3829" 
+                      stroke-width="1.5" 
+                      fill="none" 
+                      opacity="0.4"/>
+            </svg>
         </div>
+        <h1 class="app-title">WU TREE</h1>
+        <p class="tagline">Croissance sans effort<br>Organisation en harmonie</p>
 
-        <div class="app-content">
-            <h1 class="app-title">WU TREE</h1>
-            <p class="subtitle">Croissance sans effort</p>
-
-            <!-- BRANCHES (Objectifs) -->
-            <div class="section-title">Objectifs</div>
-            <div class="branches-section">
-                <div class="circle-button branch-circle" onclick="openBranch('business')">
-                    💼
-                    <div class="circle-label">Business</div>
-                </div>
-                <div class="circle-button branch-circle" onclick="openBranch('music')">
-                    🎵
-                    <div class="circle-label">Musique</div>
-                </div>
-                <div class="circle-button branch-circle" onclick="openBranch('culture')">
-                    📚
-                    <div class="circle-label">Culture</div>
-                </div>
-            </div>
-
-            <div class="divider"></div>
-
-            <!-- RACINES (Bien-être) -->
-            <div class="section-title">Bien-être</div>
-            <div class="roots-section">
-                <div class="circle-button root-circle" onclick="openRoot('affirmations')">
-                    ✨
-                    <div class="circle-label">Affirmations</div>
-                </div>
-                <div class="circle-button root-circle" onclick="openRoot('yoga')">
-                    🧘
-                    <div class="circle-label">Yoga</div>
-                </div>
-                <div class="circle-button root-circle" onclick="openRoot('sport')">
-                    💪
-                    <div class="circle-label">Sport</div>
-                </div>
-            </div>
-
-            <div class="quote">
-                "L'arbre qui plie ne rompt pas.<br>Ton bonsaï grandit à son rythme."
-            </div>
+        <div class="buttons">
+            <button class="btn btn-primary" onclick="goToSignup()">Créer un compte</button>
+            <button class="btn btn-secondary" onclick="goToLogin()">Se connecter</button>
         </div>
     </div>
 
     <script>
-        // Données des emojis par ID
-        const branchEmojis = {
-            business: '💼',
-            music: '🎵',
-            culture: '📚',
-            fitness: '💪',
-            creativity: '🎨',
-            relationships: '❤️',
-            finance: '💰',
-            learning: '🎓',
-            travel: '✈️',
-            spirituality: '🕉️'
-        };
-
-        const branchLabels = {
-            business: 'Business',
-            music: 'Musique',
-            culture: 'Culture',
-            fitness: 'Fitness',
-            creativity: 'Créativité',
-            relationships: 'Relations',
-            finance: 'Finances',
-            learning: 'Apprentissage',
-            travel: 'Voyages',
-            spirituality: 'Spiritualité'
-        };
-
-        const rootEmojis = {
-            affirmations: '✨',
-            yoga: '🧘',
-            sport: '💪',
-            meditation: '🧘‍♂️',
-            sleep: '😴',
-            nutrition: '🥗',
-            gratitude: '🙏',
-            nature: '🌳',
-            reading: '📖',
-            breathwork: '🌬️'
-        };
-
-        const rootLabels = {
-            affirmations: 'Affirmations',
-            yoga: 'Yoga',
-            sport: 'Sport',
-            meditation: 'Méditation',
-            sleep: 'Sommeil',
-            nutrition: 'Nutrition',
-            gratitude: 'Gratitude',
-            nature: 'Nature',
-            reading: 'Lecture',
-            breathwork: 'Respiration'
-        };
-
-        // Charger la configuration ou rediriger vers onboarding
-        let config = localStorage.getItem('wutree_config');
+        // Vérifier si l'utilisateur est déjà connecté
+        const currentUser = localStorage.getItem('wutree_current_user');
         
-        if (!config) {
-            // Pas de config = première utilisation → onboarding
-            window.location.href = 'wu-tree-onboarding.html';
-        } else {
-            config = JSON.parse(config);
-            loadUserInterface(config);
+        if (currentUser) {
+            // Déjà connecté, aller directement à l'app
+            window.location.href = 'wu-tree-main.html';
         }
 
-        function loadUserInterface(config) {
-            const branchesSection = document.querySelector('.branches-section');
-            const rootsSection = document.querySelector('.roots-section');
-
-            // Clear les cercles par défaut
-            branchesSection.innerHTML = '';
-            rootsSection.innerHTML = '';
-
-            // Créer les cercles pour les branches sélectionnées
-            config.branches.forEach((branchId, index) => {
-                const circle = document.createElement('div');
-                circle.className = 'circle-button branch-circle';
-                circle.style.animationDelay = `${index * 1.3}s`;
-                circle.onclick = () => openBranch(branchId);
-                circle.innerHTML = `
-                    ${branchEmojis[branchId] || '🌿'}
-                    <div class="circle-label">${branchLabels[branchId] || branchId}</div>
-                `;
-                branchesSection.appendChild(circle);
-            });
-
-            // Créer les cercles pour les racines sélectionnées
-            config.roots.forEach((rootId, index) => {
-                const circle = document.createElement('div');
-                circle.className = 'circle-button root-circle';
-                circle.style.animationDelay = `${index}s`;
-                circle.onclick = () => openRoot(rootId);
-                circle.innerHTML = `
-                    ${rootEmojis[rootId] || '🌱'}
-                    <div class="circle-label">${rootLabels[rootId] || rootId}</div>
-                `;
-                rootsSection.appendChild(circle);
-            });
+        function goToSignup() {
+            window.location.href = 'wu-tree-signup.html';
         }
 
-        function openBranch(branchName) {
-            localStorage.setItem('selectedBranch', branchName);
-            window.location.href = 'wu-tree-branch-detail.html';
+        function goToLogin() {
+            window.location.href = 'wu-tree-login.html';
         }
-
-        function openRoot(rootName) {
-            localStorage.setItem('selectedRoot', rootName);
-            window.location.href = 'wu-tree-root-detail.html';
-        }
-
-        // Option pour réinitialiser (longue pression sur le titre par exemple)
-        let pressTimer;
-        document.querySelector('.app-title').addEventListener('mousedown', function() {
-            pressTimer = setTimeout(() => {
-                if (confirm('Réinitialiser la configuration ?')) {
-                    localStorage.removeItem('wutree_config');
-                    window.location.href = 'wu-tree-onboarding.html';
-                }
-            }, 2000);
-        });
-        
-        document.querySelector('.app-title').addEventListener('mouseup', function() {
-            clearTimeout(pressTimer);
-        });
     </script>
 </body>
 </html>
