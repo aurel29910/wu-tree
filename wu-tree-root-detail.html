@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wu Tree - Bien-être</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(180deg, #B4E1D4 0%, #F5C5D4 100%);
+            min-height: 100vh;
+        }
+
+        .phone-frame {
+            width: 375px;
+            height: 812px;
+            margin: 20px auto;
+            background: linear-gradient(180deg, #B4E1D4 0%, #F5C5D4 100%);
+            border-radius: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .status-bar {
+            height: 44px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: rgba(255,255,255,0.95);
+            font-size: 14px;
+            font-weight: 500;
+            background: rgba(0,0,0,0.1);
+        }
+
+        .header {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+        }
+
+        .back-button {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:active {
+            transform: scale(0.9);
+            background: rgba(255,255,255,0.4);
+        }
+
+        .header-title {
+            flex: 1;
+        }
+
+        .root-name {
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .root-subtitle {
+            color: rgba(255,255,255,0.8);
+            font-size: 13px;
+            margin-top: 2px;
+        }
+
+        .content {
+            height: calc(100% - 44px - 80px);
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .time-section {
+            margin-bottom: 30px;
+        }
+
+        .time-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 0 5px;
+        }
+
+        .time-title {
+            color: rgba(255,255,255,0.95);
+            font-size: 16px;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .time-count {
+            color: rgba(255,255,255,0.7);
+            font-size: 13px;
+        }
+
+        .task-card {
+            background: rgba(255,255,255,0.25);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1.5px solid rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .task-card:active {
+            transform: scale(0.98);
+            background: rgba(255,255,255,0.35);
+        }
+
+        .task-indicator {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .task-indicator.flower {
+            background: radial-gradient(circle, #ffffff 0%, #FFB6C1 100%);
+            box-shadow: 0 2px 8px rgba(255,182,193,0.4);
+        }
+
+        .task-indicator.bud {
+            background: radial-gradient(circle, #90EE90 0%, #3CB371 100%);
+            box-shadow: 0 2px 8px rgba(144,238,144,0.4);
+        }
+
+        .task-indicator.bud-priority {
+            background: radial-gradient(circle, #FFD700 0%, #FFA500 100%);
+            box-shadow: 0 2px 8px rgba(255,215,0,0.5);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .task-content {
+            flex: 1;
+        }
+
+        .task-title {
+            color: white;
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 3px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .task-meta {
+            color: rgba(255,255,255,0.7);
+            font-size: 12px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(255,255,255,0.6);
+            font-size: 14px;
+        }
+
+        .add-button {
+            position: fixed;
+            bottom: 30px;
+            right: calc(50% - 167px);
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #90EE90 0%, #3CB371 100%);
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(60,179,113,0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .add-button:active {
+            transform: scale(0.9);
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .petal {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: rgba(144, 238, 144, 0.6);
+            border-radius: 50% 0 50% 0;
+            animation: fall linear infinite;
+            pointer-events: none;
+        }
+
+        .petal:nth-child(1) { left: 10%; animation-duration: 12s; animation-delay: 0s; }
+        .petal:nth-child(2) { left: 30%; animation-duration: 14s; animation-delay: 2s; }
+        .petal:nth-child(3) { left: 50%; animation-duration: 16s; animation-delay: 4s; }
+        .petal:nth-child(4) { left: 70%; animation-duration: 13s; animation-delay: 1s; }
+        .petal:nth-child(5) { left: 90%; animation-duration: 15s; animation-delay: 3s; }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+
+        <div class="status-bar">
+            <span>9:41</span>
+            <span>📶 🔋</span>
+        </div>
+
+        <div class="header">
+            <button class="back-button" onclick="goBack()">←</button>
+            <div class="header-title">
+                <div class="root-name" id="rootName">🌱 Bien-être</div>
+                <div class="root-subtitle" id="rootSubtitle">Chargement...</div>
+            </div>
+        </div>
+
+        <div class="content" id="content">
+            <!-- Les tâches seront chargées dynamiquement -->
+        </div>
+
+        <button class="add-button" onclick="addTask()">+</button>
+    </div>
+
+    <script>
+        const rootEmojis = {
+            affirmations: '✨',
+            yoga: '🧘',
+            sport: '💪',
+            meditation: '🧘‍♂️',
+            sleep: '😴',
+            nutrition: '🥗',
+            gratitude: '🙏',
+            nature: '🌳',
+            reading: '📖',
+            breathwork: '🌬️'
+        };
+
+        const rootLabels = {
+            affirmations: 'Affirmations positives',
+            yoga: 'Yoga',
+            sport: 'Sport',
+            meditation: 'Méditation',
+            sleep: 'Sommeil',
+            nutrition: 'Nutrition',
+            gratitude: 'Gratitude',
+            nature: 'Nature',
+            reading: 'Lecture',
+            breathwork: 'Respiration'
+        };
+
+        // Exemples de tâches par racine
+        const defaultRootTasks = {
+            affirmations: {
+                today: [
+                    { title: '5 affirmations du matin', status: 'ongoing' }
+                ],
+                week: [
+                    { title: 'Journal de gratitude quotidien', status: 'completed' }
+                ]
+            },
+            yoga: {
+                today: [
+                    { title: 'Session yoga 20 min', status: 'completed' },
+                    { title: 'Étirements du soir', status: 'ongoing' }
+                ],
+                week: [
+                    { title: '3 sessions cette semaine', status: 'ongoing' }
+                ]
+            },
+            sport: {
+                today: [
+                    { title: 'Marche 30 minutes', status: 'ongoing' }
+                ],
+                week: [
+                    { title: 'Physiothérapie main', status: 'completed' },
+                    { title: '3 sessions cardio', status: 'ongoing' }
+                ]
+            },
+            meditation: {
+                today: [
+                    { title: 'Méditation 15 min matin', status: 'completed' }
+                ],
+                week: [
+                    { title: 'Méditation guidée quotidienne', status: 'ongoing' }
+                ]
+            },
+            gratitude: {
+                today: [
+                    { title: 'Noter 3 gratitudes', status: 'ongoing' }
+                ],
+                week: [
+                    { title: 'Appeler un proche pour remercier', status: 'ongoing' }
+                ]
+            }
+        };
+
+        // Charger la racine sélectionnée
+        const selectedRoot = localStorage.getItem('selectedRoot');
+        
+        if (!selectedRoot) {
+            window.location.href = 'wu-tree-main.html';
+        } else {
+            loadRootDetails(selectedRoot);
+        }
+
+        function loadRootDetails(rootId) {
+            // Mettre à jour le header
+            document.getElementById('rootName').textContent = 
+                `${rootEmojis[rootId] || '🌱'} ${rootLabels[rootId] || rootId}`;
+            
+            // Charger les tâches (depuis defaultRootTasks pour l'instant)
+            const tasks = defaultRootTasks[rootId] || { today: [], week: [] };
+            renderTasks(tasks);
+        }
+
+        function renderTasks(tasks) {
+            const content = document.getElementById('content');
+            content.innerHTML = '';
+
+            // Aujourd'hui
+            if (tasks.today && tasks.today.length > 0) {
+                const section = createTimeSection('🌅 Aujourd\'hui', tasks.today);
+                content.appendChild(section);
+            }
+
+            // Cette semaine
+            if (tasks.week && tasks.week.length > 0) {
+                const section = createTimeSection('📅 Cette semaine', tasks.week);
+                content.appendChild(section);
+            }
+
+            // Si aucune tâche
+            if ((!tasks.today || tasks.today.length === 0) && 
+                (!tasks.week || tasks.week.length === 0)) {
+                content.innerHTML = '<div class="empty-state">Aucune pratique pour le moment.<br>Appuyez sur + pour ajouter.</div>';
+            }
+        }
+
+        function createTimeSection(title, tasksList) {
+            const section = document.createElement('div');
+            section.className = 'time-section';
+
+            const completed = tasksList.filter(t => t.status === 'completed').length;
+            
+            section.innerHTML = `
+                <div class="time-header">
+                    <div class="time-title">${title}</div>
+                    <div class="time-count">${completed}/${tasksList.length}</div>
+                </div>
+            `;
+
+            tasksList.forEach((task, index) => {
+                const card = createTaskCard(task, index);
+                section.appendChild(card);
+            });
+
+            return section;
+        }
+
+        function createTaskCard(task, index) {
+            const card = document.createElement('div');
+            card.className = 'task-card';
+            card.onclick = () => toggleTaskStatus(card);
+
+            const indicatorClass = task.status === 'completed' ? 'flower' : 
+                                   task.status === 'priority' ? 'bud-priority' : 'bud';
+            const emoji = task.status === 'completed' ? '🌸' : 
+                         task.status === 'priority' ? '🟡' : '🌱';
+            const meta = task.status === 'completed' ? 'Complété' : 'En cours';
+
+            card.innerHTML = `
+                <div class="task-indicator ${indicatorClass}">${emoji}</div>
+                <div class="task-content">
+                    <div class="task-title">${task.title}</div>
+                    <div class="task-meta">${meta}</div>
+                </div>
+            `;
+
+            return card;
+        }
+
+        function toggleTaskStatus(card) {
+            const indicator = card.querySelector('.task-indicator');
+            const meta = card.querySelector('.task-meta');
+            
+            if (indicator.classList.contains('flower')) {
+                indicator.classList.remove('flower');
+                indicator.classList.add('bud');
+                indicator.textContent = '🌱';
+                meta.textContent = 'En cours';
+            } else {
+                indicator.className = 'task-indicator flower';
+                indicator.textContent = '🌸';
+                meta.textContent = 'Complété à l\'instant';
+            }
+        }
+
+        function goBack() {
+            window.location.href = 'wu-tree-main.html';
+        }
+
+        function addTask() {
+            const taskName = prompt('Nouvelle pratique bien-être :');
+            if (taskName && taskName.trim()) {
+                alert('Fonctionnalité en cours de développement.\nBientôt tu pourras ajouter tes propres pratiques !');
+            }
+        }
+    </script>
+</body>
+</html>
