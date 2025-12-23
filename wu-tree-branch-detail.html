@@ -116,6 +116,31 @@
             font-size: 13px;
         }
 
+        .priority-indicator {
+            position: absolute;
+            left: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 60%;
+            border-radius: 2px;
+        }
+
+        .priority-high {
+            background: linear-gradient(180deg, #FF4444, #CC0000);
+            box-shadow: 0 0 8px rgba(255,68,68,0.5);
+        }
+
+        .priority-medium {
+            background: linear-gradient(180deg, #FFD700, #FFA500);
+            box-shadow: 0 0 8px rgba(255,215,0,0.5);
+        }
+
+        .priority-normal {
+            background: linear-gradient(180deg, #90EE90, #3CB371);
+            box-shadow: 0 0 8px rgba(144,238,144,0.3);
+        }
+
         .task-card {
             background: rgba(255,255,255,0.25);
             backdrop-filter: blur(10px);
@@ -215,6 +240,34 @@
             transform: scale(0.9);
         }
 
+        .tree-view-button {
+            position: fixed;
+            bottom: 100px;
+            right: calc(50% - 167px);
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #8BC34A, #7CB342);
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(139,195,74,0.4);
+            transition: all 0.3s ease;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .tree-view-button.show {
+            display: flex;
+        }
+
+        .tree-view-button:active {
+            transform: scale(0.9);
+        }
+
         /* Pétales qui tombent */
         @keyframes fall {
             to {
@@ -256,7 +309,7 @@
         <div class="header">
             <button class="back-button" onclick="goBack()">←</button>
             <div class="header-title">
-                <div class="branch-name">💰 Business</div>
+                <div class="branch-name">💼 Business</div>
                 <div class="branch-subtitle">6 objectifs • 3 complétés</div>
             </div>
         </div>
@@ -266,12 +319,13 @@
         </div>
 
         <button class="add-button" onclick="addTask()">+</button>
+        <button class="tree-view-button" id="treeViewBtn" onclick="openTreeView()">🌳</button>
     </div>
 
     <script>
         // Données des emojis et labels
         const branchEmojis = {
-            business: '💰',
+            business: '💼',
             music: '🎵',
             culture: '📚',
             fitness: '💪',
@@ -312,6 +366,12 @@
             
             branchName.textContent = `${branchEmojis[branchId] || '🌿'} ${branchLabels[branchId] || branchId}`;
             
+            // Afficher le bouton vue arborescente uniquement pour Business
+            const treeViewBtn = document.getElementById('treeViewBtn');
+            if (branchId === 'business') {
+                treeViewBtn.classList.add('show');
+            }
+            
             // Charger les tâches depuis le localStorage
             const tasks = loadTasksFromStorage(branchId);
             
@@ -323,6 +383,10 @@
                 branchSubtitle.textContent = `${tasks.length} objectif${tasks.length > 1 ? 's' : ''} • ${completed} complété${completed > 1 ? 's' : ''}`;
                 renderTasks(tasks);
             }
+        }
+
+        function openTreeView() {
+            window.location.href = 'wu-tree-business-tree.html';
         }
 
         function loadTasksFromStorage(branchId) {
@@ -368,10 +432,26 @@
                 year: '🌟 1 an et +'
             };
 
+            // Fonction de tri par priorité
+            const sortByPriority = (a, b) => {
+                // Si complété, mettre à la fin
+                if (a.status === 'completed' && b.status !== 'completed') return 1;
+                if (a.status !== 'completed' && b.status === 'completed') return -1;
+                if (a.status === 'completed' && b.status === 'completed') return 0;
+                
+                // Sinon trier par priorité : high > medium > normal
+                const priorityOrder = { high: 3, medium: 2, normal: 1 };
+                const priorityA = priorityOrder[a.priority] || 1;
+                const priorityB = priorityOrder[b.priority] || 1;
+                return priorityB - priorityA;
+            };
+
             // Afficher chaque période qui a des tâches
             Object.keys(tasksByPeriod).forEach(period => {
                 if (tasksByPeriod[period].length > 0) {
-                    const section = createTimeSection(periodTitles[period], tasksByPeriod[period], period);
+                    // Trier les tâches par priorité
+                    const sortedTasks = [...tasksByPeriod[period]].sort(sortByPriority);
+                    const section = createTimeSection(periodTitles[period], sortedTasks, period);
                     content.appendChild(section);
                 }
             });
@@ -403,27 +483,32 @@
             card.className = 'task-card';
             card.onclick = () => toggleTaskStatus(task.id);
 
-            let indicatorClass, emoji, meta;
+            let indicatorClass, emoji, meta, priorityBar;
             
             if (task.status === 'completed') {
                 indicatorClass = 'flower';
                 emoji = '🌸';
                 meta = 'Complété';
+                priorityBar = ''; // Pas de barre pour les tâches complétées
             } else if (task.priority === 'high') {
                 indicatorClass = 'bud-priority';
                 emoji = '🔴';
                 meta = 'Vital - Prioritaire';
+                priorityBar = '<div class="priority-indicator priority-high"></div>';
             } else if (task.priority === 'medium') {
                 indicatorClass = 'bud-priority';
                 emoji = '🟡';
                 meta = 'Important';
+                priorityBar = '<div class="priority-indicator priority-medium"></div>';
             } else {
                 indicatorClass = 'bud';
                 emoji = '🌱';
                 meta = 'En cours';
+                priorityBar = '<div class="priority-indicator priority-normal"></div>';
             }
 
             card.innerHTML = `
+                ${priorityBar}
                 <div class="task-indicator ${indicatorClass}">${emoji}</div>
                 <div class="task-content">
                     <div class="task-title">${task.title}</div>
