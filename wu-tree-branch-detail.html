@@ -300,22 +300,24 @@
 
         <button class="add-button" onclick="openAddModal()">+</button>
 
-        <!-- Modal pour ajouter un objectif -->
+        <!-- Modal pour ajouter -->
         <div class="modal" id="addModal">
             <div class="modal-content">
-                <h2 class="modal-title">Nouvel objectif</h2>
+                <h2 class="modal-title" id="modalTitle">Nouvel élément</h2>
                 
                 <div class="form-group">
-                    <label class="form-label">Quel est ton objectif ?</label>
-                    <input type="text" class="form-input" id="goalInput" placeholder="Ex: Atteindre 10k€/mois">
+                    <label class="form-label">Titre</label>
+                    <input type="text" class="form-input" id="goalInput" placeholder="Ex: 100k€ en 2026">
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Pourquoi est-ce important ?</label>
-                    <input type="text" class="form-input" id="whyInput" placeholder="Ex: Liberté financière">
+                    <label class="form-label">Emoji (optionnel)</label>
+                    <input type="text" class="form-input" id="emojiInput" placeholder="💰" maxlength="2">
                 </div>
 
-                <p class="info-text">💡 Le "pourquoi" est ta motivation profonde</p>
+                <div id="showSubBranchField" style="display:none;">
+                    <p class="info-text">💡 Les branches représentent les différents moyens d'atteindre ton objectif</p>
+                </div>
 
                 <button class="btn btn-primary" onclick="saveGoal()">Créer</button>
                 <button class="btn btn-secondary" onclick="closeAddModal()">Annuler</button>
@@ -324,42 +326,76 @@
     </div>
 
     <script>
-        let goals = [];
+        let ultimateGoal = null;
+        let mainBranches = [];
         const svg = document.getElementById('treeSvg');
         const centerX = 187.5;
-        const centerY = 580;
+        const centerY = 580; // TOI en bas
 
-        // Charger les objectifs depuis localStorage
-        function loadGoals() {
-            const saved = localStorage.getItem('wutree_business_goals');
-            goals = saved ? JSON.parse(saved) : [];
+        // Charger les données depuis localStorage
+        function loadData() {
+            const savedGoal = localStorage.getItem('wutree_business_ultimate_goal');
+            const savedBranches = localStorage.getItem('wutree_business_branches');
+            
+            ultimateGoal = savedGoal ? JSON.parse(savedGoal) : null;
+            mainBranches = savedBranches ? JSON.parse(savedBranches) : [];
+            
             renderTree();
         }
 
-        // Sauvegarder les objectifs
-        function saveGoals() {
-            localStorage.setItem('wutree_business_goals', JSON.stringify(goals));
+        // Sauvegarder les données
+        function saveData() {
+            if (ultimateGoal) {
+                localStorage.setItem('wutree_business_ultimate_goal', JSON.stringify(ultimateGoal));
+            }
+            localStorage.setItem('wutree_business_branches', JSON.stringify(mainBranches));
         }
 
-        // Rendre l'arbre
+        // Rendre l'arbre complet
         function renderTree() {
             svg.innerHTML = '';
 
-            // Nœud central (TOI)
-            const centerGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-            centerGroup.classList.add('center-node');
-            
-            const centerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            centerCircle.setAttribute('cx', centerX);
-            centerCircle.setAttribute('cy', centerY);
-            centerCircle.setAttribute('r', 35);
-            centerCircle.classList.add('node-circle', 'center-circle');
-            centerCircle.style.fill = 'url(#centerGradient)';
+            // Créer les gradients
+            createGradients();
 
-            // Gradient pour le centre
+            // 1. Nœud central (TOI) en BAS
+            drawCenterNode();
+
+            // 2. Dessiner les branches principales
+            if (mainBranches.length > 0) {
+                drawMainBranches();
+            }
+
+            // 3. Objectif ultime en HAUT (si défini)
+            if (ultimateGoal) {
+                drawUltimateGoal();
+            }
+
+            // Mettre à jour le sous-titre
+            const totalNodes = mainBranches.reduce((sum, branch) => {
+                return sum + 1 + (branch.subBranches ? branch.subBranches.length : 0);
+            }, 0);
+            document.getElementById('subtitle').textContent = 
+                `${totalNodes} nœud${totalNodes > 1 ? 's' : ''}`;
+        }
+
+        function createGradients() {
             const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+            
+            // Gradient pour le centre (TOI)
+            const centerGrad = createGradient('centerGradient', '#FFD700', '#FFA500');
+            defs.appendChild(centerGrad);
+            
+            // Gradient pour l'objectif ultime
+            const goalGrad = createGradient('goalGradient', '#FF69B4', '#FF1493');
+            defs.appendChild(goalGrad);
+            
+            svg.appendChild(defs);
+        }
+
+        function createGradient(id, color1, color2) {
             const gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
-            gradient.setAttribute('id', 'centerGradient');
+            gradient.setAttribute('id', id);
             gradient.setAttribute('x1', '0%');
             gradient.setAttribute('y1', '0%');
             gradient.setAttribute('x2', '100%');
@@ -367,121 +403,207 @@
             
             const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
             stop1.setAttribute('offset', '0%');
-            stop1.setAttribute('style', 'stop-color:#FFD700;stop-opacity:1');
+            stop1.setAttribute('style', `stop-color:${color1};stop-opacity:1`);
             
             const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
             stop2.setAttribute('offset', '100%');
-            stop2.setAttribute('style', 'stop-color:#FFA500;stop-opacity:1');
+            stop2.setAttribute('style', `stop-color:${color2};stop-opacity:1`);
             
             gradient.appendChild(stop1);
             gradient.appendChild(stop2);
-            defs.appendChild(gradient);
-            svg.appendChild(defs);
+            
+            return gradient;
+        }
 
-            const centerText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            centerText.setAttribute('x', centerX);
-            centerText.setAttribute('y', centerY + 10);
-            centerText.classList.add('node-text', 'center-text');
-            centerText.textContent = '🧘';
+        function drawCenterNode() {
+            const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            group.classList.add('center-node');
+            
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', centerX);
+            circle.setAttribute('cy', centerY);
+            circle.setAttribute('r', 35);
+            circle.style.fill = 'url(#centerGradient)';
+            circle.style.filter = 'drop-shadow(0 4px 12px rgba(255,215,0,0.5))';
 
-            centerGroup.appendChild(centerCircle);
-            centerGroup.appendChild(centerText);
-            svg.appendChild(centerGroup);
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', centerX);
+            text.setAttribute('y', centerY + 12);
+            text.classList.add('node-text', 'center-text');
+            text.textContent = '🧘';
 
-            // Mettre à jour le sous-titre
-            document.getElementById('subtitle').textContent = `${goals.length} objectif${goals.length > 1 ? 's' : ''}`;
+            const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            label.setAttribute('x', centerX);
+            label.setAttribute('y', centerY + 55);
+            label.classList.add('node-text');
+            label.style.fontSize = '11px';
+            label.textContent = 'TOI';
 
-            // Dessiner les objectifs
-            const angleStep = Math.PI / (goals.length + 1);
-            goals.forEach((goal, index) => {
-                const angle = Math.PI - angleStep * (index + 1);
-                const distance = 180;
-                const goalX = centerX + Math.cos(angle) * distance;
-                const goalY = centerY - Math.sin(angle) * distance;
+            group.appendChild(circle);
+            group.appendChild(text);
+            group.appendChild(label);
+            svg.appendChild(group);
+        }
 
-                // Ligne vers l'objectif
-                const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                line.setAttribute('d', `M ${centerX} ${centerY} Q ${centerX} ${centerY - 50} ${goalX} ${goalY}`);
-                line.classList.add('branch-line');
-                svg.appendChild(line);
+        function drawMainBranches() {
+            const branchCount = mainBranches.length;
+            const spacing = 280 / Math.max(branchCount, 1);
+            const startX = centerX - (spacing * (branchCount - 1)) / 2;
 
-                // Nœud objectif
-                const goalGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-                goalGroup.classList.add('goal-node');
-                goalGroup.onclick = () => editGoal(index);
+            mainBranches.forEach((branch, index) => {
+                const branchX = startX + (spacing * index);
+                const branchY = 380;
 
-                const goalCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                goalCircle.setAttribute('cx', goalX);
-                goalCircle.setAttribute('cy', goalY);
-                goalCircle.setAttribute('r', 28);
-                goalCircle.classList.add('node-circle');
-                goalCircle.style.fill = 'rgba(255,182,193,0.3)';
+                // Ligne vers la branche principale
+                drawLine(centerX, centerY, branchX, branchY, 3);
 
-                const goalText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                goalText.setAttribute('x', goalX);
-                goalText.setAttribute('y', goalY - 35);
-                goalText.classList.add('node-text');
-                goalText.textContent = truncate(goal.title, 15);
+                // Nœud branche principale
+                drawBranchNode(branchX, branchY, branch, index);
 
-                const goalEmoji = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                goalEmoji.setAttribute('x', goalX);
-                goalEmoji.setAttribute('y', goalY + 8);
-                goalEmoji.classList.add('node-text');
-                goalEmoji.style.fontSize = '20px';
-                goalEmoji.textContent = '🎯';
-
-                goalGroup.appendChild(goalCircle);
-                goalGroup.appendChild(goalText);
-                goalGroup.appendChild(goalEmoji);
-                svg.appendChild(goalGroup);
-
-                // Si "pourquoi" existe, créer un sous-nœud
-                if (goal.why) {
-                    const whyDistance = 80;
-                    const whyX = goalX + Math.cos(angle) * whyDistance;
-                    const whyY = goalY - Math.sin(angle) * whyDistance;
-
-                    // Ligne vers le pourquoi
-                    const whyLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    whyLine.setAttribute('x1', goalX);
-                    whyLine.setAttribute('y1', goalY);
-                    whyLine.setAttribute('x2', whyX);
-                    whyLine.setAttribute('y2', whyY);
-                    whyLine.classList.add('branch-line');
-                    whyLine.style.strokeWidth = '1.5';
-                    whyLine.style.strokeDasharray = '3,3';
-                    svg.appendChild(whyLine);
-
-                    // Nœud pourquoi
-                    const whyGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-                    whyGroup.classList.add('why-node');
-
-                    const whyCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                    whyCircle.setAttribute('cx', whyX);
-                    whyCircle.setAttribute('cy', whyY);
-                    whyCircle.setAttribute('r', 20);
-                    whyCircle.classList.add('node-circle');
-                    whyCircle.style.fill = 'rgba(144,238,144,0.3)';
-
-                    const whyText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    whyText.setAttribute('x', whyX);
-                    whyText.setAttribute('y', whyY - 25);
-                    whyText.classList.add('node-text', 'why-text');
-                    whyText.textContent = truncate(goal.why, 12);
-
-                    const whyEmoji = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    whyEmoji.setAttribute('x', whyX);
-                    whyEmoji.setAttribute('y', whyY + 6);
-                    whyEmoji.classList.add('node-text');
-                    whyEmoji.style.fontSize = '16px';
-                    whyEmoji.textContent = '💚';
-
-                    whyGroup.appendChild(whyCircle);
-                    whyGroup.appendChild(whyText);
-                    whyGroup.appendChild(whyEmoji);
-                    svg.appendChild(whyGroup);
+                // Sous-branches si elles existent
+                if (branch.subBranches && branch.subBranches.length > 0) {
+                    drawSubBranches(branchX, branchY, branch.subBranches, index);
                 }
             });
+        }
+
+        function drawBranchNode(x, y, branch, branchIndex) {
+            const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            group.classList.add('goal-node');
+            group.onclick = () => manageBranch(branchIndex);
+
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', x);
+            circle.setAttribute('cy', y);
+            circle.setAttribute('r', 30);
+            circle.style.fill = 'rgba(144,238,144,0.3)';
+            circle.style.stroke = 'rgba(255,255,255,0.6)';
+            circle.style.strokeWidth = '2';
+            circle.style.filter = 'drop-shadow(0 2px 8px rgba(0,0,0,0.2))';
+
+            const emoji = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            emoji.setAttribute('x', x);
+            emoji.setAttribute('y', y + 8);
+            emoji.classList.add('node-text');
+            emoji.style.fontSize = '22px';
+            emoji.textContent = branch.emoji || '🎯';
+
+            const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            label.setAttribute('x', x);
+            label.setAttribute('y', y - 38);
+            label.classList.add('node-text');
+            label.textContent = truncate(branch.title, 12);
+
+            group.appendChild(circle);
+            group.appendChild(emoji);
+            group.appendChild(label);
+            svg.appendChild(group);
+        }
+
+        function drawSubBranches(parentX, parentY, subBranches, branchIndex) {
+            const subCount = subBranches.length;
+            const subSpacing = 80;
+            const subStartX = parentX - (subSpacing * (subCount - 1)) / 2;
+
+            subBranches.forEach((subBranch, subIndex) => {
+                const subX = subStartX + (subSpacing * subIndex);
+                const subY = parentY - 120;
+
+                // Ligne vers sous-branche
+                drawLine(parentX, parentY, subX, subY, 2, true);
+
+                // Nœud sous-branche
+                const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                group.classList.add('why-node');
+                group.onclick = () => deleteSubBranch(branchIndex, subIndex);
+
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', subX);
+                circle.setAttribute('cy', subY);
+                circle.setAttribute('r', 22);
+                circle.style.fill = 'rgba(255,182,193,0.3)';
+                circle.style.stroke = 'rgba(255,255,255,0.5)';
+                circle.style.strokeWidth = '1.5';
+
+                const emoji = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                emoji.setAttribute('x', subX);
+                emoji.setAttribute('y', subY + 6);
+                emoji.classList.add('node-text');
+                emoji.style.fontSize = '16px';
+                emoji.textContent = subBranch.emoji || '📌';
+
+                const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                label.setAttribute('x', subX);
+                label.setAttribute('y', subY - 28);
+                label.classList.add('node-text', 'why-text');
+                label.textContent = truncate(subBranch.title, 10);
+
+                group.appendChild(circle);
+                group.appendChild(emoji);
+                group.appendChild(label);
+                svg.appendChild(group);
+            });
+        }
+
+        function drawUltimateGoal() {
+            const goalY = 80;
+
+            // Lignes depuis toutes les branches principales vers l'objectif
+            mainBranches.forEach((_, index) => {
+                const branchCount = mainBranches.length;
+                const spacing = 280 / Math.max(branchCount, 1);
+                const startX = centerX - (spacing * (branchCount - 1)) / 2;
+                const branchX = startX + (spacing * index);
+                const branchY = 380;
+
+                drawLine(branchX, branchY - 30, centerX, goalY + 40, 2, true);
+            });
+
+            // Nœud objectif ultime
+            const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            group.classList.add('goal-node');
+            group.onclick = () => editUltimateGoal();
+
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', centerX);
+            circle.setAttribute('cy', goalY);
+            circle.setAttribute('r', 40);
+            circle.style.fill = 'url(#goalGradient)';
+            circle.style.filter = 'drop-shadow(0 4px 16px rgba(255,105,180,0.6))';
+
+            const emoji = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            emoji.setAttribute('x', centerX);
+            emoji.setAttribute('y', goalY + 10);
+            emoji.classList.add('node-text');
+            emoji.style.fontSize = '28px';
+            emoji.textContent = ultimateGoal.emoji || '💰';
+
+            const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            label.setAttribute('x', centerX);
+            label.setAttribute('y', goalY - 48);
+            label.classList.add('node-text');
+            label.style.fontSize = '14px';
+            label.style.fontWeight = '700';
+            label.textContent = truncate(ultimateGoal.title, 18);
+
+            group.appendChild(circle);
+            group.appendChild(emoji);
+            group.appendChild(label);
+            svg.appendChild(group);
+        }
+
+        function drawLine(x1, y1, x2, y2, width = 2, dashed = false) {
+            const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+            line.setAttribute('x1', x1);
+            line.setAttribute('y1', y1);
+            line.setAttribute('x2', x2);
+            line.setAttribute('y2', y2);
+            line.classList.add('branch-line');
+            line.style.strokeWidth = width;
+            if (dashed) {
+                line.style.strokeDasharray = '4,4';
+            }
+            svg.appendChild(line);
         }
 
         function truncate(text, maxLength) {
@@ -489,9 +611,23 @@
         }
 
         function openAddModal() {
-            document.getElementById('addModal').classList.add('active');
+            const modal = document.getElementById('addModal');
+            const title = document.getElementById('modalTitle');
+            
+            if (!ultimateGoal) {
+                title.textContent = 'Objectif ultime';
+                document.getElementById('goalInput').placeholder = 'Ex: 100k€ en 2026';
+                document.getElementById('emojiInput').value = '💰';
+            } else {
+                title.textContent = 'Nouvelle branche';
+                document.getElementById('goalInput').placeholder = 'Ex: Crypto, Wu Tree...';
+                document.getElementById('emojiInput').value = '🎯';
+            }
+            
             document.getElementById('goalInput').value = '';
-            document.getElementById('whyInput').value = '';
+            document.getElementById('showSubBranchField').style.display = mainBranches.length > 0 ? 'block' : 'none';
+            
+            modal.classList.add('active');
         }
 
         function closeAddModal() {
@@ -500,30 +636,79 @@
 
         function saveGoal() {
             const title = document.getElementById('goalInput').value.trim();
-            const why = document.getElementById('whyInput').value.trim();
+            const emoji = document.getElementById('emojiInput').value.trim() || '🎯';
 
             if (!title) {
-                alert('Merci de renseigner un objectif');
+                alert('Merci de renseigner un titre');
                 return;
             }
 
-            goals.push({
-                id: Date.now(),
-                title: title,
-                why: why || null,
-                createdAt: new Date().toISOString()
-            });
+            if (!ultimateGoal) {
+                // Créer l'objectif ultime
+                ultimateGoal = { title, emoji };
+            } else {
+                // Ajouter une branche principale
+                mainBranches.push({
+                    id: Date.now(),
+                    title,
+                    emoji,
+                    subBranches: []
+                });
+            }
 
-            saveGoals();
+            saveData();
             renderTree();
             closeAddModal();
         }
 
-        function editGoal(index) {
-            if (confirm(`Supprimer "${goals[index].title}" ?`)) {
-                goals.splice(index, 1);
-                saveGoals();
+        function manageBranch(index) {
+            const branch = mainBranches[index];
+            const action = prompt(`Branche: ${branch.title}\n\n1 = Ajouter sous-branche\n2 = Supprimer cette branche\n\nTapez le numéro :`);
+            
+            if (action === '1') {
+                addSubBranch(index);
+            } else if (action === '2') {
+                if (confirm(`Supprimer "${branch.title}" et toutes ses sous-branches ?`)) {
+                    mainBranches.splice(index, 1);
+                    saveData();
+                    renderTree();
+                }
+            }
+        }
+
+        function addSubBranch(branchIndex) {
+            const title = prompt('Nom de la sous-branche :');
+            if (!title || !title.trim()) return;
+
+            const emoji = prompt('Emoji (optionnel) :') || '📌';
+
+            mainBranches[branchIndex].subBranches.push({
+                id: Date.now(),
+                title: title.trim(),
+                emoji: emoji.trim()
+            });
+
+            saveData();
+            renderTree();
+        }
+
+        function deleteSubBranch(branchIndex, subIndex) {
+            const subBranch = mainBranches[branchIndex].subBranches[subIndex];
+            if (confirm(`Supprimer "${subBranch.title}" ?`)) {
+                mainBranches[branchIndex].subBranches.splice(subIndex, 1);
+                saveData();
                 renderTree();
+            }
+        }
+
+        function editUltimateGoal() {
+            if (confirm('Modifier l\'objectif ultime ?')) {
+                const newTitle = prompt('Nouvel objectif :', ultimateGoal.title);
+                if (newTitle && newTitle.trim()) {
+                    ultimateGoal.title = newTitle.trim();
+                    saveData();
+                    renderTree();
+                }
             }
         }
 
@@ -532,7 +717,7 @@
         }
 
         // Charger au démarrage
-        loadGoals();
+        loadData();
     </script>
 </body>
 </html>
