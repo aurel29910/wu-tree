@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wu Tree - Business</title>
+    <title>Wu Tree - Business & Finance</title>
     <style>
         * {
             margin: 0;
@@ -13,15 +13,17 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(180deg, #B4D4E1 0%, #F5C5D4 100%);
+            background: linear-gradient(180deg, #87CEEB 0%, #FFB6C1 100%);
             min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .phone-frame {
             width: 375px;
             height: 812px;
-            margin: 20px auto;
-            background: linear-gradient(180deg, #B4D4E1 0%, #F5C5D4 100%);
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
             border-radius: 40px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.4);
             overflow: hidden;
@@ -61,12 +63,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        .back-button:active {
-            transform: scale(0.9);
-            background: rgba(255,255,255,0.4);
         }
 
         .header-title {
@@ -86,135 +82,76 @@
             margin-top: 2px;
         }
 
-        .content {
-            height: calc(100% - 44px - 80px);
-            overflow-y: auto;
-            padding: 20px;
+        .canvas-container {
+            position: relative;
+            height: calc(100% - 44px - 66px - 70px);
+            overflow: hidden;
         }
 
-        .time-section {
-            margin-bottom: 30px;
+        svg {
+            width: 100%;
+            height: 100%;
         }
 
-        .time-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            padding: 0 5px;
-        }
-
-        .time-title {
-            color: rgba(255,255,255,0.95);
-            font-size: 16px;
-            font-weight: 600;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .time-count {
-            color: rgba(255,255,255,0.7);
-            font-size: 13px;
-        }
-
-        .priority-indicator {
-            position: absolute;
-            left: -8px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 4px;
-            height: 60%;
-            border-radius: 2px;
-        }
-
-        .priority-high {
-            background: linear-gradient(180deg, #FF4444, #CC0000);
-            box-shadow: 0 0 8px rgba(255,68,68,0.5);
-        }
-
-        .priority-medium {
-            background: linear-gradient(180deg, #FFD700, #FFA500);
-            box-shadow: 0 0 8px rgba(255,215,0,0.5);
-        }
-
-        .priority-normal {
-            background: linear-gradient(180deg, #90EE90, #3CB371);
-            box-shadow: 0 0 8px rgba(144,238,144,0.3);
-        }
-
-        .task-card {
-            background: rgba(255,255,255,0.25);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 15px;
-            margin-bottom: 10px;
-            border: 1.5px solid rgba(255,255,255,0.3);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: all 0.3s ease;
+        .center-node {
             cursor: pointer;
         }
 
-        .task-card:active {
-            transform: scale(0.98);
-            background: rgba(255,255,255,0.35);
+        .goal-node {
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        .task-indicator {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
+        .goal-node:hover circle {
+            r: 32;
         }
 
-        .task-indicator.flower {
-            background: radial-gradient(circle, #ffffff 0%, #FFB6C1 100%);
-            box-shadow: 0 2px 8px rgba(255,182,193,0.4);
+        .why-node {
+            cursor: pointer;
+            opacity: 0.85;
         }
 
-        .task-indicator.bud {
-            background: radial-gradient(circle, #90EE90 0%, #3CB371 100%);
-            box-shadow: 0 2px 8px rgba(144,238,144,0.4);
+        .branch-line {
+            stroke: rgba(255,255,255,0.4);
+            stroke-width: 2;
+            fill: none;
+            stroke-linecap: round;
         }
 
-        .task-indicator.bud-priority {
-            background: radial-gradient(circle, #FFD700 0%, #FFA500 100%);
-            box-shadow: 0 2px 8px rgba(255,215,0,0.5);
-            animation: pulse 2s ease-in-out infinite;
+        .node-circle {
+            fill: rgba(255,255,255,0.25);
+            stroke: rgba(255,255,255,0.5);
+            stroke-width: 2;
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.2));
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+        .center-circle {
+            fill: linear-gradient(135deg, #FFD700, #FFA500);
+            animation: pulse-center 3s ease-in-out infinite;
         }
 
-        .task-content {
-            flex: 1;
+        @keyframes pulse-center {
+            0%, 100% { r: 35; }
+            50% { r: 40; }
         }
 
-        .task-title {
-            color: white;
-            font-size: 15px;
-            font-weight: 500;
-            margin-bottom: 3px;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
-        }
-
-        .task-meta {
-            color: rgba(255,255,255,0.7);
+        .node-text {
+            fill: white;
             font-size: 12px;
+            font-weight: 600;
+            text-anchor: middle;
+            pointer-events: none;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 30px 20px;
-            color: rgba(255,255,255,0.6);
-            font-size: 14px;
+        .center-text {
+            font-size: 28px;
+        }
+
+        .why-text {
+            font-size: 10px;
             font-style: italic;
+            opacity: 0.9;
         }
 
         .add-button {
@@ -224,83 +161,124 @@
             width: 56px;
             height: 56px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #FF69B4 0%, #FF1493 100%);
+            background: linear-gradient(135deg, #FF69B4, #FF1493);
             border: none;
             color: white;
-            font-size: 28px;
+            font-size: 32px;
+            font-weight: 300;
             cursor: pointer;
             box-shadow: 0 4px 20px rgba(255,105,180,0.4);
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 100;
         }
 
         .add-button:active {
             transform: scale(0.9);
         }
 
-        .tree-view-button {
-            position: fixed;
-            bottom: 100px;
-            right: calc(50% - 167px);
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #8BC34A, #7CB342);
-            border: none;
-            color: white;
-            font-size: 28px;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(139,195,74,0.4);
-            transition: all 0.3s ease;
+        .modal {
             display: none;
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 375px;
+            height: 812px;
+            background: rgba(0,0,0,0.6);
+            z-index: 200;
             align-items: center;
             justify-content: center;
-            z-index: 100;
         }
 
-        .tree-view-button.show {
+        .modal.active {
             display: flex;
         }
 
-        .tree-view-button:active {
-            transform: scale(0.9);
+        .modal-content {
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-height: 80%;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
         }
 
-        /* Pétales qui tombent */
-        @keyframes fall {
-            to {
-                transform: translateY(100vh) rotate(360deg);
-                opacity: 0;
-            }
+        .modal-title {
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
         }
 
-        .petal {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            background: rgba(255, 182, 193, 0.6);
-            border-radius: 50% 0 50% 0;
-            animation: fall linear infinite;
-            pointer-events: none;
+        .form-group {
+            margin-bottom: 20px;
         }
 
-        .petal:nth-child(1) { left: 10%; animation-duration: 12s; animation-delay: 0s; }
-        .petal:nth-child(2) { left: 30%; animation-duration: 14s; animation-delay: 2s; }
-        .petal:nth-child(3) { left: 50%; animation-duration: 16s; animation-delay: 4s; }
-        .petal:nth-child(4) { left: 70%; animation-duration: 13s; animation-delay: 1s; }
-        .petal:nth-child(5) { left: 90%; animation-duration: 15s; animation-delay: 3s; }
+        .form-label {
+            display: block;
+            color: rgba(255,255,255,0.9);
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            font-size: 15px;
+        }
+
+        .form-input::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: rgba(255,255,255,0.6);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #FF69B4, #FF1493);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.3);
+            color: white;
+        }
+
+        .info-text {
+            color: rgba(255,255,255,0.8);
+            font-size: 13px;
+            text-align: center;
+            margin-top: 15px;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
     <div class="phone-frame">
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-
         <div class="status-bar">
             <span>9:41</span>
             <span>📶 🔋</span>
@@ -309,276 +287,252 @@
         <div class="header">
             <button class="back-button" onclick="goBack()">←</button>
             <div class="header-title">
-                <div class="branch-name">💼 Business</div>
-                <div class="branch-subtitle">6 objectifs • 3 complétés</div>
+                <div class="branch-name">💰 Business & Finance</div>
+                <div class="branch-subtitle" id="subtitle">Vue arborescente</div>
             </div>
         </div>
 
-        <div class="content">
-            <!-- Les tâches seront chargées dynamiquement -->
+        <div class="canvas-container">
+            <svg id="treeSvg" viewBox="0 0 375 650">
+                <!-- Les branches seront générées ici -->
+            </svg>
         </div>
 
-        <button class="add-button" onclick="addTask()">+</button>
-        <button class="tree-view-button" id="treeViewBtn" onclick="openTreeView()">🌳</button>
+        <button class="add-button" onclick="openAddModal()">+</button>
+
+        <!-- Modal pour ajouter un objectif -->
+        <div class="modal" id="addModal">
+            <div class="modal-content">
+                <h2 class="modal-title">Nouvel objectif</h2>
+                
+                <div class="form-group">
+                    <label class="form-label">Quel est ton objectif ?</label>
+                    <input type="text" class="form-input" id="goalInput" placeholder="Ex: Atteindre 10k€/mois">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Pourquoi est-ce important ?</label>
+                    <input type="text" class="form-input" id="whyInput" placeholder="Ex: Liberté financière">
+                </div>
+
+                <p class="info-text">💡 Le "pourquoi" est ta motivation profonde</p>
+
+                <button class="btn btn-primary" onclick="saveGoal()">Créer</button>
+                <button class="btn btn-secondary" onclick="closeAddModal()">Annuler</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Données des emojis et labels
-        const branchEmojis = {
-            business: '💼',
-            music: '🎵',
-            culture: '📚',
-            fitness: '💪',
-            creativity: '🎨',
-            relationships: '❤️',
-            finance: '💰',
-            learning: '🎓',
-            travel: '✈️',
-            spirituality: '🕉️'
-        };
+        let goals = [];
+        const svg = document.getElementById('treeSvg');
+        const centerX = 187.5;
+        const centerY = 580;
 
-        const branchLabels = {
-            business: 'Business',
-            music: 'Musique',
-            culture: 'Culture',
-            fitness: 'Fitness',
-            creativity: 'Créativité',
-            relationships: 'Relations',
-            finance: 'Finances',
-            learning: 'Apprentissage',
-            travel: 'Voyages',
-            spirituality: 'Spiritualité'
-        };
-
-        // Charger la branche sélectionnée
-        const selectedBranch = localStorage.getItem('selectedBranch');
-        
-        if (!selectedBranch) {
-            window.location.href = 'wu-tree-main.html';
-        } else {
-            loadBranchDetails(selectedBranch);
+        // Charger les objectifs depuis localStorage
+        function loadGoals() {
+            const saved = localStorage.getItem('wutree_business_goals');
+            goals = saved ? JSON.parse(saved) : [];
+            renderTree();
         }
 
-        function loadBranchDetails(branchId) {
-            // Mettre à jour le header
-            const branchName = document.querySelector('.branch-name');
-            const branchSubtitle = document.querySelector('.branch-subtitle');
+        // Sauvegarder les objectifs
+        function saveGoals() {
+            localStorage.setItem('wutree_business_goals', JSON.stringify(goals));
+        }
+
+        // Rendre l'arbre
+        function renderTree() {
+            svg.innerHTML = '';
+
+            // Nœud central (TOI)
+            const centerGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            centerGroup.classList.add('center-node');
             
-            branchName.textContent = `${branchEmojis[branchId] || '🌿'} ${branchLabels[branchId] || branchId}`;
+            const centerCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            centerCircle.setAttribute('cx', centerX);
+            centerCircle.setAttribute('cy', centerY);
+            centerCircle.setAttribute('r', 35);
+            centerCircle.classList.add('node-circle', 'center-circle');
+            centerCircle.style.fill = 'url(#centerGradient)';
+
+            // Gradient pour le centre
+            const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+            const gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
+            gradient.setAttribute('id', 'centerGradient');
+            gradient.setAttribute('x1', '0%');
+            gradient.setAttribute('y1', '0%');
+            gradient.setAttribute('x2', '100%');
+            gradient.setAttribute('y2', '100%');
             
-            // Afficher le bouton vue arborescente uniquement pour Business
-            const treeViewBtn = document.getElementById('treeViewBtn');
-            if (branchId === 'business') {
-                treeViewBtn.classList.add('show');
-            }
+            const stop1 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+            stop1.setAttribute('offset', '0%');
+            stop1.setAttribute('style', 'stop-color:#FFD700;stop-opacity:1');
             
-            // Charger les tâches depuis le localStorage
-            const tasks = loadTasksFromStorage(branchId);
+            const stop2 = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
+            stop2.setAttribute('offset', '100%');
+            stop2.setAttribute('style', 'stop-color:#FFA500;stop-opacity:1');
             
-            if (tasks.length === 0) {
-                branchSubtitle.textContent = 'Aucun objectif pour le moment';
-                showEmptyState();
-            } else {
-                const completed = tasks.filter(t => t.status === 'completed').length;
-                branchSubtitle.textContent = `${tasks.length} objectif${tasks.length > 1 ? 's' : ''} • ${completed} complété${completed > 1 ? 's' : ''}`;
-                renderTasks(tasks);
-            }
-        }
+            gradient.appendChild(stop1);
+            gradient.appendChild(stop2);
+            defs.appendChild(gradient);
+            svg.appendChild(defs);
 
-        function openTreeView() {
-            window.location.href = 'wu-tree-business-tree.html';
-        }
+            const centerText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            centerText.setAttribute('x', centerX);
+            centerText.setAttribute('y', centerY + 10);
+            centerText.classList.add('node-text', 'center-text');
+            centerText.textContent = '🧘';
 
-        function loadTasksFromStorage(branchId) {
-            const storageKey = `wutree_tasks_${branchId}`;
-            const tasksJson = localStorage.getItem(storageKey);
-            return tasksJson ? JSON.parse(tasksJson) : [];
-        }
+            centerGroup.appendChild(centerCircle);
+            centerGroup.appendChild(centerText);
+            svg.appendChild(centerGroup);
 
-        function saveTasksToStorage(branchId, tasks) {
-            const storageKey = `wutree_tasks_${branchId}`;
-            localStorage.setItem(storageKey, JSON.stringify(tasks));
-        }
+            // Mettre à jour le sous-titre
+            document.getElementById('subtitle').textContent = `${goals.length} objectif${goals.length > 1 ? 's' : ''}`;
 
-        function showEmptyState() {
-            const content = document.querySelector('.content');
-            content.innerHTML = `
-                <div class="empty-state">
-                    <div style="font-size: 48px; margin-bottom: 20px;">🌱</div>
-                    <p style="margin-bottom: 10px; font-weight: 500;">Aucun objectif pour le moment</p>
-                    <p style="font-size: 13px; opacity: 0.8;">Appuyez sur + pour ajouter votre premier objectif</p>
-                </div>
-            `;
-        }
+            // Dessiner les objectifs
+            const angleStep = Math.PI / (goals.length + 1);
+            goals.forEach((goal, index) => {
+                const angle = Math.PI - angleStep * (index + 1);
+                const distance = 180;
+                const goalX = centerX + Math.cos(angle) * distance;
+                const goalY = centerY - Math.sin(angle) * distance;
 
-        function renderTasks(tasks) {
-            const content = document.querySelector('.content');
-            content.innerHTML = '';
+                // Ligne vers l'objectif
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                line.setAttribute('d', `M ${centerX} ${centerY} Q ${centerX} ${centerY - 50} ${goalX} ${goalY}`);
+                line.classList.add('branch-line');
+                svg.appendChild(line);
 
-            // Grouper par période
-            const tasksByPeriod = {
-                today: tasks.filter(t => t.period === 'today'),
-                week: tasks.filter(t => t.period === 'week'),
-                month: tasks.filter(t => t.period === 'month'),
-                quarter: tasks.filter(t => t.period === 'quarter'),
-                year: tasks.filter(t => t.period === 'year')
-            };
+                // Nœud objectif
+                const goalGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                goalGroup.classList.add('goal-node');
+                goalGroup.onclick = () => editGoal(index);
 
-            const periodTitles = {
-                today: '🌅 Aujourd\'hui',
-                week: '📅 Cette semaine',
-                month: '📆 Ce mois',
-                quarter: '🎯 3-6 mois',
-                year: '🌟 1 an et +'
-            };
+                const goalCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                goalCircle.setAttribute('cx', goalX);
+                goalCircle.setAttribute('cy', goalY);
+                goalCircle.setAttribute('r', 28);
+                goalCircle.classList.add('node-circle');
+                goalCircle.style.fill = 'rgba(255,182,193,0.3)';
 
-            // Fonction de tri par priorité
-            const sortByPriority = (a, b) => {
-                // Si complété, mettre à la fin
-                if (a.status === 'completed' && b.status !== 'completed') return 1;
-                if (a.status !== 'completed' && b.status === 'completed') return -1;
-                if (a.status === 'completed' && b.status === 'completed') return 0;
-                
-                // Sinon trier par priorité : high > medium > normal
-                const priorityOrder = { high: 3, medium: 2, normal: 1 };
-                const priorityA = priorityOrder[a.priority] || 1;
-                const priorityB = priorityOrder[b.priority] || 1;
-                return priorityB - priorityA;
-            };
+                const goalText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                goalText.setAttribute('x', goalX);
+                goalText.setAttribute('y', goalY - 35);
+                goalText.classList.add('node-text');
+                goalText.textContent = truncate(goal.title, 15);
 
-            // Afficher chaque période qui a des tâches
-            Object.keys(tasksByPeriod).forEach(period => {
-                if (tasksByPeriod[period].length > 0) {
-                    // Trier les tâches par priorité
-                    const sortedTasks = [...tasksByPeriod[period]].sort(sortByPriority);
-                    const section = createTimeSection(periodTitles[period], sortedTasks, period);
-                    content.appendChild(section);
+                const goalEmoji = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                goalEmoji.setAttribute('x', goalX);
+                goalEmoji.setAttribute('y', goalY + 8);
+                goalEmoji.classList.add('node-text');
+                goalEmoji.style.fontSize = '20px';
+                goalEmoji.textContent = '🎯';
+
+                goalGroup.appendChild(goalCircle);
+                goalGroup.appendChild(goalText);
+                goalGroup.appendChild(goalEmoji);
+                svg.appendChild(goalGroup);
+
+                // Si "pourquoi" existe, créer un sous-nœud
+                if (goal.why) {
+                    const whyDistance = 80;
+                    const whyX = goalX + Math.cos(angle) * whyDistance;
+                    const whyY = goalY - Math.sin(angle) * whyDistance;
+
+                    // Ligne vers le pourquoi
+                    const whyLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    whyLine.setAttribute('x1', goalX);
+                    whyLine.setAttribute('y1', goalY);
+                    whyLine.setAttribute('x2', whyX);
+                    whyLine.setAttribute('y2', whyY);
+                    whyLine.classList.add('branch-line');
+                    whyLine.style.strokeWidth = '1.5';
+                    whyLine.style.strokeDasharray = '3,3';
+                    svg.appendChild(whyLine);
+
+                    // Nœud pourquoi
+                    const whyGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    whyGroup.classList.add('why-node');
+
+                    const whyCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                    whyCircle.setAttribute('cx', whyX);
+                    whyCircle.setAttribute('cy', whyY);
+                    whyCircle.setAttribute('r', 20);
+                    whyCircle.classList.add('node-circle');
+                    whyCircle.style.fill = 'rgba(144,238,144,0.3)';
+
+                    const whyText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    whyText.setAttribute('x', whyX);
+                    whyText.setAttribute('y', whyY - 25);
+                    whyText.classList.add('node-text', 'why-text');
+                    whyText.textContent = truncate(goal.why, 12);
+
+                    const whyEmoji = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    whyEmoji.setAttribute('x', whyX);
+                    whyEmoji.setAttribute('y', whyY + 6);
+                    whyEmoji.classList.add('node-text');
+                    whyEmoji.style.fontSize = '16px';
+                    whyEmoji.textContent = '💚';
+
+                    whyGroup.appendChild(whyCircle);
+                    whyGroup.appendChild(whyText);
+                    whyGroup.appendChild(whyEmoji);
+                    svg.appendChild(whyGroup);
                 }
             });
         }
 
-        function createTimeSection(title, tasksList, period) {
-            const section = document.createElement('div');
-            section.className = 'time-section';
-
-            const completed = tasksList.filter(t => t.status === 'completed').length;
-            
-            section.innerHTML = `
-                <div class="time-header">
-                    <div class="time-title">${title}</div>
-                    <div class="time-count">${completed}/${tasksList.length}</div>
-                </div>
-            `;
-
-            tasksList.forEach((task, index) => {
-                const card = createTaskCard(task, index);
-                section.appendChild(card);
-            });
-
-            return section;
+        function truncate(text, maxLength) {
+            return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
         }
 
-        function createTaskCard(task, index) {
-            const card = document.createElement('div');
-            card.className = 'task-card';
-            card.onclick = () => toggleTaskStatus(task.id);
+        function openAddModal() {
+            document.getElementById('addModal').classList.add('active');
+            document.getElementById('goalInput').value = '';
+            document.getElementById('whyInput').value = '';
+        }
 
-            let indicatorClass, emoji, meta, priorityBar;
-            
-            if (task.status === 'completed') {
-                indicatorClass = 'flower';
-                emoji = '🌸';
-                meta = 'Complété';
-                priorityBar = ''; // Pas de barre pour les tâches complétées
-            } else if (task.priority === 'high') {
-                indicatorClass = 'bud-priority';
-                emoji = '🔴';
-                meta = 'Vital - Prioritaire';
-                priorityBar = '<div class="priority-indicator priority-high"></div>';
-            } else if (task.priority === 'medium') {
-                indicatorClass = 'bud-priority';
-                emoji = '🟡';
-                meta = 'Important';
-                priorityBar = '<div class="priority-indicator priority-medium"></div>';
-            } else {
-                indicatorClass = 'bud';
-                emoji = '🌱';
-                meta = 'En cours';
-                priorityBar = '<div class="priority-indicator priority-normal"></div>';
+        function closeAddModal() {
+            document.getElementById('addModal').classList.remove('active');
+        }
+
+        function saveGoal() {
+            const title = document.getElementById('goalInput').value.trim();
+            const why = document.getElementById('whyInput').value.trim();
+
+            if (!title) {
+                alert('Merci de renseigner un objectif');
+                return;
             }
 
-            card.innerHTML = `
-                ${priorityBar}
-                <div class="task-indicator ${indicatorClass}">${emoji}</div>
-                <div class="task-content">
-                    <div class="task-title">${task.title}</div>
-                    <div class="task-meta">${meta}</div>
-                </div>
-            `;
+            goals.push({
+                id: Date.now(),
+                title: title,
+                why: why || null,
+                createdAt: new Date().toISOString()
+            });
 
-            return card;
+            saveGoals();
+            renderTree();
+            closeAddModal();
         }
 
-        function toggleTaskStatus(taskId) {
-            const tasks = loadTasksFromStorage(selectedBranch);
-            const task = tasks.find(t => t.id === taskId);
-            
-            if (task) {
-                task.status = task.status === 'completed' ? 'ongoing' : 'completed';
-                saveTasksToStorage(selectedBranch, tasks);
-                loadBranchDetails(selectedBranch);
+        function editGoal(index) {
+            if (confirm(`Supprimer "${goals[index].title}" ?`)) {
+                goals.splice(index, 1);
+                saveGoals();
+                renderTree();
             }
         }
 
         function goBack() {
-            window.location.href = 'wu-tree-main.html';
+            window.location.href = 'wu-tree-branch-detail.html';
         }
 
-        function addTask() {
-            // Formulaire simple pour ajouter une tâche
-            const title = prompt('Nom de l\'objectif :');
-            if (!title || !title.trim()) return;
-
-            const periodChoice = prompt('Période ?\n\n1 = Aujourd\'hui\n2 = Cette semaine\n3 = Ce mois\n4 = 3-6 mois\n5 = 1 an+\n\nTapez le numéro :');
-            
-            const periodMap = {
-                '1': 'today',
-                '2': 'week',
-                '3': 'month',
-                '4': 'quarter',
-                '5': 'year'
-            };
-
-            const selectedPeriod = periodMap[periodChoice] || 'today';
-
-            const priorityChoice = prompt('Priorité ?\n\n1 = Normal\n2 = Important\n3 = Vital (prioritaire)\n\nTapez le numéro :');
-            
-            const priorityMap = {
-                '1': 'normal',
-                '2': 'medium',
-                '3': 'high'
-            };
-
-            const priority = priorityMap[priorityChoice] || 'normal';
-
-            // Créer la nouvelle tâche
-            const newTask = {
-                id: Date.now(),
-                title: title.trim(),
-                period: selectedPeriod,
-                priority: priority,
-                status: 'ongoing',
-                createdAt: new Date().toISOString()
-            };
-
-            // Sauvegarder
-            const tasks = loadTasksFromStorage(selectedBranch);
-            tasks.push(newTask);
-            saveTasksToStorage(selectedBranch, tasks);
-
-            // Recharger l'affichage
-            loadBranchDetails(selectedBranch);
-        }
+        // Charger au démarrage
+        loadGoals();
     </script>
 </body>
 </html>
