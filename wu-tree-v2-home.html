@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wu Tree</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(180deg, #87CEEB 0%, #FFB6C1 100%);
+            min-height: 100vh; display: flex; justify-content: center; align-items: center;
+        }
+        .phone-frame {
+            width: 375px; height: 812px;
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+            border-radius: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            position: relative; overflow: hidden;
+        }
+        .petal { position: absolute; width: 10px; height: 10px;
+            background: linear-gradient(135deg, rgba(255, 182, 193, 0.8), rgba(255, 105, 180, 0.6));
+            border-radius: 50% 0 50% 0; animation: fall linear infinite; pointer-events: none; z-index: 50; }
+        .petal:nth-child(1) { left: 10%; animation-duration: 12s; width: 8px; }
+        .petal:nth-child(2) { left: 20%; animation-duration: 14s; animation-delay: 2s; }
+        .petal:nth-child(3) { left: 30%; animation-duration: 16s; animation-delay: 4s; }
+        .petal:nth-child(4) { left: 40%; animation-duration: 13s; animation-delay: 1s; }
+        .petal:nth-child(5) { left: 50%; animation-duration: 15s; animation-delay: 3s; }
+        .petal:nth-child(6) { left: 60%; animation-duration: 17s; animation-delay: 5s; }
+        .petal:nth-child(7) { left: 70%; animation-duration: 14s; animation-delay: 6s; }
+        .petal:nth-child(8) { left: 80%; animation-duration: 16s; animation-delay: 7s; }
+        .petal:nth-child(9) { left: 90%; animation-duration: 13s; animation-delay: 8s; }
+        .petal:nth-child(10) { left: 15%; animation-duration: 15s; animation-delay: 9s; }
+        @keyframes fall { 0% { transform: translateY(-50px) rotate(0deg); opacity: 0.8; }
+            100% { transform: translateY(812px) rotate(360deg); opacity: 0; } }
+        .cloud { position: absolute; color: white; font-size: 50px; opacity: 0.7;
+            animation: float-cloud linear infinite; pointer-events: none; z-index: 40; }
+        .cloud:nth-child(11) { top: 60px; animation-duration: 180s; }
+        .cloud:nth-child(12) { top: 100px; animation-duration: 220s; animation-delay: -60s; font-size: 40px; }
+        .cloud:nth-child(13) { top: 140px; animation-duration: 200s; animation-delay: -120s; font-size: 45px; }
+        @keyframes float-cloud { 0% { transform: translateX(-80px); } 100% { transform: translateX(455px); } }
+        .status-bar { position: absolute; top: 0; left: 0; right: 0; height: 44px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 20px; color: rgba(255,255,255,0.95); font-size: 14px; z-index: 100; }
+        .content { position: relative; height: calc(100% - 44px - 70px); margin-top: 44px; z-index: 60; overflow-y: auto; }
+        
+        .tree { width: 100%; min-height: 100%; position: relative; padding: 40px 20px; display: flex;
+            flex-direction: column; justify-content: flex-end; gap: 40px; }
+        
+        .branches { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
+            z-index: 10; padding: 20px 0; }
+        .branch { width: 75px; height: 75px; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(10px);
+            border: 3px solid rgba(255, 255, 255, 0.6);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: all 0.3s;
+            position: relative; }
+        .branch:active { transform: scale(0.95); }
+        .branch-emoji { font-size: 30px; }
+        .branch-name { font-size: 9px; font-weight: 600; color: white;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2); margin-top: 2px; }
+        .branch-delete { position: absolute; top: -8px; right: -8px; width: 24px; height: 24px;
+            background: #FF6B6B; border-radius: 50%; color: white; font-size: 14px; font-weight: bold;
+            display: none; align-items: center; justify-content: center; cursor: pointer;
+            border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        .branch:hover .branch-delete { display: flex; }
+        
+        .roots { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
+            z-index: 10; padding: 20px 0; }
+        .root { width: 65px; height: 65px; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.35); backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 26px; box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+            cursor: pointer; position: relative; transition: all 0.3s; }
+        .root:active { transform: scale(0.95); }
+        
+        .foundations { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;
+            font-size: 32px; z-index: 10; padding: 20px 0; }
+        .foundation { cursor: pointer; transition: all 0.3s; position: relative; }
+        .foundation:active { transform: scale(0.95); }
+        
+        svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
+        
+        .empty { text-align: center; padding: 150px 30px; }
+        .empty-icon { font-size: 64px; margin-bottom: 20px; }
+        .empty-text { font-size: 16px; color: white; line-height: 1.8; text-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        
+        .fab { position: absolute; bottom: 90px; right: 20px; width: 56px; height: 56px; border-radius: 50%;
+            background: linear-gradient(135deg, #FFB6C1 0%, #FF69B4 100%);
+            color: white; font-size: 28px; font-weight: 300;
+            cursor: pointer; box-shadow: 0 4px 20px rgba(255, 105, 180, 0.4);
+            z-index: 100; display: flex; align-items: center; justify-content: center;
+            border: 2px solid rgba(255, 255, 255, 0.6); transition: all 0.3s; }
+        .fab:hover { transform: scale(1.05); box-shadow: 0 6px 25px rgba(255, 105, 180, 0.5); }
+        .fab:active { transform: scale(0.95); }
+        
+        .bottom-menu { position: absolute; bottom: 0; left: 0; right: 0; height: 70px;
+            background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(20px);
+            display: flex; justify-content: space-around; align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.4); z-index: 90; }
+        .menu-item { display: flex; flex-direction: column; align-items: center; gap: 4px;
+            cursor: pointer; padding: 8px 20px; border-radius: 12px; transition: all 0.3s; }
+        .menu-item.active { background: rgba(255, 255, 255, 0.6); }
+        .menu-icon { font-size: 24px; }
+        .menu-label { font-size: 10px; color: rgba(74, 90, 79, 0.8); font-weight: 500; }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div>
+        <div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div>
+        <div class="cloud">☁️</div><div class="cloud">☁️</div><div class="cloud">☁️</div>
+        <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
+        <div class="content">
+            <div class="tree" id="tree"></div>
+        </div>
+        <button class="fab" onclick="createProject()">+</button>
+        <div class="bottom-menu">
+            <div class="menu-item" onclick="goToValues()"><div class="menu-icon">🏛️</div><div class="menu-label">Fondations</div></div>
+            <div class="menu-item active"><div class="menu-icon">🌳</div><div class="menu-label">Arbre</div></div>
+            <div class="menu-item" onclick="goToRoots()"><div class="menu-icon">🌿</div><div class="menu-label">Racines</div></div>
+        </div>
+    </div>
+    <script>
+        function loadTree() {
+            const values = JSON.parse(localStorage.getItem('wutree_values') || '[]');
+            const roots = JSON.parse(localStorage.getItem('wutree_roots') || '[]');
+            const projects = JSON.parse(localStorage.getItem('wutree_projects') || '[]');
+            const tree = document.getElementById('tree');
+            
+            // Si rien n'est configuré, afficher l'état vide
+            if (values.length === 0 && roots.length === 0) {
+                tree.innerHTML = '<div class="empty"><div class="empty-icon">🌿</div><p class="empty-text">Clique sur 🏛️ Fondations pour commencer</p></div>';
+                return;
+            }
+            
+            let html = '';
+            
+            // SEULEMENT si il y a des projets, afficher branches + lignes
+            if (projects.length > 0) {
+                const centerX = 187.5;
+                const topJunction = 180;
+                const bottomJunction = 450;
+                
+                html += '<svg>';
+                
+                // TRONC (seulement si projets ET racines)
+                if (roots.length > 0) {
+                    html += `<line x1="${centerX}" y1="${topJunction}" x2="${centerX}" y2="${bottomJunction}" 
+                        stroke="rgba(255,255,255,0.5)" stroke-width="3"/>`;
+                }
+                
+                // Lignes branches
+                const branchCount = projects.length;
+                const branchSpacing = Math.min(115, 280 / branchCount);
+                const branchStartX = centerX - ((branchCount - 1) * branchSpacing / 2);
+                
+                projects.forEach((p, i) => {
+                    const x = branchStartX + (i * branchSpacing);
+                    const controlX = (x + centerX) / 2;
+                    const controlY = topJunction - 30;
+                    html += `<path d="M ${x} 90 Q ${controlX} ${controlY} ${centerX} ${topJunction}" 
+                        stroke="rgba(255,255,255,0.45)" stroke-width="2" fill="none"/>`;
+                });
+                
+                // Lignes racines (seulement si racines existent)
+                if (roots.length > 0) {
+                    const rootCount = roots.length;
+                    const rootSpacing = Math.min(105, 280 / rootCount);
+                    const rootStartX = centerX - ((rootCount - 1) * rootSpacing / 2);
+                    
+                    roots.forEach((r, i) => {
+                        const x = rootStartX + (i * rootSpacing);
+                        const controlX = (x + centerX) / 2;
+                        const controlY = bottomJunction + 30;
+                        const rootY = 550 + (roots.length > 3 ? 50 : 0);
+                        html += `<path d="M ${x} ${rootY} Q ${controlX} ${controlY} ${centerX} ${bottomJunction}" 
+                            stroke="rgba(255,255,255,0.45)" stroke-width="2" fill="none"/>`;
+                    });
+                }
+                
+                html += '</svg>';
+                
+                // BRANCHES
+                html += '<div class="branches">';
+                projects.forEach(p => {
+                    html += `<div class="branch" onclick="openProject('${p.id}')">
+                        <div class="branch-emoji">${p.emoji}</div>
+                        <div class="branch-name">${p.name}</div>
+                        <div class="branch-delete" onclick="event.stopPropagation(); deleteProject('${p.id}')">×</div>
+                    </div>`;
+                });
+                html += '</div>';
+            }
+            
+            // RACINES (toujours affichées si configurées)
+            if (roots.length > 0) {
+                html += '<div class="roots">';
+                roots.forEach(r => html += `<div class="root" onclick="goToRoots()">${r.emoji}</div>`);
+                html += '</div>';
+            }
+            
+            // FONDATIONS (toujours affichées si configurées)
+            if (values.length > 0) {
+                html += '<div class="foundations">';
+                values.forEach(v => html += `<div class="foundation" onclick="goToValues()">${v.emoji}</div>`);
+                html += '</div>';
+            }
+            
+            tree.innerHTML = html;
+        }
+        
+        function deleteProject(id) {
+            if (confirm('Supprimer ce projet ?')) {
+                let projects = JSON.parse(localStorage.getItem('wutree_projects') || '[]');
+                projects = projects.filter(p => p.id !== id);
+                localStorage.setItem('wutree_projects', JSON.stringify(projects));
+                loadTree();
+            }
+        }
+        
+        function openProject(id) {
+            localStorage.setItem('wutree_current_project', id);
+            window.location.href = 'wu-tree-v2-project-tree.html';
+        }
+        function createProject() { window.location.href = 'wu-tree-v2-project-create.html'; }
+        function goToValues() { window.location.href = 'wu-tree-v2-values.html'; }
+        function goToRoots() { window.location.href = 'wu-tree-v2-roots.html'; }
+        
+        loadTree();
+        if (!localStorage.getItem('wutree_onboarding_complete')) window.location.href = 'wu-tree-v2-values.html';
+    </script>
+</body>
+</html>
