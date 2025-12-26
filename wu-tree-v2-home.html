@@ -42,13 +42,15 @@
         .status-bar { position: absolute; top: 0; left: 0; right: 0; height: 44px;
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 20px; color: rgba(255,255,255,0.95); font-size: 14px; z-index: 100; }
-        .content { position: relative; height: calc(100% - 44px - 70px); margin-top: 44px; z-index: 60; overflow-y: auto; }
+        .content { position: relative; height: calc(100% - 44px - 70px); margin-top: 44px; z-index: 60; overflow: hidden; }
         
-        .tree { width: 100%; min-height: 100%; position: relative; padding: 40px 20px; display: flex;
-            flex-direction: column; justify-content: flex-end; gap: 40px; }
+        .tree-container { width: 100%; height: 100%; position: relative; }
         
-        .branches { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
-            z-index: 10; padding: 20px 0; }
+        svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
+        
+        .branches { position: absolute; top: 50px; left: 0; right: 0;
+            display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
+            z-index: 10; padding: 0 20px; }
         .branch { width: 75px; height: 75px; border-radius: 50%;
             background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(10px);
             border: 3px solid rgba(255, 255, 255, 0.6);
@@ -65,8 +67,9 @@
             border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
         .branch:hover .branch-delete { display: flex; }
         
-        .roots { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
-            z-index: 10; padding: 20px 0; }
+        .roots { position: absolute; bottom: 180px; left: 0; right: 0;
+            display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
+            z-index: 10; padding: 0 20px; }
         .root { width: 65px; height: 65px; border-radius: 50%;
             background: rgba(255, 255, 255, 0.35); backdrop-filter: blur(10px);
             border: 2px solid rgba(255, 255, 255, 0.5);
@@ -75,14 +78,13 @@
             cursor: pointer; position: relative; transition: all 0.3s; }
         .root:active { transform: scale(0.95); }
         
-        .foundations { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;
-            font-size: 32px; z-index: 10; padding: 20px 0; }
+        .foundations { position: absolute; bottom: 100px; left: 0; right: 0;
+            display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;
+            font-size: 32px; z-index: 10; padding: 0 20px; }
         .foundation { cursor: pointer; transition: all 0.3s; position: relative; }
         .foundation:active { transform: scale(0.95); }
         
-        svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
-        
-        .empty { text-align: center; padding: 150px 30px; }
+        .empty { text-align: center; padding: 250px 30px; }
         .empty-icon { font-size: 64px; margin-bottom: 20px; }
         .empty-text { font-size: 16px; color: white; line-height: 1.8; text-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         
@@ -113,7 +115,7 @@
         <div class="cloud">☁️</div><div class="cloud">☁️</div><div class="cloud">☁️</div>
         <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
         <div class="content">
-            <div class="tree" id="tree"></div>
+            <div class="tree-container" id="treeContainer"></div>
         </div>
         <button class="fab" onclick="createProject()">+</button>
         <div class="bottom-menu">
@@ -127,65 +129,20 @@
             const values = JSON.parse(localStorage.getItem('wutree_values') || '[]');
             const roots = JSON.parse(localStorage.getItem('wutree_roots') || '[]');
             const projects = JSON.parse(localStorage.getItem('wutree_projects') || '[]');
-            const tree = document.getElementById('tree');
+            const container = document.getElementById('treeContainer');
             
-            // Si rien n'est configuré, afficher l'état vide
             if (values.length === 0 && roots.length === 0) {
-                tree.innerHTML = '<div class="empty"><div class="empty-icon">🌿</div><p class="empty-text">Clique sur 🏛️ Fondations pour commencer</p></div>';
+                container.innerHTML = '<div class="empty"><div class="empty-icon">🌿</div><p class="empty-text">Clique sur 🏛️ Fondations pour commencer</p></div>';
                 return;
             }
             
             let html = '';
             
-            // SEULEMENT si il y a des projets, afficher branches + lignes
+            // BRANCHES (seulement si projets)
             if (projects.length > 0) {
-                const centerX = 187.5;
-                const topJunction = 180;
-                const bottomJunction = 450;
-                
-                html += '<svg>';
-                
-                // TRONC (seulement si projets ET racines)
-                if (roots.length > 0) {
-                    html += `<line x1="${centerX}" y1="${topJunction}" x2="${centerX}" y2="${bottomJunction}" 
-                        stroke="rgba(255,255,255,0.5)" stroke-width="3"/>`;
-                }
-                
-                // Lignes branches
-                const branchCount = projects.length;
-                const branchSpacing = Math.min(115, 280 / branchCount);
-                const branchStartX = centerX - ((branchCount - 1) * branchSpacing / 2);
-                
-                projects.forEach((p, i) => {
-                    const x = branchStartX + (i * branchSpacing);
-                    const controlX = (x + centerX) / 2;
-                    const controlY = topJunction - 30;
-                    html += `<path d="M ${x} 90 Q ${controlX} ${controlY} ${centerX} ${topJunction}" 
-                        stroke="rgba(255,255,255,0.45)" stroke-width="2" fill="none"/>`;
-                });
-                
-                // Lignes racines (seulement si racines existent)
-                if (roots.length > 0) {
-                    const rootCount = roots.length;
-                    const rootSpacing = Math.min(105, 280 / rootCount);
-                    const rootStartX = centerX - ((rootCount - 1) * rootSpacing / 2);
-                    
-                    roots.forEach((r, i) => {
-                        const x = rootStartX + (i * rootSpacing);
-                        const controlX = (x + centerX) / 2;
-                        const controlY = bottomJunction + 30;
-                        const rootY = 550 + (roots.length > 3 ? 50 : 0);
-                        html += `<path d="M ${x} ${rootY} Q ${controlX} ${controlY} ${centerX} ${bottomJunction}" 
-                            stroke="rgba(255,255,255,0.45)" stroke-width="2" fill="none"/>`;
-                    });
-                }
-                
-                html += '</svg>';
-                
-                // BRANCHES
-                html += '<div class="branches">';
+                html += '<div class="branches" id="branchesContainer">';
                 projects.forEach(p => {
-                    html += `<div class="branch" onclick="openProject('${p.id}')">
+                    html += `<div class="branch" data-project-id="${p.id}" onclick="openProject('${p.id}')">
                         <div class="branch-emoji">${p.emoji}</div>
                         <div class="branch-name">${p.name}</div>
                         <div class="branch-delete" onclick="event.stopPropagation(); deleteProject('${p.id}')">×</div>
@@ -194,21 +151,92 @@
                 html += '</div>';
             }
             
-            // RACINES (toujours affichées si configurées)
+            // RACINES
             if (roots.length > 0) {
-                html += '<div class="roots">';
-                roots.forEach(r => html += `<div class="root" onclick="goToRoots()">${r.emoji}</div>`);
+                html += '<div class="roots" id="rootsContainer">';
+                roots.forEach((r, i) => {
+                    html += `<div class="root" data-root-index="${i}" onclick="goToRoots()">${r.emoji}</div>`;
+                });
                 html += '</div>';
             }
             
-            // FONDATIONS (toujours affichées si configurées)
+            // FONDATIONS
             if (values.length > 0) {
                 html += '<div class="foundations">';
                 values.forEach(v => html += `<div class="foundation" onclick="goToValues()">${v.emoji}</div>`);
                 html += '</div>';
             }
             
-            tree.innerHTML = html;
+            container.innerHTML = html;
+            
+            // Dessiner les lignes APRÈS que le DOM soit chargé
+            if (projects.length > 0 && roots.length > 0) {
+                setTimeout(drawLines, 50);
+            }
+        }
+        
+        function drawLines() {
+            const container = document.getElementById('treeContainer');
+            const branchElements = container.querySelectorAll('.branch');
+            const rootElements = container.querySelectorAll('.root');
+            
+            if (branchElements.length === 0 || rootElements.length === 0) return;
+            
+            const containerRect = container.getBoundingClientRect();
+            const centerX = container.offsetWidth / 2;
+            
+            // Calculer positions réelles des branches
+            const branchPositions = Array.from(branchElements).map(el => {
+                const rect = el.getBoundingClientRect();
+                return {
+                    x: rect.left + rect.width / 2 - containerRect.left,
+                    y: rect.top + rect.height / 2 - containerRect.top
+                };
+            });
+            
+            // Calculer positions réelles des racines
+            const rootPositions = Array.from(rootElements).map(el => {
+                const rect = el.getBoundingClientRect();
+                return {
+                    x: rect.left + rect.width / 2 - containerRect.left,
+                    y: rect.top + rect.height / 2 - containerRect.top
+                };
+            });
+            
+            // Points de jonction
+            const topJunction = Math.max(...branchPositions.map(p => p.y)) + 40;
+            const bottomJunction = Math.min(...rootPositions.map(p => p.y)) - 40;
+            
+            let svgContent = '';
+            
+            // TRONC (ligne centrale)
+            svgContent += `<line x1="${centerX}" y1="${topJunction}" x2="${centerX}" y2="${bottomJunction}" 
+                stroke="rgba(255,255,255,0.5)" stroke-width="3"/>`;
+            
+            // LIGNES DES RACINES → POINT BAS
+            rootPositions.forEach(pos => {
+                const controlX = (pos.x + centerX) / 2;
+                const controlY = bottomJunction + 20;
+                svgContent += `<path d="M ${pos.x} ${pos.y} Q ${controlX} ${controlY} ${centerX} ${bottomJunction}" 
+                    stroke="rgba(255,255,255,0.45)" stroke-width="2" fill="none"/>`;
+            });
+            
+            // LIGNES POINT HAUT → BRANCHES
+            branchPositions.forEach(pos => {
+                const controlX = (pos.x + centerX) / 2;
+                const controlY = topJunction - 20;
+                svgContent += `<path d="M ${centerX} ${topJunction} Q ${controlX} ${controlY} ${pos.x} ${pos.y}" 
+                    stroke="rgba(255,255,255,0.45)" stroke-width="2" fill="none"/>`;
+            });
+            
+            // Insérer SVG
+            const existingSvg = container.querySelector('svg');
+            if (existingSvg) existingSvg.remove();
+            
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;z-index:5;pointer-events:none;';
+            svg.innerHTML = svgContent;
+            container.insertBefore(svg, container.firstChild);
         }
         
         function deleteProject(id) {
