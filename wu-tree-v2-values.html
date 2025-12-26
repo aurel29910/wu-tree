@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wu Tree - Mes Fondations</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(180deg, #87CEEB 0%, #FFB6C1 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .phone-frame {
+            width: 375px;
+            height: 812px;
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+            border-radius: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Pétales qui tombent - EXACT comme wu-tree-main.html */
+        .petal {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: linear-gradient(135deg, rgba(255, 182, 193, 0.8) 0%, rgba(255, 105, 180, 0.6) 100%);
+            border-radius: 50% 0 50% 0;
+            animation: fall linear infinite;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        .petal:nth-child(1) { left: 10%; animation-duration: 12s; animation-delay: 0s; width: 8px; height: 8px; }
+        .petal:nth-child(2) { left: 20%; animation-duration: 14s; animation-delay: 2s; width: 10px; height: 10px; }
+        .petal:nth-child(3) { left: 30%; animation-duration: 16s; animation-delay: 4s; width: 9px; height: 9px; }
+        .petal:nth-child(4) { left: 40%; animation-duration: 13s; animation-delay: 1s; width: 11px; height: 11px; }
+        .petal:nth-child(5) { left: 50%; animation-duration: 15s; animation-delay: 3s; width: 8px; height: 8px; }
+        .petal:nth-child(6) { left: 60%; animation-duration: 17s; animation-delay: 5s; width: 10px; height: 10px; }
+        .petal:nth-child(7) { left: 70%; animation-duration: 14s; animation-delay: 6s; width: 9px; height: 9px; }
+        .petal:nth-child(8) { left: 80%; animation-duration: 16s; animation-delay: 7s; width: 11px; height: 11px; }
+        .petal:nth-child(9) { left: 90%; animation-duration: 13s; animation-delay: 8s; width: 8px; height: 8px; }
+        .petal:nth-child(10) { left: 15%; animation-duration: 15s; animation-delay: 9s; width: 10px; height: 10px; }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-50px) rotate(0deg);
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(812px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Nuages blancs - NOUVEAU */
+        .cloud {
+            position: absolute;
+            color: white;
+            font-size: 50px;
+            opacity: 0.7;
+            animation: float-cloud linear infinite;
+            pointer-events: none;
+            z-index: 40;
+            filter: drop-shadow(0 2px 8px rgba(255,255,255,0.4));
+        }
+
+        .cloud:nth-child(11) { 
+            top: 60px; 
+            animation-duration: 180s;
+            animation-delay: 0s;
+        }
+        .cloud:nth-child(12) { 
+            top: 120px; 
+            animation-duration: 220s;
+            animation-delay: -60s;
+            font-size: 40px;
+        }
+        .cloud:nth-child(13) { 
+            top: 180px; 
+            animation-duration: 200s;
+            animation-delay: -120s;
+            font-size: 45px;
+        }
+
+        @keyframes float-cloud {
+            0% { 
+                transform: translateX(-80px);
+            }
+            100% { 
+                transform: translateX(455px);
+            }
+        }
+
+        .status-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 44px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            color: rgba(255,255,255,0.95);
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 100;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .content {
+            position: relative;
+            height: calc(100% - 44px);
+            margin-top: 44px;
+            overflow-y: auto;
+            padding: 30px 25px;
+            z-index: 60;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 2px 8px rgba(0,0,0,0.1));
+        }
+
+        h1 {
+            font-family: 'Comfortaa', cursive;
+            font-size: 28px;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            font-size: 15px;
+            color: rgba(255,255,255,0.95);
+            line-height: 1.6;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+
+        .counter {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 14px;
+            color: rgba(255,255,255,0.9);
+            font-weight: 500;
+        }
+
+        .counter.warning {
+            color: #FFE4B5;
+        }
+
+        .values-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .value-card {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            border: 2px solid transparent;
+            border-radius: 16px;
+            padding: 16px 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .value-card:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .value-card.selected {
+            border-color: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+        }
+
+        .value-emoji {
+            font-size: 28px;
+            width: 40px;
+            text-align: center;
+        }
+
+        .value-content {
+            flex: 1;
+        }
+
+        .value-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: white;
+            margin-bottom: 3px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .value-description {
+            font-size: 13px;
+            color: rgba(255,255,255,0.85);
+            line-height: 1.4;
+        }
+
+        .value-checkbox {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .value-card.selected .value-checkbox {
+            background: white;
+            border-color: white;
+        }
+
+        .value-checkbox::after {
+            content: '✓';
+            color: #B4A7D6;
+            font-size: 14px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .value-card.selected .value-checkbox::after {
+            opacity: 1;
+        }
+
+        .custom-value-section {
+            margin-top: 20px;
+            padding: 18px;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 2px dashed rgba(255, 255, 255, 0.5);
+        }
+
+        .custom-value-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .custom-value-input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .custom-value-input::placeholder {
+            color: rgba(255,255,255,0.7);
+        }
+
+        .info-box {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border-left: 4px solid rgba(255, 255, 255, 0.6);
+            padding: 15px 18px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .info-box p {
+            font-size: 14px;
+            color: white;
+            line-height: 1.6;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .continue-btn {
+            width: 100%;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 16px;
+            color: #B4A7D6;
+            font-family: 'Comfortaa', cursive;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .continue-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+            background: white;
+        }
+
+        .continue-btn:active {
+            transform: scale(0.98);
+        }
+
+        .continue-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <!-- Pétales qui tombent (10 pétales) -->
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+
+        <!-- Nuages blancs (3 nuages) -->
+        <div class="cloud">☁️</div>
+        <div class="cloud">☁️</div>
+        <div class="cloud">☁️</div>
+
+        <div class="status-bar">
+            <span>9:41</span>
+            <span>📶 🔋</span>
+        </div>
+
+        <div class="content">
+            <div class="header">
+                <div class="header-icon">🏛️</div>
+                <h1>Mes Fondations</h1>
+                <p class="subtitle">Choisis 3 à 5 valeurs qui résonnent profondément en toi</p>
+            </div>
+
+            <div class="counter" id="counter">0 / 5 valeurs sélectionnées</div>
+
+            <div class="values-grid" id="valuesGrid"></div>
+
+            <div class="custom-value-section">
+                <input 
+                    type="text" 
+                    class="custom-value-input" 
+                    id="customValueInput"
+                    placeholder="+ Ajouter ma propre valeur"
+                    maxlength="30"
+                >
+            </div>
+
+            <div class="info-box">
+                <p>💡 Prends le temps de choisir. Ces valeurs sont tes racines.</p>
+            </div>
+
+            <button class="continue-btn" id="continueBtn" onclick="saveValuesAndContinue()">Continuer</button>
+        </div>
+    </div>
+
+    <script>
+        const predefinedValues = [
+            { emoji: '💎', name: 'Liberté', description: 'Autonomie, indépendance' },
+            { emoji: '❤️', name: 'Famille', description: 'Liens, transmission' },
+            { emoji: '🌱', name: 'Croissance', description: 'Évolution, apprentissage' },
+            { emoji: '🎨', name: 'Créativité', description: 'Expression, innovation' },
+            { emoji: '💪', name: 'Impact', description: 'Contribution, influence' },
+            { emoji: '🧘', name: 'Sérénité', description: 'Paix intérieure, calme' },
+            { emoji: '🌍', name: 'Aventure', description: 'Découverte, exploration' },
+            { emoji: '💚', name: 'Authenticité', description: 'Sincérité, vérité' },
+            { emoji: '🤝', name: 'Connexion', description: 'Relations, partage' },
+            { emoji: '🎯', name: 'Excellence', description: 'Maîtrise, qualité' },
+        ];
+
+        let selectedValues = [];
+        const MAX_VALUES = 5;
+        const MIN_VALUES = 3;
+
+        function renderValues() {
+            const grid = document.getElementById('valuesGrid');
+            grid.innerHTML = predefinedValues.map((value, index) => `
+                <div class="value-card" onclick="toggleValue(${index}, '${value.name}', '${value.emoji}')">
+                    <div class="value-emoji">${value.emoji}</div>
+                    <div class="value-content">
+                        <div class="value-name">${value.name}</div>
+                        <div class="value-description">${value.description}</div>
+                    </div>
+                    <div class="value-checkbox"></div>
+                </div>
+            `).join('');
+        }
+
+        function toggleValue(index, name, emoji) {
+            const cards = document.querySelectorAll('.value-card');
+            const card = cards[index];
+            
+            const existingIndex = selectedValues.findIndex(v => v.name === name);
+            
+            if (existingIndex !== -1) {
+                selectedValues.splice(existingIndex, 1);
+                card.classList.remove('selected');
+            } else {
+                if (selectedValues.length < MAX_VALUES) {
+                    selectedValues.push({ name, emoji, custom: false });
+                    card.classList.add('selected');
+                }
+            }
+            
+            updateCounter();
+            updateContinueButton();
+        }
+
+        function updateCounter() {
+            const counter = document.getElementById('counter');
+            counter.textContent = `${selectedValues.length} / ${MAX_VALUES} valeurs sélectionnées`;
+            counter.classList.toggle('warning', selectedValues.length < MIN_VALUES);
+        }
+
+        function updateContinueButton() {
+            document.getElementById('continueBtn').disabled = selectedValues.length < MIN_VALUES;
+        }
+
+        document.getElementById('customValueInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && this.value.trim()) {
+                if (selectedValues.length >= MAX_VALUES) {
+                    alert('Tu as déjà sélectionné 5 valeurs.');
+                    return;
+                }
+                if (selectedValues.find(v => v.name.toLowerCase() === this.value.trim().toLowerCase())) {
+                    alert('Cette valeur est déjà sélectionnée.');
+                    return;
+                }
+                selectedValues.push({ name: this.value.trim(), emoji: '✨', custom: true });
+                this.value = '';
+                updateCounter();
+                updateContinueButton();
+            }
+        });
+
+        function saveValuesAndContinue() {
+            if (selectedValues.length < MIN_VALUES) {
+                alert(`Merci de sélectionner au moins ${MIN_VALUES} valeurs.`);
+                return;
+            }
+            localStorage.setItem('wutree_values', JSON.stringify(selectedValues));
+            window.location.href = 'wu-tree-v2-roots.html';
+        }
+
+        renderValues();
+        updateCounter();
+        updateContinueButton();
+    </script>
+</body>
+</html>
