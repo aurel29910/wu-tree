@@ -55,9 +55,9 @@
         
         svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
         
-        /* SOUS-PROJETS RONDS EN HAUT */
+        /* SOUS-PROJETS RONDS */
         .subprojects { position: absolute; top: 50px; left: 0; right: 0;
-            display: flex; gap: 30px; justify-content: center; flex-wrap: wrap;
+            display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
             z-index: 10; padding: 0 20px; }
         .subproject { width: 75px; height: 75px; border-radius: 50%;
             background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(10px);
@@ -75,8 +75,8 @@
             border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
         .subproject:hover .subproject-delete { display: flex; }
         
-        /* PROJET PARENT ROND EN BAS */
-        .parent-project { position: absolute; bottom: 110px; left: 0; right: 0;
+        /* PROJET PARENT ROND */
+        .parent-project { position: absolute; bottom: 100px; left: 0; right: 0;
             display: flex; justify-content: center; z-index: 10; padding: 0 20px; }
         .parent { width: 90px; height: 90px; border-radius: 50%;
             background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(10px);
@@ -191,18 +191,16 @@
                 };
             });
             
-            // TRONC PLUS COURT
-            const topJunction = Math.max(...subprojectPositions.map(p => p.y)) + 30;
+            // TRONC COURT : jonctions plus proches (20 au lieu de 40)
+            const topJunction = Math.max(...subprojectPositions.map(p => p.y)) + 20;
             const bottomJunction = parentY - 50;
             
             let svgContent = '';
             
-            // TRONC
             const trunkMidY = (topJunction + bottomJunction) / 2;
             svgContent += `<path d="M ${parentX} ${parentY} C ${parentX + 2} ${trunkMidY} ${centerX - 2} ${trunkMidY} ${centerX} ${topJunction}" 
                 stroke="rgba(255,255,255,0.5)" stroke-width="3" fill="none"/>`;
             
-            // LIGNE PARENT → POINT BAS
             if (Math.abs(parentX - centerX) > 5) {
                 const controlX = (parentX + centerX) / 2;
                 const controlY = parentY - 25;
@@ -210,7 +208,6 @@
                     stroke="rgba(255,255,255,0.45)" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
             }
             
-            // LIGNES POINT HAUT → SOUS-PROJETS
             subprojectPositions.forEach(pos => {
                 const dx = pos.x - centerX;
                 const dy = pos.y - topJunction;
