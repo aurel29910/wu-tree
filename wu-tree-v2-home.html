@@ -48,25 +48,16 @@
         
         svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
         
-        /* BRANCHES - Formes organiques */
+        /* BRANCHES - CERCLES PARFAITS */
         .branches { position: absolute; top: 50px; left: 0; right: 0;
             display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
             z-index: 10; padding: 0 20px; }
-        .branch { width: 75px; height: 75px;
+        .branch { width: 75px; height: 75px; border-radius: 50%;
             background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(10px);
             border: 3px solid rgba(255, 255, 255, 0.6);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: all 0.3s;
             position: relative; }
-        
-        /* Formes organiques variées pour les branches */
-        .branch:nth-child(1) { border-radius: 60% 40% 55% 45% / 50% 45% 55% 50%; }
-        .branch:nth-child(2) { border-radius: 45% 55% 50% 50% / 55% 50% 50% 45%; width: 78px; height: 72px; }
-        .branch:nth-child(3) { border-radius: 50% 50% 45% 55% / 45% 55% 45% 55%; width: 72px; height: 77px; }
-        .branch:nth-child(4) { border-radius: 55% 45% 60% 40% / 50% 55% 45% 50%; }
-        .branch:nth-child(5) { border-radius: 50% 50% 50% 50% / 60% 40% 60% 40%; width: 76px; height: 74px; }
-        .branch:nth-child(6) { border-radius: 40% 60% 45% 55% / 55% 45% 55% 45%; }
-        
         .branch:active { transform: scale(0.95); }
         .branch-emoji { font-size: 30px; }
         .branch-name { font-size: 9px; font-weight: 600; color: white;
@@ -77,25 +68,16 @@
             border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
         .branch:hover .branch-delete { display: flex; }
         
-        /* RACINES - Formes organiques */
+        /* RACINES - CERCLES PARFAITS */
         .roots { position: absolute; bottom: 180px; left: 0; right: 0;
             display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
             z-index: 10; padding: 0 20px; }
-        .root { width: 65px; height: 65px;
+        .root { width: 65px; height: 65px; border-radius: 50%;
             background: rgba(255, 255, 255, 0.35); backdrop-filter: blur(10px);
             border: 2px solid rgba(255, 255, 255, 0.5);
             display: flex; align-items: center; justify-content: center;
             font-size: 26px; box-shadow: 0 3px 12px rgba(0,0,0,0.06);
             cursor: pointer; position: relative; transition: all 0.3s; }
-        
-        /* Formes organiques variées pour les racines */
-        .root:nth-child(1) { border-radius: 55% 45% 50% 50% / 60% 40% 60% 40%; width: 68px; height: 62px; }
-        .root:nth-child(2) { border-radius: 50% 50% 45% 55% / 45% 55% 45% 55%; }
-        .root:nth-child(3) { border-radius: 45% 55% 55% 45% / 50% 50% 50% 50%; width: 62px; height: 67px; }
-        .root:nth-child(4) { border-radius: 60% 40% 45% 55% / 55% 45% 55% 45%; }
-        .root:nth-child(5) { border-radius: 50% 50% 50% 50% / 55% 45% 55% 45%; width: 66px; height: 64px; }
-        .root:nth-child(6) { border-radius: 45% 55% 60% 40% / 50% 50% 50% 50%; }
-        
         .root:active { transform: scale(0.95); }
         
         .foundations { position: absolute; bottom: 100px; left: 0; right: 0;
@@ -205,7 +187,7 @@
                 const rect = el.getBoundingClientRect();
                 return {
                     x: rect.left + rect.width / 2 - containerRect.left,
-                    y: rect.top + rect.height / 2 - containerRect.top
+                    y: rect.bottom - containerRect.top - 5 // Bas de la bulle
                 };
             });
             
@@ -213,44 +195,48 @@
                 const rect = el.getBoundingClientRect();
                 return {
                     x: rect.left + rect.width / 2 - containerRect.left,
-                    y: rect.top + rect.height / 2 - containerRect.top
+                    y: rect.top - containerRect.top + 5 // Haut de la bulle
                 };
             });
             
-            const topJunction = Math.max(...branchPositions.map(p => p.y)) + 40;
-            const bottomJunction = Math.min(...rootPositions.map(p => p.y)) - 40;
+            const topJunction = Math.max(...branchPositions.map(p => p.y)) + 35;
+            const bottomJunction = Math.min(...rootPositions.map(p => p.y)) - 35;
             
             let svgContent = '';
             
-            // TRONC avec courbe douce
+            // TRONC CENTRAL (légèrement courbé)
             const trunkMidY = (topJunction + bottomJunction) / 2;
-            svgContent += `<path d="M ${centerX} ${topJunction} C ${centerX + 2} ${trunkMidY} ${centerX - 2} ${trunkMidY} ${centerX} ${bottomJunction}" 
-                stroke="rgba(255,255,255,0.5)" stroke-width="3" fill="none"/>`;
+            svgContent += `<path d="M ${centerX} ${topJunction} C ${centerX + 3} ${trunkMidY} ${centerX - 3} ${trunkMidY} ${centerX} ${bottomJunction}" 
+                stroke="rgba(255,255,255,0.55)" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
             
-            // LIGNES RACINES → TRONC (courbes cubiques organiques)
+            // LIGNES RACINES → TRONC (courbes organiques douces)
             rootPositions.forEach(pos => {
                 const dx = centerX - pos.x;
                 const dy = bottomJunction - pos.y;
-                const control1X = pos.x + dx * 0.3;
-                const control1Y = pos.y + dy * 0.1;
-                const control2X = pos.x + dx * 0.7;
-                const control2Y = pos.y + dy * 0.6;
+                
+                // Points de contrôle pour courbe douce
+                const control1X = pos.x + dx * 0.25;
+                const control1Y = pos.y;
+                const control2X = pos.x + dx * 0.75;
+                const control2Y = pos.y + dy * 0.7;
                 
                 svgContent += `<path d="M ${pos.x} ${pos.y} C ${control1X} ${control1Y} ${control2X} ${control2Y} ${centerX} ${bottomJunction}" 
-                    stroke="rgba(255,255,255,0.45)" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+                    stroke="rgba(255,255,255,0.5)" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
             });
             
-            // LIGNES TRONC → BRANCHES (courbes cubiques organiques)
+            // LIGNES TRONC → BRANCHES (courbes organiques douces)
             branchPositions.forEach(pos => {
                 const dx = pos.x - centerX;
                 const dy = pos.y - topJunction;
-                const control1X = centerX + dx * 0.3;
-                const control1Y = topJunction + dy * 0.4;
-                const control2X = centerX + dx * 0.7;
-                const control2Y = topJunction + dy * 0.9;
+                
+                // Points de contrôle pour courbe douce
+                const control1X = centerX + dx * 0.25;
+                const control1Y = topJunction + dy * 0.3;
+                const control2X = centerX + dx * 0.75;
+                const control2Y = topJunction + dy;
                 
                 svgContent += `<path d="M ${centerX} ${topJunction} C ${control1X} ${control1Y} ${control2X} ${control2Y} ${pos.x} ${pos.y}" 
-                    stroke="rgba(255,255,255,0.45)" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+                    stroke="rgba(255,255,255,0.5)" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
             });
             
             const existingSvg = container.querySelector('svg');
