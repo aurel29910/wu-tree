@@ -55,7 +55,6 @@
         
         svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
         
-        /* SOUS-PROJETS RONDS */
         .subprojects { position: absolute; top: 50px; left: 0; right: 0;
             display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
             z-index: 10; padding: 0 20px; }
@@ -75,7 +74,6 @@
             border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
         .subproject:hover .subproject-delete { display: flex; }
         
-        /* PROJET PARENT ROND */
         .parent-project { position: absolute; bottom: 100px; left: 0; right: 0;
             display: flex; justify-content: center; z-index: 10; padding: 0 20px; }
         .parent { width: 90px; height: 90px; border-radius: 50%;
@@ -181,42 +179,37 @@
             
             const parentRect = parentElement.getBoundingClientRect();
             const parentX = parentRect.left + parentRect.width / 2 - containerRect.left;
-            const parentY = parentRect.top + parentRect.height / 2 - containerRect.top;
+            const parentY = parentRect.top - containerRect.top;
             
             const subprojectPositions = Array.from(subprojectElements).map(el => {
                 const rect = el.getBoundingClientRect();
                 return {
                     x: rect.left + rect.width / 2 - containerRect.left,
-                    y: rect.top + rect.height / 2 - containerRect.top
+                    y: rect.bottom - containerRect.top
                 };
             });
             
-            // TRONC COURT : jonctions plus proches (20 au lieu de 40)
-            const topJunction = Math.max(...subprojectPositions.map(p => p.y)) + 20;
-            const bottomJunction = parentY - 50;
+            // TRONC HORIZONTAL
+            const subprojectsBottom = Math.max(...subprojectPositions.map(p => p.y));
+            const trunkY = (subprojectsBottom + parentY) / 2;
+            
+            const leftMost = Math.min(...subprojectPositions.map(p => p.x), parentX);
+            const rightMost = Math.max(...subprojectPositions.map(p => p.x), parentX);
             
             let svgContent = '';
             
-            const trunkMidY = (topJunction + bottomJunction) / 2;
-            svgContent += `<path d="M ${parentX} ${parentY} C ${parentX + 2} ${trunkMidY} ${centerX - 2} ${trunkMidY} ${centerX} ${topJunction}" 
-                stroke="rgba(255,255,255,0.5)" stroke-width="3" fill="none"/>`;
+            // TRONC HORIZONTAL
+            svgContent += `<path d="M ${leftMost - 20} ${trunkY} L ${rightMost + 20} ${trunkY}" 
+                stroke="rgba(255,255,255,0.5)" stroke-width="3" fill="none" stroke-linecap="round"/>`;
             
-            if (Math.abs(parentX - centerX) > 5) {
-                const controlX = (parentX + centerX) / 2;
-                const controlY = parentY - 25;
-                svgContent += `<path d="M ${parentX} ${parentY} Q ${controlX} ${controlY} ${centerX} ${bottomJunction}" 
-                    stroke="rgba(255,255,255,0.45)" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
-            }
+            // LIGNE VERTICALE CENTRALE (du tronc vers parent)
+            svgContent += `<line x1="${centerX}" y1="${trunkY}" x2="${parentX}" y2="${parentY}" 
+                stroke="rgba(255,255,255,0.5)" stroke-width="3" stroke-linecap="round"/>`;
             
+            // LIGNES SOUS-PROJETS → TRONC (courbes douces)
             subprojectPositions.forEach(pos => {
-                const dx = pos.x - centerX;
-                const dy = pos.y - topJunction;
-                const control1X = centerX + dx * 0.3;
-                const control1Y = topJunction + dy * 0.4;
-                const control2X = centerX + dx * 0.7;
-                const control2Y = topJunction + dy * 0.9;
-                
-                svgContent += `<path d="M ${centerX} ${topJunction} C ${control1X} ${control1Y} ${control2X} ${control2Y} ${pos.x} ${pos.y}" 
+                const controlY = pos.y + (trunkY - pos.y) * 0.5;
+                svgContent += `<path d="M ${pos.x} ${pos.y} Q ${pos.x} ${controlY} ${pos.x} ${trunkY}" 
                     stroke="rgba(255,255,255,0.45)" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
             });
             
