@@ -11,7 +11,6 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(180deg, #87CEEB 0%, #FFB6C1 100%);
             min-height: 100vh; display: flex; justify-content: center; align-items: center;
-            overflow: hidden;
         }
         .phone-frame {
             width: 375px; height: 812px;
@@ -19,15 +18,6 @@
             border-radius: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.4);
             position: relative; overflow: hidden;
         }
-        
-        /* Animations naturelles */
-        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
-        @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
-        @keyframes fadeIn { 0% { opacity: 0; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1); } }
-        @keyframes fall { 0% { transform: translateY(-50px) rotate(0deg); opacity: 0.8; }
-            100% { transform: translateY(812px) rotate(360deg); opacity: 0; } }
-        @keyframes float-cloud { 0% { transform: translateX(-80px); } 100% { transform: translateX(455px); } }
-        
         .petal { position: absolute; width: 10px; height: 10px;
             background: linear-gradient(135deg, rgba(255, 182, 193, 0.8), rgba(255, 105, 180, 0.6));
             border-radius: 50% 0 50% 0; animation: fall linear infinite; pointer-events: none; z-index: 50; }
@@ -36,97 +26,89 @@
         .petal:nth-child(3) { left: 30%; animation-duration: 16s; animation-delay: 4s; }
         .petal:nth-child(4) { left: 40%; animation-duration: 13s; animation-delay: 1s; }
         .petal:nth-child(5) { left: 50%; animation-duration: 15s; animation-delay: 3s; }
-        
+        .petal:nth-child(6) { left: 60%; animation-duration: 17s; animation-delay: 5s; }
+        .petal:nth-child(7) { left: 70%; animation-duration: 14s; animation-delay: 6s; }
+        .petal:nth-child(8) { left: 80%; animation-duration: 16s; animation-delay: 7s; }
+        .petal:nth-child(9) { left: 90%; animation-duration: 13s; animation-delay: 8s; }
+        .petal:nth-child(10) { left: 15%; animation-duration: 15s; animation-delay: 9s; }
+        @keyframes fall { 0% { transform: translateY(-50px) rotate(0deg); opacity: 0.8; }
+            100% { transform: translateY(812px) rotate(360deg); opacity: 0; } }
         .cloud { position: absolute; color: white; font-size: 50px; opacity: 0.7;
             animation: float-cloud linear infinite; pointer-events: none; z-index: 40; }
-        .cloud:nth-child(6) { top: 60px; animation-duration: 180s; }
-        .cloud:nth-child(7) { top: 100px; animation-duration: 220s; animation-delay: -60s; font-size: 40px; }
-        
+        .cloud:nth-child(11) { top: 60px; animation-duration: 180s; }
+        .cloud:nth-child(12) { top: 100px; animation-duration: 220s; animation-delay: -60s; font-size: 40px; }
+        .cloud:nth-child(13) { top: 140px; animation-duration: 200s; animation-delay: -120s; font-size: 45px; }
+        @keyframes float-cloud { 0% { transform: translateX(-80px); } 100% { transform: translateX(455px); } }
         .status-bar { position: absolute; top: 0; left: 0; right: 0; height: 44px;
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 20px; color: rgba(255,255,255,0.95); font-size: 14px; z-index: 100; }
-        
         .back-button { position: absolute; top: 50px; left: 20px; width: 40px; height: 40px;
             background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(10px);
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             cursor: pointer; z-index: 100; border: 2px solid rgba(255, 255, 255, 0.5);
-            transition: all 0.3s; }
+            transition: all 0.3s; font-size: 18px; color: white; }
         .back-button:hover { background: rgba(255, 255, 255, 0.4); transform: scale(1.05); }
         .back-button:active { transform: scale(0.95); }
-        
         .content { position: relative; height: calc(100% - 44px - 70px); margin-top: 44px; z-index: 60; overflow: hidden; }
         
-        .domain-container { width: 100%; height: 100%; position: relative; display: flex;
-            flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .tree-container { width: 100%; height: 100%; position: relative; }
         
-        /* TRONC CENTRAL */
-        .trunk { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 120px; height: 120px; border-radius: 60% 40% 55% 45% / 50% 45% 55% 50%;
-            background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(15px);
-            border: 4px solid rgba(255, 255, 255, 0.7);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-            animation: breathe 6s ease-in-out infinite;
-            z-index: 15; }
-        .trunk-emoji { font-size: 48px; margin-bottom: 6px; }
-        .trunk-name { font-family: 'Comfortaa', cursive; font-size: 14px; font-weight: 600;
-            color: white; text-shadow: 0 2px 6px rgba(0,0,0,0.15); }
-        
-        /* SOUS-PROJETS FLOTTANTS */
-        .subprojects { position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
-            gap: 25px; padding: 80px 30px; z-index: 10; }
-        
-        .subproject { width: 85px; height: 85px;
-            background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(12px);
-            border: 3px solid rgba(255, 255, 255, 0.6);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            transition: all 0.4s ease;
-            position: relative;
-            animation: fadeIn 0.6s ease-out backwards; }
-        
-        /* Formes organiques variées */
-        .subproject:nth-child(1) { border-radius: 60% 40% 55% 45% / 50% 45% 55% 50%;
-            animation-delay: 0.1s; }
-        .subproject:nth-child(2) { border-radius: 45% 55% 50% 50% / 55% 50% 50% 45%;
-            animation-delay: 0.2s; }
-        .subproject:nth-child(3) { border-radius: 50% 50% 45% 55% / 45% 55% 45% 55%;
-            animation-delay: 0.3s; }
-        .subproject:nth-child(4) { border-radius: 55% 45% 60% 40% / 50% 55% 45% 50%;
-            animation-delay: 0.4s; }
-        .subproject:nth-child(5) { border-radius: 50% 50% 50% 50% / 60% 40% 60% 40%;
-            animation-delay: 0.5s; }
-        .subproject:nth-child(6) { border-radius: 40% 60% 45% 55% / 55% 45% 55% 45%;
-            animation-delay: 0.6s; }
-        
-        /* Animation flottante et respiration */
-        .subproject:nth-child(odd) { animation: fadeIn 0.6s ease-out backwards, float 5s ease-in-out infinite, breathe 8s ease-in-out infinite; }
-        .subproject:nth-child(even) { animation: fadeIn 0.6s ease-out backwards, float 6s ease-in-out infinite 1s, breathe 9s ease-in-out infinite 2s; }
-        
-        .subproject:hover { transform: scale(1.05) translateY(-4px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.12); }
-        .subproject:active { transform: scale(0.98); }
-        
-        .subproject-emoji { font-size: 34px; margin-bottom: 4px; }
-        .subproject-name { font-size: 10px; font-weight: 600; color: white;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.2); text-align: center; line-height: 1.2; }
-        
-        /* Lignes douces vers tronc */
         svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
         
-        .empty-state { text-align: center; padding: 40px 30px; }
-        .empty-icon { font-size: 56px; margin-bottom: 16px; opacity: 0.7; }
-        .empty-text { font-size: 15px; color: white; line-height: 1.7;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        /* SOUS-PROJETS EN HAUT (comme branches) */
+        .subprojects { position: absolute; top: 50px; left: 0; right: 0;
+            display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
+            z-index: 10; padding: 0 20px; }
+        .subproject { width: 75px; height: 75px;
+            background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(10px);
+            border: 3px solid rgba(255, 255, 255, 0.6);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: all 0.3s;
+            position: relative; }
+        
+        /* Formes organiques variées */
+        .subproject:nth-child(1) { border-radius: 60% 40% 55% 45% / 50% 45% 55% 50%; }
+        .subproject:nth-child(2) { border-radius: 45% 55% 50% 50% / 55% 50% 50% 45%; width: 78px; height: 72px; }
+        .subproject:nth-child(3) { border-radius: 50% 50% 45% 55% / 45% 55% 45% 55%; width: 72px; height: 77px; }
+        .subproject:nth-child(4) { border-radius: 55% 45% 60% 40% / 50% 55% 45% 50%; }
+        .subproject:nth-child(5) { border-radius: 50% 50% 50% 50% / 60% 40% 60% 40%; width: 76px; height: 74px; }
+        .subproject:nth-child(6) { border-radius: 40% 60% 45% 55% / 55% 45% 55% 45%; }
+        
+        .subproject:active { transform: scale(0.95); }
+        .subproject-emoji { font-size: 30px; }
+        .subproject-name { font-size: 9px; font-weight: 600; color: white;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2); margin-top: 2px; }
+        .subproject-delete { position: absolute; top: -8px; right: -8px; width: 24px; height: 24px;
+            background: #FF6B6B; border-radius: 50%; color: white; font-size: 14px; font-weight: bold;
+            display: none; align-items: center; justify-content: center; cursor: pointer;
+            border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        .subproject:hover .subproject-delete { display: flex; }
+        
+        /* PROJET PARENT EN BAS (comme fondations) */
+        .parent-project { position: absolute; bottom: 100px; left: 0; right: 0;
+            display: flex; justify-content: center; z-index: 10; padding: 0 20px; }
+        .parent { width: 90px; height: 90px;
+            background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(10px);
+            border: 3px solid rgba(255, 255, 255, 0.7);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 55% 45% 50% 50% / 60% 40% 60% 40%;
+            cursor: pointer; transition: all 0.3s; }
+        .parent:active { transform: scale(0.95); }
+        .parent-emoji { font-size: 38px; margin-bottom: 4px; }
+        .parent-name { font-size: 11px; font-weight: 600; color: white;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        
+        .empty { text-align: center; padding: 250px 30px; }
+        .empty-icon { font-size: 64px; margin-bottom: 20px; }
+        .empty-text { font-size: 16px; color: white; line-height: 1.8; text-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         
         .fab { position: absolute; bottom: 90px; right: 20px; width: 56px; height: 56px; border-radius: 50%;
             background: linear-gradient(135deg, #FFB6C1 0%, #FF69B4 100%);
             color: white; font-size: 28px; font-weight: 300;
             cursor: pointer; box-shadow: 0 4px 20px rgba(255, 105, 180, 0.4);
             z-index: 100; display: flex; align-items: center; justify-content: center;
-            border: 2px solid rgba(255, 255, 255, 0.6); transition: all 0.3s;
-            animation: breathe 4s ease-in-out infinite; }
+            border: 2px solid rgba(255, 255, 255, 0.6); transition: all 0.3s; }
         .fab:hover { transform: scale(1.05); box-shadow: 0 6px 25px rgba(255, 105, 180, 0.5); }
         .fab:active { transform: scale(0.95); }
         
@@ -144,93 +126,115 @@
 <body>
     <div class="phone-frame">
         <div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div>
-        <div class="cloud">☁️</div><div class="cloud">☁️</div>
+        <div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div>
+        <div class="cloud">☁️</div><div class="cloud">☁️</div><div class="cloud">☁️</div>
         <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
         <div class="back-button" onclick="goBack()">←</div>
         <div class="content">
-            <div class="domain-container" id="domainContainer"></div>
+            <div class="tree-container" id="treeContainer"></div>
         </div>
         <button class="fab" onclick="createSubproject()">+</button>
         <div class="bottom-menu">
             <div class="menu-item" onclick="goHome()"><div class="menu-icon">🌳</div><div class="menu-label">Arbre</div></div>
             <div class="menu-item active"><div class="menu-icon">🌿</div><div class="menu-label">Domaine</div></div>
-            <div class="menu-item" onclick="showSettings()"><div class="menu-icon">⚙️</div><div class="menu-label">Options</div></div>
         </div>
     </div>
     <script>
-        let currentProject = null;
-        
         function loadDomain() {
             const projectId = localStorage.getItem('wutree_current_project');
             if (!projectId) { window.location.href = 'wu-tree-v2-home.html'; return; }
             
             const projects = JSON.parse(localStorage.getItem('wutree_projects') || '[]');
-            currentProject = projects.find(p => p.id === projectId);
+            const currentProject = projects.find(p => p.id === projectId);
             if (!currentProject) { window.location.href = 'wu-tree-v2-home.html'; return; }
             
-            const container = document.getElementById('domainContainer');
+            const container = document.getElementById('treeContainer');
             const subprojects = currentProject.subprojects || [];
             
             let html = '';
             
-            // TRONC CENTRAL
-            html += `<div class="trunk">
-                <div class="trunk-emoji">${currentProject.emoji}</div>
-                <div class="trunk-name">${currentProject.name}</div>
-            </div>`;
-            
-            // SOUS-PROJETS
+            // SOUS-PROJETS EN HAUT (si existants)
             if (subprojects.length > 0) {
-                html += '<div class="subprojects">';
+                html += '<div class="subprojects" id="subprojectsContainer">';
                 subprojects.forEach(sp => {
-                    html += `<div class="subproject" onclick="openSubproject('${sp.id}')">
+                    html += `<div class="subproject" data-subproject-id="${sp.id}" onclick="openSubproject('${sp.id}')">
                         <div class="subproject-emoji">${sp.emoji}</div>
                         <div class="subproject-name">${sp.name}</div>
+                        <div class="subproject-delete" onclick="event.stopPropagation(); deleteSubproject('${sp.id}')">×</div>
                     </div>`;
                 });
                 html += '</div>';
-                
-                // Dessiner lignes après chargement
-                setTimeout(drawLines, 100);
-            } else {
-                html += `<div class="empty-state">
-                    <div class="empty-icon">🌱</div>
-                    <p class="empty-text">Aucun sous-projet encore.<br>Clique sur + pour en créer un.</p>
-                </div>`;
             }
             
+            // PROJET PARENT EN BAS (toujours affiché)
+            html += `<div class="parent-project">
+                <div class="parent">
+                    <div class="parent-emoji">${currentProject.emoji}</div>
+                    <div class="parent-name">${currentProject.name}</div>
+                </div>
+            </div>`;
+            
             container.innerHTML = html;
+            
+            // Dessiner lignes si sous-projets
+            if (subprojects.length > 0) {
+                setTimeout(drawLines, 50);
+            }
         }
         
         function drawLines() {
-            const container = document.getElementById('domainContainer');
-            const trunk = container.querySelector('.trunk');
+            const container = document.getElementById('treeContainer');
             const subprojectElements = container.querySelectorAll('.subproject');
+            const parentElement = container.querySelector('.parent');
             
-            if (!trunk || subprojectElements.length === 0) return;
+            if (subprojectElements.length === 0 || !parentElement) return;
             
             const containerRect = container.getBoundingClientRect();
-            const trunkRect = trunk.getBoundingClientRect();
-            const trunkX = trunkRect.left + trunkRect.width / 2 - containerRect.left;
-            const trunkY = trunkRect.top + trunkRect.height / 2 - containerRect.top;
+            const centerX = container.offsetWidth / 2;
+            
+            // Position parent
+            const parentRect = parentElement.getBoundingClientRect();
+            const parentX = parentRect.left + parentRect.width / 2 - containerRect.left;
+            const parentY = parentRect.top + parentRect.height / 2 - containerRect.top;
+            
+            // Positions sous-projets
+            const subprojectPositions = Array.from(subprojectElements).map(el => {
+                const rect = el.getBoundingClientRect();
+                return {
+                    x: rect.left + rect.width / 2 - containerRect.left,
+                    y: rect.top + rect.height / 2 - containerRect.top
+                };
+            });
+            
+            const topJunction = Math.max(...subprojectPositions.map(p => p.y)) + 40;
+            const bottomJunction = parentY - 60;
             
             let svgContent = '';
             
-            subprojectElements.forEach(el => {
-                const rect = el.getBoundingClientRect();
-                const x = rect.left + rect.width / 2 - containerRect.left;
-                const y = rect.top + rect.height / 2 - containerRect.top;
+            // TRONC avec courbe douce
+            const trunkMidY = (topJunction + bottomJunction) / 2;
+            svgContent += `<path d="M ${parentX} ${parentY} C ${parentX + 2} ${trunkMidY} ${centerX - 2} ${trunkMidY} ${centerX} ${topJunction}" 
+                stroke="rgba(255,255,255,0.5)" stroke-width="3" fill="none"/>`;
+            
+            // LIGNES PARENT → POINT BAS DU TRONC
+            if (Math.abs(parentX - centerX) > 5) {
+                const controlX = (parentX + centerX) / 2;
+                const controlY = parentY - 30;
+                svgContent += `<path d="M ${parentX} ${parentY} Q ${controlX} ${controlY} ${centerX} ${bottomJunction}" 
+                    stroke="rgba(255,255,255,0.45)" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+            }
+            
+            // LIGNES POINT HAUT DU TRONC → SOUS-PROJETS
+            subprojectPositions.forEach(pos => {
+                const dx = pos.x - centerX;
+                const dy = pos.y - topJunction;
+                const control1X = centerX + dx * 0.3;
+                const control1Y = topJunction + dy * 0.4;
+                const control2X = centerX + dx * 0.7;
+                const control2Y = topJunction + dy * 0.9;
                 
-                const dx = trunkX - x;
-                const dy = trunkY - y;
-                const control1X = x + dx * 0.4;
-                const control1Y = y + dy * 0.2;
-                const control2X = x + dx * 0.7;
-                const control2Y = y + dy * 0.8;
-                
-                svgContent += `<path d="M ${x} ${y} C ${control1X} ${control1Y} ${control2X} ${control2Y} ${trunkX} ${trunkY}" 
-                    stroke="rgba(255,255,255,0.4)" stroke-width="2" fill="none" stroke-linecap="round"
-                    opacity="0.6"/>`;
+                svgContent += `<path d="M ${centerX} ${topJunction} C ${control1X} ${control1Y} ${control2X} ${control2Y} ${pos.x} ${pos.y}" 
+                    stroke="rgba(255,255,255,0.45)" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
             });
             
             const existingSvg = container.querySelector('svg');
@@ -241,18 +245,27 @@
             container.insertBefore(svg, container.firstChild);
         }
         
+        function deleteSubproject(id) {
+            if (confirm('Supprimer ce sous-projet ?')) {
+                const projectId = localStorage.getItem('wutree_current_project');
+                let projects = JSON.parse(localStorage.getItem('wutree_projects') || '[]');
+                const projectIndex = projects.findIndex(p => p.id === projectId);
+                if (projectIndex === -1) return;
+                
+                projects[projectIndex].subprojects = projects[projectIndex].subprojects.filter(sp => sp.id !== id);
+                localStorage.setItem('wutree_projects', JSON.stringify(projects));
+                loadDomain();
+            }
+        }
+        
         function openSubproject(id) {
             localStorage.setItem('wutree_current_subproject', id);
             window.location.href = 'wu-tree-v2-subproject-tree.html';
         }
         
-        function createSubproject() {
-            window.location.href = 'wu-tree-v2-subproject-create.html';
-        }
-        
+        function createSubproject() { window.location.href = 'wu-tree-v2-subproject-create.html'; }
         function goBack() { window.location.href = 'wu-tree-v2-home.html'; }
         function goHome() { window.location.href = 'wu-tree-v2-home.html'; }
-        function showSettings() { alert('Options à venir'); }
         
         loadDomain();
     </script>
