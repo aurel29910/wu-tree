@@ -189,12 +189,11 @@
                 };
             });
             
-            // Point de jonction haut (sous les sous-projets)
+            // TRONC PLUS COURT : jonctions éloignées
             const subprojectsBottom = Math.max(...subprojectPositions.map(p => p.y));
-            const topJunction = subprojectsBottom + 80;
+            const topJunction = subprojectsBottom + 100;
             
-            // Point de jonction bas (au-dessus du parent)
-            const bottomJunction = parentY - 80;
+            const bottomJunction = parentY - 100;
             
             let svgContent = '';
             
