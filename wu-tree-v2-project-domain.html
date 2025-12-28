@@ -191,10 +191,10 @@
             
             // Point de jonction haut (sous les sous-projets)
             const subprojectsBottom = Math.max(...subprojectPositions.map(p => p.y));
-            const topJunction = subprojectsBottom + 60;
+            const topJunction = subprojectsBottom + 25;
             
             // Point de jonction bas (au-dessus du parent)
-            const bottomJunction = parentY - 60;
+            const bottomJunction = parentY - 25;
             
             let svgContent = '';
             
