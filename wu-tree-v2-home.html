@@ -185,7 +185,7 @@
                 const rect = el.getBoundingClientRect();
                 return {
                     x: rect.left + rect.width / 2 - containerRect.left,
-                    y: rect.top + rect.height / 2 - containerRect.top
+                    y: rect.bottom - containerRect.top
                 };
             });
             
@@ -193,41 +193,41 @@
                 const rect = el.getBoundingClientRect();
                 return {
                     x: rect.left + rect.width / 2 - containerRect.left,
-                    y: rect.top + rect.height / 2 - containerRect.top
+                    y: rect.top - containerRect.top
                 };
             });
             
-            // TRONC COURT : jonctions plus proches (20 au lieu de 40)
-            const topJunction = Math.max(...branchPositions.map(p => p.y)) + 20;
-            const bottomJunction = Math.min(...rootPositions.map(p => p.y)) - 20;
+            // TRONC HORIZONTAL - position entre branches et racines
+            const branchesBottom = Math.max(...branchPositions.map(p => p.y));
+            const rootsTop = Math.min(...rootPositions.map(p => p.y));
+            const trunkY = (branchesBottom + rootsTop) / 2;
+            
+            // Largeur du tronc horizontal
+            const leftMost = Math.min(...branchPositions.map(p => p.x), ...rootPositions.map(p => p.x));
+            const rightMost = Math.max(...branchPositions.map(p => p.x), ...rootPositions.map(p => p.x));
             
             let svgContent = '';
             
-            const trunkMidY = (topJunction + bottomJunction) / 2;
-            svgContent += `<path d="M ${centerX} ${topJunction} C ${centerX + 2} ${trunkMidY} ${centerX - 2} ${trunkMidY} ${centerX} ${bottomJunction}" 
-                stroke="rgba(255,255,255,0.5)" stroke-width="3" fill="none"/>`;
+            // TRONC HORIZONTAL (comme dans ton dessin)
+            svgContent += `<path d="M ${leftMost - 20} ${trunkY} L ${rightMost + 20} ${trunkY}" 
+                stroke="rgba(255,255,255,0.5)" stroke-width="3" fill="none" stroke-linecap="round"/>`;
             
-            rootPositions.forEach(pos => {
-                const dx = centerX - pos.x;
-                const dy = bottomJunction - pos.y;
-                const control1X = pos.x + dx * 0.3;
-                const control1Y = pos.y + dy * 0.1;
-                const control2X = pos.x + dx * 0.7;
-                const control2Y = pos.y + dy * 0.6;
-                
-                svgContent += `<path d="M ${pos.x} ${pos.y} C ${control1X} ${control1Y} ${control2X} ${control2Y} ${centerX} ${bottomJunction}" 
+            // LIGNE VERTICALE CENTRALE (du tronc vers racines)
+            const trunkBottom = Math.max(...rootPositions.map(p => p.y)) + 10;
+            svgContent += `<line x1="${centerX}" y1="${trunkY}" x2="${centerX}" y2="${trunkBottom}" 
+                stroke="rgba(255,255,255,0.5)" stroke-width="3" stroke-linecap="round"/>`;
+            
+            // LIGNES DES BRANCHES → TRONC HORIZONTAL (courbes douces)
+            branchPositions.forEach(pos => {
+                const controlY = pos.y + (trunkY - pos.y) * 0.5;
+                svgContent += `<path d="M ${pos.x} ${pos.y} Q ${pos.x} ${controlY} ${pos.x} ${trunkY}" 
                     stroke="rgba(255,255,255,0.45)" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
             });
             
-            branchPositions.forEach(pos => {
-                const dx = pos.x - centerX;
-                const dy = pos.y - topJunction;
-                const control1X = centerX + dx * 0.3;
-                const control1Y = topJunction + dy * 0.4;
-                const control2X = centerX + dx * 0.7;
-                const control2Y = topJunction + dy * 0.9;
-                
-                svgContent += `<path d="M ${centerX} ${topJunction} C ${control1X} ${control1Y} ${control2X} ${control2Y} ${pos.x} ${pos.y}" 
+            // LIGNES RACINES → TRONC VERTICAL (courbes douces)
+            rootPositions.forEach(pos => {
+                const controlY = pos.y - (pos.y - trunkBottom) * 0.5;
+                svgContent += `<path d="M ${pos.x} ${pos.y} Q ${pos.x} ${controlY} ${centerX} ${trunkBottom}" 
                     stroke="rgba(255,255,255,0.45)" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
             });
             
