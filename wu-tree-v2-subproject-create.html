@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wu Tree - Nouveau Sous-Projet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(180deg, #87CEEB 0%, #FFB6C1 100%);
+            min-height: 100vh; display: flex; justify-content: center; align-items: center; overflow: hidden;
+        }
+        .phone-frame {
+            width: 375px; height: 812px;
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+            border-radius: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            position: relative; overflow: hidden;
+        }
+        .petal { position: absolute; width: 10px; height: 10px;
+            background: linear-gradient(135deg, rgba(255, 182, 193, 0.8), rgba(255, 105, 180, 0.6));
+            border-radius: 50% 0 50% 0; animation: fall linear infinite; pointer-events: none; z-index: 50; }
+        .petal:nth-child(1) { left: 10%; animation-duration: 12s; animation-delay: 0s; width: 8px; height: 8px; }
+        .petal:nth-child(2) { left: 20%; animation-duration: 14s; animation-delay: 2s; width: 10px; height: 10px; }
+        .petal:nth-child(3) { left: 30%; animation-duration: 16s; animation-delay: 4s; width: 9px; height: 9px; }
+        @keyframes fall { 0% { transform: translateY(-50px) rotate(0deg); opacity: 0.8; }
+            100% { transform: translateY(812px) rotate(360deg); opacity: 0; } }
+        .cloud { position: absolute; color: white; font-size: 50px; opacity: 0.7;
+            animation: float-cloud linear infinite; pointer-events: none; z-index: 40; }
+        .cloud:nth-child(4) { top: 60px; animation-duration: 180s; }
+        @keyframes float-cloud { 0% { transform: translateX(-80px); } 100% { transform: translateX(455px); } }
+        .status-bar { position: absolute; top: 0; left: 0; right: 0; height: 44px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 20px; color: rgba(255,255,255,0.95); font-size: 14px; z-index: 100; }
+        .content { position: relative; height: calc(100% - 44px); margin-top: 44px;
+            overflow-y: auto; padding: 25px 20px; z-index: 60; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .header-icon { font-size: 40px; margin-bottom: 10px; }
+        h1 { font-family: 'Comfortaa', cursive; font-size: 24px; color: white;
+            margin-bottom: 6px; text-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .subtitle { font-size: 13px; color: rgba(255,255,255,0.95); text-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .form-section { margin-bottom: 20px; }
+        .form-label { display: block; font-weight: 600; font-size: 13px; color: white;
+            margin-bottom: 8px; text-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .form-input { width: 100%; padding: 12px 14px; border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 12px; font-size: 15px; background: rgba(255, 255, 255, 0.3);
+            color: white; }
+        .form-input:focus { outline: none; border-color: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.4); }
+        .form-input::placeholder { color: rgba(255,255,255,0.7); }
+        .emoji-picker { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; margin-top: 8px;
+            max-height: 200px; overflow-y: auto; padding: 10px; background: rgba(255,255,255,0.2);
+            border-radius: 12px; }
+        .emoji-option { width: 36px; height: 36px; display: flex; align-items: center;
+            justify-content: center; font-size: 22px; cursor: pointer; border-radius: 8px;
+            border: 2px solid transparent; background: rgba(255, 255, 255, 0.2); transition: all 0.2s; }
+        .emoji-option:hover { background: rgba(255, 255, 255, 0.35); }
+        .emoji-option.selected { border-color: rgba(255, 255, 255, 0.8);
+            background: rgba(255, 255, 255, 0.5); transform: scale(1.1); }
+        .info-box { background: rgba(255, 255, 255, 0.2); border-left: 3px solid rgba(255, 255, 255, 0.6);
+            padding: 12px 14px; border-radius: 8px; margin: 20px 0; }
+        .info-box p { font-size: 12px; color: white; line-height: 1.6; }
+        .buttons-row { display: flex; gap: 8px; margin-top: 20px; }
+        .btn { flex: 1; padding: 12px; border: none; border-radius: 12px;
+            font-family: 'Comfortaa', cursive; font-size: 14px; font-weight: 600; cursor: pointer; }
+        .btn-primary { background: rgba(255, 255, 255, 0.9); color: #B4A7D6;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-secondary { background: rgba(255, 255, 255, 0.3); color: white; }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+        <div class="cloud">☁️</div>
+        <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
+        <div class="content">
+            <div class="header">
+                <div class="header-icon">🌿</div>
+                <h1>Nouveau Sous-Projet</h1>
+                <p class="subtitle">Une nouvelle branche pousse</p>
+            </div>
+            <div class="form-section">
+                <label class="form-label">Nom du sous-projet</label>
+                <input type="text" class="form-input" id="subprojectName" placeholder="Ex: Développement app..." maxlength="50">
+            </div>
+            <div class="form-section">
+                <label class="form-label">Emoji</label>
+                <div class="emoji-picker" id="emojiPicker"></div>
+            </div>
+            <div class="info-box">
+                <p>🌱 Ce sous-projet fera partie du domaine <span id="parentName"></span></p>
+            </div>
+            <div class="buttons-row">
+                <button class="btn btn-secondary" onclick="cancel()">Annuler</button>
+                <button class="btn btn-primary" onclick="createSubproject()">Créer</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const emojis = [
+            '💻','📱','🎨','📚','💪','🧘','🎵','✈️','💡','🌱','🏠','🎬',
+            '📈','💰','🎯','⚡','🔥','❤️','🌟','⭐','🌈','🎪','🎭','🎤',
+            '🎸','🎹','🥁','🎺','📷','📸','🎥','🖼️','🖌️','✍️','📝','📖',
+            '📰','📊','📉','💹','🏆','🥇','🥈','🥉','🏅','🎖️','🏵️','🎗️',
+            '🎀','🎁','🎈','🎉','🌍','🌎','🌏','🗺️','🧭','⛰️','🏔️','🌋',
+            '🗻','🏕️','🏖️','🏝️','₿','🪙','🎮','☕','🚀','🎓','📱','💼'
+        ];
+        
+        let selectedEmoji = '💻';
+        let currentProject = null;
+        
+        function init() {
+            const projectId = localStorage.getItem('wutree_current_project');
+            if (!projectId) { window.location.href = 'wu-tree-v2-home.html'; return; }
+            
+            const projects = JSON.parse(localStorage.getItem('wutree_projects') || '[]');
+            currentProject = projects.find(p => p.id === projectId);
+            if (!currentProject) { window.location.href = 'wu-tree-v2-home.html'; return; }
+            
+            document.getElementById('parentName').textContent = `${currentProject.emoji} ${currentProject.name}`;
+            renderEmojiPicker();
+        }
+        
+        function renderEmojiPicker() {
+            document.getElementById('emojiPicker').innerHTML = emojis.map(e => `
+                <div class="emoji-option ${e === selectedEmoji ? 'selected' : ''}" onclick="selectEmoji('${e}')">${e}</div>
+            `).join('');
+        }
+        
+        function selectEmoji(e) { selectedEmoji = e; renderEmojiPicker(); }
+        
+        function createSubproject() {
+            const name = document.getElementById('subprojectName').value.trim();
+            if (!name) { alert('Nom du sous-projet requis'); return; }
+            
+            const subproject = {
+                id: Date.now().toString(),
+                name,
+                emoji: selectedEmoji,
+                createdAt: new Date().toISOString()
+            };
+            
+            const projects = JSON.parse(localStorage.getItem('wutree_projects') || '[]');
+            const projectIndex = projects.findIndex(p => p.id === currentProject.id);
+            if (projectIndex === -1) return;
+            
+            if (!projects[projectIndex].subprojects) projects[projectIndex].subprojects = [];
+            projects[projectIndex].subprojects.push(subproject);
+            
+            localStorage.setItem('wutree_projects', JSON.stringify(projects));
+            window.location.href = 'wu-tree-v2-project-domain.html';
+        }
+        
+        function cancel() { window.location.href = 'wu-tree-v2-project-domain.html'; }
+        
+        init();
+    </script>
+</body>
+</html>
