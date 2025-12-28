@@ -199,11 +199,11 @@
             
             // Point de jonction haut (sous les branches)
             const branchesBottom = Math.max(...branchPositions.map(p => p.y));
-            const topJunction = branchesBottom + 25;
+            const topJunction = branchesBottom + 80;
             
             // Point de jonction bas (au-dessus des racines)
             const rootsTop = Math.min(...rootPositions.map(p => p.y));
-            const bottomJunction = rootsTop - 25;
+            const bottomJunction = rootsTop - 80;
             
             let svgContent = '';
             
