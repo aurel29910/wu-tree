@@ -48,15 +48,25 @@
         
         svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
         
+        /* BRANCHES - Formes organiques */
         .branches { position: absolute; top: 50px; left: 0; right: 0;
             display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
             z-index: 10; padding: 0 20px; }
-        .branch { width: 75px; height: 75px; border-radius: 50%;
+        .branch { width: 75px; height: 75px;
             background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(10px);
             border: 3px solid rgba(255, 255, 255, 0.6);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: all 0.3s;
             position: relative; }
+        
+        /* Formes organiques variées pour les branches */
+        .branch:nth-child(1) { border-radius: 60% 40% 55% 45% / 50% 45% 55% 50%; }
+        .branch:nth-child(2) { border-radius: 45% 55% 50% 50% / 55% 50% 50% 45%; width: 78px; height: 72px; }
+        .branch:nth-child(3) { border-radius: 50% 50% 45% 55% / 45% 55% 45% 55%; width: 72px; height: 77px; }
+        .branch:nth-child(4) { border-radius: 55% 45% 60% 40% / 50% 55% 45% 50%; }
+        .branch:nth-child(5) { border-radius: 50% 50% 50% 50% / 60% 40% 60% 40%; width: 76px; height: 74px; }
+        .branch:nth-child(6) { border-radius: 40% 60% 45% 55% / 55% 45% 55% 45%; }
+        
         .branch:active { transform: scale(0.95); }
         .branch-emoji { font-size: 30px; }
         .branch-name { font-size: 9px; font-weight: 600; color: white;
@@ -67,15 +77,25 @@
             border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
         .branch:hover .branch-delete { display: flex; }
         
+        /* RACINES - Formes organiques */
         .roots { position: absolute; bottom: 180px; left: 0; right: 0;
             display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
             z-index: 10; padding: 0 20px; }
-        .root { width: 65px; height: 65px; border-radius: 50%;
+        .root { width: 65px; height: 65px;
             background: rgba(255, 255, 255, 0.35); backdrop-filter: blur(10px);
             border: 2px solid rgba(255, 255, 255, 0.5);
             display: flex; align-items: center; justify-content: center;
             font-size: 26px; box-shadow: 0 3px 12px rgba(0,0,0,0.06);
             cursor: pointer; position: relative; transition: all 0.3s; }
+        
+        /* Formes organiques variées pour les racines */
+        .root:nth-child(1) { border-radius: 55% 45% 50% 50% / 60% 40% 60% 40%; width: 68px; height: 62px; }
+        .root:nth-child(2) { border-radius: 50% 50% 45% 55% / 45% 55% 45% 55%; }
+        .root:nth-child(3) { border-radius: 45% 55% 55% 45% / 50% 50% 50% 50%; width: 62px; height: 67px; }
+        .root:nth-child(4) { border-radius: 60% 40% 45% 55% / 55% 45% 55% 45%; }
+        .root:nth-child(5) { border-radius: 50% 50% 50% 50% / 55% 45% 55% 45%; width: 66px; height: 64px; }
+        .root:nth-child(6) { border-radius: 45% 55% 60% 40% / 50% 50% 50% 50%; }
+        
         .root:active { transform: scale(0.95); }
         
         .foundations { position: absolute; bottom: 100px; left: 0; right: 0;
@@ -138,7 +158,6 @@
             
             let html = '';
             
-            // BRANCHES (seulement si projets)
             if (projects.length > 0) {
                 html += '<div class="branches" id="branchesContainer">';
                 projects.forEach(p => {
@@ -151,7 +170,6 @@
                 html += '</div>';
             }
             
-            // RACINES
             if (roots.length > 0) {
                 html += '<div class="roots" id="rootsContainer">';
                 roots.forEach((r, i) => {
@@ -160,7 +178,6 @@
                 html += '</div>';
             }
             
-            // FONDATIONS
             if (values.length > 0) {
                 html += '<div class="foundations">';
                 values.forEach(v => html += `<div class="foundation" onclick="goToValues()">${v.emoji}</div>`);
@@ -169,7 +186,6 @@
             
             container.innerHTML = html;
             
-            // Dessiner les lignes APRÈS que le DOM soit chargé
             if (projects.length > 0 && roots.length > 0) {
                 setTimeout(drawLines, 50);
             }
@@ -185,7 +201,6 @@
             const containerRect = container.getBoundingClientRect();
             const centerX = container.offsetWidth / 2;
             
-            // Calculer positions réelles des branches
             const branchPositions = Array.from(branchElements).map(el => {
                 const rect = el.getBoundingClientRect();
                 return {
@@ -194,7 +209,6 @@
                 };
             });
             
-            // Calculer positions réelles des racines
             const rootPositions = Array.from(rootElements).map(el => {
                 const rect = el.getBoundingClientRect();
                 return {
@@ -203,33 +217,42 @@
                 };
             });
             
-            // Points de jonction
             const topJunction = Math.max(...branchPositions.map(p => p.y)) + 40;
             const bottomJunction = Math.min(...rootPositions.map(p => p.y)) - 40;
             
             let svgContent = '';
             
-            // TRONC (ligne centrale)
-            svgContent += `<line x1="${centerX}" y1="${topJunction}" x2="${centerX}" y2="${bottomJunction}" 
-                stroke="rgba(255,255,255,0.5)" stroke-width="3"/>`;
+            // TRONC avec courbe douce
+            const trunkMidY = (topJunction + bottomJunction) / 2;
+            svgContent += `<path d="M ${centerX} ${topJunction} C ${centerX + 2} ${trunkMidY} ${centerX - 2} ${trunkMidY} ${centerX} ${bottomJunction}" 
+                stroke="rgba(255,255,255,0.5)" stroke-width="3" fill="none"/>`;
             
-            // LIGNES DES RACINES → POINT BAS
+            // LIGNES RACINES → TRONC (courbes cubiques organiques)
             rootPositions.forEach(pos => {
-                const controlX = (pos.x + centerX) / 2;
-                const controlY = bottomJunction + 20;
-                svgContent += `<path d="M ${pos.x} ${pos.y} Q ${controlX} ${controlY} ${centerX} ${bottomJunction}" 
-                    stroke="rgba(255,255,255,0.45)" stroke-width="2" fill="none"/>`;
+                const dx = centerX - pos.x;
+                const dy = bottomJunction - pos.y;
+                const control1X = pos.x + dx * 0.3;
+                const control1Y = pos.y + dy * 0.1;
+                const control2X = pos.x + dx * 0.7;
+                const control2Y = pos.y + dy * 0.6;
+                
+                svgContent += `<path d="M ${pos.x} ${pos.y} C ${control1X} ${control1Y} ${control2X} ${control2Y} ${centerX} ${bottomJunction}" 
+                    stroke="rgba(255,255,255,0.45)" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
             });
             
-            // LIGNES POINT HAUT → BRANCHES
+            // LIGNES TRONC → BRANCHES (courbes cubiques organiques)
             branchPositions.forEach(pos => {
-                const controlX = (pos.x + centerX) / 2;
-                const controlY = topJunction - 20;
-                svgContent += `<path d="M ${centerX} ${topJunction} Q ${controlX} ${controlY} ${pos.x} ${pos.y}" 
-                    stroke="rgba(255,255,255,0.45)" stroke-width="2" fill="none"/>`;
+                const dx = pos.x - centerX;
+                const dy = pos.y - topJunction;
+                const control1X = centerX + dx * 0.3;
+                const control1Y = topJunction + dy * 0.4;
+                const control2X = centerX + dx * 0.7;
+                const control2Y = topJunction + dy * 0.9;
+                
+                svgContent += `<path d="M ${centerX} ${topJunction} C ${control1X} ${control1Y} ${control2X} ${control2Y} ${pos.x} ${pos.y}" 
+                    stroke="rgba(255,255,255,0.45)" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
             });
             
-            // Insérer SVG
             const existingSvg = container.querySelector('svg');
             if (existingSvg) existingSvg.remove();
             
