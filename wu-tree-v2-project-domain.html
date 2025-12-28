@@ -55,25 +55,16 @@
         
         svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
         
-        /* SOUS-PROJETS EN HAUT (comme branches) */
+        /* SOUS-PROJETS RONDS EN HAUT */
         .subprojects { position: absolute; top: 50px; left: 0; right: 0;
-            display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
+            display: flex; gap: 30px; justify-content: center; flex-wrap: wrap;
             z-index: 10; padding: 0 20px; }
-        .subproject { width: 75px; height: 75px;
+        .subproject { width: 75px; height: 75px; border-radius: 50%;
             background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(10px);
             border: 3px solid rgba(255, 255, 255, 0.6);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: all 0.3s;
             position: relative; }
-        
-        /* Formes organiques variées */
-        .subproject:nth-child(1) { border-radius: 60% 40% 55% 45% / 50% 45% 55% 50%; }
-        .subproject:nth-child(2) { border-radius: 45% 55% 50% 50% / 55% 50% 50% 45%; width: 78px; height: 72px; }
-        .subproject:nth-child(3) { border-radius: 50% 50% 45% 55% / 45% 55% 45% 55%; width: 72px; height: 77px; }
-        .subproject:nth-child(4) { border-radius: 55% 45% 60% 40% / 50% 55% 45% 50%; }
-        .subproject:nth-child(5) { border-radius: 50% 50% 50% 50% / 60% 40% 60% 40%; width: 76px; height: 74px; }
-        .subproject:nth-child(6) { border-radius: 40% 60% 45% 55% / 55% 45% 55% 45%; }
-        
         .subproject:active { transform: scale(0.95); }
         .subproject-emoji { font-size: 30px; }
         .subproject-name { font-size: 9px; font-weight: 600; color: white;
@@ -84,15 +75,14 @@
             border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
         .subproject:hover .subproject-delete { display: flex; }
         
-        /* PROJET PARENT EN BAS (comme fondations) */
-        .parent-project { position: absolute; bottom: 100px; left: 0; right: 0;
+        /* PROJET PARENT ROND EN BAS */
+        .parent-project { position: absolute; bottom: 110px; left: 0; right: 0;
             display: flex; justify-content: center; z-index: 10; padding: 0 20px; }
-        .parent { width: 90px; height: 90px;
+        .parent { width: 90px; height: 90px; border-radius: 50%;
             background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(10px);
             border: 3px solid rgba(255, 255, 255, 0.7);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border-radius: 55% 45% 50% 50% / 60% 40% 60% 40%;
             cursor: pointer; transition: all 0.3s; }
         .parent:active { transform: scale(0.95); }
         .parent-emoji { font-size: 38px; margin-bottom: 4px; }
@@ -153,7 +143,6 @@
             
             let html = '';
             
-            // SOUS-PROJETS EN HAUT (si existants)
             if (subprojects.length > 0) {
                 html += '<div class="subprojects" id="subprojectsContainer">';
                 subprojects.forEach(sp => {
@@ -166,7 +155,6 @@
                 html += '</div>';
             }
             
-            // PROJET PARENT EN BAS (toujours affiché)
             html += `<div class="parent-project">
                 <div class="parent">
                     <div class="parent-emoji">${currentProject.emoji}</div>
@@ -176,7 +164,6 @@
             
             container.innerHTML = html;
             
-            // Dessiner lignes si sous-projets
             if (subprojects.length > 0) {
                 setTimeout(drawLines, 50);
             }
@@ -192,12 +179,10 @@
             const containerRect = container.getBoundingClientRect();
             const centerX = container.offsetWidth / 2;
             
-            // Position parent
             const parentRect = parentElement.getBoundingClientRect();
             const parentX = parentRect.left + parentRect.width / 2 - containerRect.left;
             const parentY = parentRect.top + parentRect.height / 2 - containerRect.top;
             
-            // Positions sous-projets
             const subprojectPositions = Array.from(subprojectElements).map(el => {
                 const rect = el.getBoundingClientRect();
                 return {
@@ -206,25 +191,26 @@
                 };
             });
             
-            const topJunction = Math.max(...subprojectPositions.map(p => p.y)) + 40;
-            const bottomJunction = parentY - 60;
+            // TRONC PLUS COURT
+            const topJunction = Math.max(...subprojectPositions.map(p => p.y)) + 30;
+            const bottomJunction = parentY - 50;
             
             let svgContent = '';
             
-            // TRONC avec courbe douce
+            // TRONC
             const trunkMidY = (topJunction + bottomJunction) / 2;
             svgContent += `<path d="M ${parentX} ${parentY} C ${parentX + 2} ${trunkMidY} ${centerX - 2} ${trunkMidY} ${centerX} ${topJunction}" 
                 stroke="rgba(255,255,255,0.5)" stroke-width="3" fill="none"/>`;
             
-            // LIGNES PARENT → POINT BAS DU TRONC
+            // LIGNE PARENT → POINT BAS
             if (Math.abs(parentX - centerX) > 5) {
                 const controlX = (parentX + centerX) / 2;
-                const controlY = parentY - 30;
+                const controlY = parentY - 25;
                 svgContent += `<path d="M ${parentX} ${parentY} Q ${controlX} ${controlY} ${centerX} ${bottomJunction}" 
                     stroke="rgba(255,255,255,0.45)" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
             }
             
-            // LIGNES POINT HAUT DU TRONC → SOUS-PROJETS
+            // LIGNES POINT HAUT → SOUS-PROJETS
             subprojectPositions.forEach(pos => {
                 const dx = pos.x - centerX;
                 const dy = pos.y - topJunction;
