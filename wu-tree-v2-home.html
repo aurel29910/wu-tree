@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wu Tree</title>
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <style>
@@ -197,13 +197,12 @@
                 };
             });
             
-            // Point de jonction haut (sous les branches)
+            // TRONC PLUS COURT : jonctions éloignées
             const branchesBottom = Math.max(...branchPositions.map(p => p.y));
-            const topJunction = branchesBottom + 80;
+            const topJunction = branchesBottom + 100;
             
-            // Point de jonction bas (au-dessus des racines)
             const rootsTop = Math.min(...rootPositions.map(p => p.y));
-            const bottomJunction = rootsTop - 80;
+            const bottomJunction = rootsTop - 100;
             
             let svgContent = '';
             
@@ -216,7 +215,6 @@
                 const dx = centerX - pos.x;
                 const dy = topJunction - pos.y;
                 
-                // Point de contrôle pour courbe douce
                 const ctrlX = pos.x + dx * 0.5;
                 const ctrlY = pos.y + dy * 0.6;
                 
@@ -229,7 +227,6 @@
                 const dx = centerX - pos.x;
                 const dy = bottomJunction - pos.y;
                 
-                // Point de contrôle pour courbe douce
                 const ctrlX = pos.x + dx * 0.5;
                 const ctrlY = pos.y + dy * 0.4;
                 
