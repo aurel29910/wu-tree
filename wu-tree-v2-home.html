@@ -203,12 +203,11 @@
                     const color = p.color || '#FFFFFF';
                     html += `<div class="branch" data-project-id="${p.id}" 
                         style="border-color: ${color}; box-shadow: 0 4px 15px ${color}40;"
-                        onclick="openProject('${p.id}')"
                         onmousedown="startLongPress('${p.id}')"
-                        onmouseup="cancelLongPress()"
+                        onmouseup="handleMouseUp('${p.id}')"
                         onmouseleave="cancelLongPress()"
                         ontouchstart="startLongPress('${p.id}')"
-                        ontouchend="cancelLongPress()"
+                        ontouchend="handleMouseUp('${p.id}')"
                         ontouchcancel="cancelLongPress()">
                         <div class="branch-emoji">${p.emoji}</div>
                         <div class="branch-name">${p.name}</div>
@@ -320,6 +319,7 @@
         
         // Long press pour éditer
         let longPressTimer = null;
+        let isLongPress = false;
         let editingProjectId = null;
         
         const COLORS = [
@@ -336,9 +336,12 @@
         ];
         
         function startLongPress(projectId) {
+            isLongPress = false;
             longPressTimer = setTimeout(() => {
+                isLongPress = true;
+                navigator.vibrate && navigator.vibrate(50);
                 openEditModal(projectId);
-            }, 500);
+            }, 600);
         }
         
         function cancelLongPress() {
@@ -346,6 +349,14 @@
                 clearTimeout(longPressTimer);
                 longPressTimer = null;
             }
+        }
+        
+        function handleMouseUp(projectId) {
+            cancelLongPress();
+            if (!isLongPress) {
+                openProject(projectId);
+            }
+            isLongPress = false;
         }
         
         function openEditModal(projectId) {
@@ -376,6 +387,7 @@
         function closeEditModal() {
             document.getElementById('editModal').classList.remove('show');
             editingProjectId = null;
+            isLongPress = false;
         }
         
         function selectColor(hex) {
@@ -421,8 +433,6 @@
         }
         
         function openProject(id) {
-            // Ne pas ouvrir si on est en train de faire un long press
-            if (longPressTimer) return;
             localStorage.setItem('wutree_current_project', id);
             window.location.href = 'wu-tree-v2-project-domain.html';
         }
