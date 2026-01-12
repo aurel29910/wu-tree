@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wu Tree - Détail Action</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(180deg, #87CEEB 0%, #FFB6C1 100%);
+            min-height: 100vh; display: flex; justify-content: center; align-items: center;
+        }
+        .phone-frame {
+            width: 375px; height: 812px;
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+            border-radius: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            position: relative; overflow: hidden;
+        }
+        
+        .petal { position: absolute; width: 10px; height: 10px;
+            background: linear-gradient(135deg, rgba(255, 182, 193, 0.8), rgba(255, 105, 180, 0.6));
+            border-radius: 50% 0 50% 0; animation: fall linear infinite; pointer-events: none; z-index: 50; }
+        .petal:nth-child(1) { left: 15%; animation-duration: 14s; width: 8px; }
+        .petal:nth-child(2) { left: 45%; animation-duration: 16s; animation-delay: 3s; }
+        .petal:nth-child(3) { left: 75%; animation-duration: 12s; animation-delay: 6s; }
+        @keyframes fall { 0% { transform: translateY(-50px) rotate(0deg); opacity: 0.8; }
+            100% { transform: translateY(812px) rotate(360deg); opacity: 0; } }
+        
+        .cloud { position: absolute; color: white; font-size: 35px; opacity: 0.5;
+            animation: float-cloud linear infinite; pointer-events: none; z-index: 40; }
+        .cloud:nth-child(4) { top: 120px; animation-duration: 220s; }
+        @keyframes float-cloud { 0% { transform: translateX(-80px); } 100% { transform: translateX(455px); } }
+        
+        .status-bar { position: absolute; top: 0; left: 0; right: 0; height: 44px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 20px; color: rgba(255,255,255,0.95); font-size: 14px; z-index: 100; }
+        
+        .header { position: absolute; top: 44px; left: 0; right: 0; height: 55px;
+            display: flex; align-items: center; padding: 0 15px; z-index: 90;
+            background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
+        .back-button { width: 36px; height: 36px; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3); display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 18px; color: white; border: 2px solid rgba(255, 255, 255, 0.5); }
+        .back-button:active { transform: scale(0.95); }
+        .header-title { flex: 1; text-align: center; font-family: 'Comfortaa', cursive;
+            font-size: 16px; font-weight: 600; color: white; text-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        .delete-btn { width: 36px; height: 36px; border-radius: 50%;
+            background: rgba(255, 107, 107, 0.6); display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 16px; color: white; border: 2px solid rgba(255, 255, 255, 0.5); }
+        .delete-btn:active { transform: scale(0.95); }
+        
+        .content { position: absolute; top: 99px; left: 0; right: 0; bottom: 70px;
+            overflow-y: auto; padding: 20px; z-index: 60; }
+        
+        /* Status bar completion */
+        .completion-bar { background: rgba(255, 255, 255, 0.25); border-radius: 14px;
+            padding: 14px 16px; margin-bottom: 18px; display: flex; align-items: center; gap: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.4); }
+        .completion-checkbox { width: 32px; height: 32px; border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, 0.7); display: flex;
+            align-items: center; justify-content: center; cursor: pointer;
+            background: rgba(255, 255, 255, 0.2); transition: all 0.3s; flex-shrink: 0; }
+        .completion-checkbox.checked { background: rgba(76, 175, 80, 0.7); border-color: white; }
+        .completion-checkbox::after { content: '✓'; color: white; font-size: 18px;
+            font-weight: bold; opacity: 0; transition: opacity 0.3s; }
+        .completion-checkbox.checked::after { opacity: 1; }
+        .completion-text { flex: 1; font-size: 15px; color: white; font-weight: 600; }
+        .completion-text.completed { text-decoration: line-through; opacity: 0.7; }
+        
+        /* Sections */
+        .section { background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px);
+            border-radius: 14px; padding: 14px 16px; margin-bottom: 14px;
+            border: 2px solid rgba(255, 255, 255, 0.4); }
+        .section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+        .section-icon { font-size: 18px; }
+        .section-title { font-size: 12px; color: rgba(255, 255, 255, 0.9);
+            text-transform: uppercase; font-weight: 600; letter-spacing: 1px; }
+        
+        .editable-text { width: 100%; padding: 10px 12px; border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px; font-size: 14px; background: rgba(255, 255, 255, 0.2);
+            color: white; resize: none; min-height: 60px; }
+        .editable-text:focus { outline: none; border-color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.3); }
+        .editable-text::placeholder { color: rgba(255,255,255,0.5); }
+        
+        /* Due date */
+        .due-section { display: flex; align-items: center; gap: 12px; }
+        .due-input { flex: 1; padding: 10px 12px; border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px; font-size: 14px; background: rgba(255, 255, 255, 0.2);
+            color: white; }
+        .due-input:focus { outline: none; border-color: rgba(255, 255, 255, 0.6); }
+        .due-status { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .due-status.overdue { background: rgba(255, 107, 107, 0.6); color: white; }
+        .due-status.today { background: rgba(255, 193, 7, 0.6); color: white; }
+        .due-status.soon { background: rgba(76, 175, 80, 0.5); color: white; }
+        .due-status.normal { background: rgba(255, 255, 255, 0.3); color: white; }
+        
+        /* Subtasks */
+        .subtask-item { display: flex; align-items: center; gap: 10px; padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
+        .subtask-item:last-child { border-bottom: none; }
+        .subtask-checkbox { width: 22px; height: 22px; border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.6); display: flex;
+            align-items: center; justify-content: center; cursor: pointer;
+            background: rgba(255, 255, 255, 0.15); transition: all 0.3s; flex-shrink: 0; }
+        .subtask-checkbox.checked { background: rgba(255, 255, 255, 0.6); border-color: white; }
+        .subtask-checkbox::after { content: '✓'; color: #B4A7D6; font-size: 12px;
+            font-weight: bold; opacity: 0; }
+        .subtask-checkbox.checked::after { opacity: 1; }
+        .subtask-text { flex: 1; font-size: 14px; color: white; }
+        .subtask-text.completed { text-decoration: line-through; opacity: 0.6; }
+        .subtask-delete { width: 24px; height: 24px; border-radius: 50%;
+            background: rgba(255, 107, 107, 0.5); color: white; font-size: 14px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            opacity: 0; transition: opacity 0.3s; }
+        .subtask-item:hover .subtask-delete { opacity: 1; }
+        
+        .add-subtask { display: flex; gap: 8px; margin-top: 10px; padding-top: 10px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2); }
+        .add-subtask-input { flex: 1; padding: 10px 12px; border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px; font-size: 13px; background: rgba(255, 255, 255, 0.15);
+            color: white; }
+        .add-subtask-input:focus { outline: none; border-color: rgba(255, 255, 255, 0.5); }
+        .add-subtask-input::placeholder { color: rgba(255,255,255,0.4); }
+        .add-subtask-btn { width: 40px; height: 40px; border-radius: 50%;
+            background: linear-gradient(135deg, #FFB6C1 0%, #FF69B4 100%);
+            color: white; font-size: 20px; border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; }
+        .add-subtask-btn:active { transform: scale(0.95); }
+        
+        /* Progress */
+        .progress-bar { height: 8px; background: rgba(255, 255, 255, 0.3); border-radius: 4px;
+            margin-top: 10px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #76c7c0, #88d8b0);
+            border-radius: 4px; transition: width 0.3s; }
+        .progress-text { font-size: 11px; color: rgba(255, 255, 255, 0.8); margin-top: 5px; text-align: right; }
+        
+        /* Save button */
+        .save-btn { width: 100%; padding: 16px; background: rgba(255, 255, 255, 0.9);
+            border: none; border-radius: 14px; color: #B4A7D6;
+            font-family: 'Comfortaa', cursive; font-size: 16px; font-weight: 600;
+            cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-top: 10px; }
+        .save-btn:active { transform: scale(0.98); }
+        
+        .bottom-menu { position: absolute; bottom: 0; left: 0; right: 0; height: 70px;
+            background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(20px);
+            display: flex; justify-content: space-around; align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.4); z-index: 90; }
+        .menu-item { display: flex; flex-direction: column; align-items: center; gap: 4px;
+            cursor: pointer; padding: 8px 20px; border-radius: 12px; transition: all 0.3s; }
+        .menu-item.active { background: rgba(255, 255, 255, 0.6); }
+        .menu-icon { font-size: 24px; }
+        .menu-label { font-size: 10px; color: rgba(74, 90, 79, 0.8); font-weight: 500; }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+        <div class="cloud">☁️</div>
+        
+        <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
+        
+        <div class="header">
+            <div class="back-button" onclick="saveAndGoBack()">←</div>
+            <div class="header-title">Détail</div>
+            <div class="delete-btn" onclick="deleteAction()">🗑️</div>
+        </div>
+        
+        <div class="content" id="content"></div>
+        
+        <div class="bottom-menu">
+            <div class="menu-item" onclick="goToTree()"><div class="menu-icon">📅</div><div class="menu-label">Arbre</div></div>
+            <div class="menu-item active"><div class="menu-icon">📝</div><div class="menu-label">Détail</div></div>
+        </div>
+    </div>
+    
+    <script>
+        let currentAction = null;
+        let currentSubproject = null;
+        let treeData = {};
+        let currentLevelId = null;
+        
+        function init() {
+            const actionId = localStorage.getItem('wutree_current_action');
+            currentLevelId = localStorage.getItem('wutree_current_level');
+            const subprojectId = localStorage.getItem('wutree_current_subproject');
+            const projectId = localStorage.getItem('wutree_current_project');
+            
+            if (!actionId || !currentLevelId || !subprojectId || !projectId) {
+                window.location.href = 'wu-tree-v2-level-detail.html';
+                return;
+            }
+            
+            const projects = JSON.parse(localStorage.getItem('wutree_projects') || '[]');
+            const project = projects.find(p => p.id === projectId);
+            if (!project) { window.location.href = 'wu-tree-v2-home.html'; return; }
+            
+            currentSubproject = project.subprojects?.find(sp => sp.id === subprojectId);
+            if (!currentSubproject) { window.location.href = 'wu-tree-v2-project-domain.html'; return; }
+            
+            treeData = currentSubproject.tree || {};
+            const levelData = treeData[currentLevelId] || { intention: '', actions: [] };
+            
+            currentAction = levelData.actions.find(a => a.id === actionId);
+            if (!currentAction) { window.location.href = 'wu-tree-v2-level-detail.html'; return; }
+            
+            // Initialiser les sous-tâches si pas encore fait
+            if (!currentAction.subtasks) currentAction.subtasks = [];
+            if (!currentAction.description) currentAction.description = '';
+            if (!currentAction.notes) currentAction.notes = '';
+            
+            renderContent();
+        }
+        
+        function getDueStatus(dueDate) {
+            if (!dueDate) return { class: 'normal', text: 'Pas de date' };
+            
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const due = new Date(dueDate);
+            due.setHours(0, 0, 0, 0);
+            
+            const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
+            
+            if (diffDays < 0) return { class: 'overdue', text: `${Math.abs(diffDays)}j de retard` };
+            if (diffDays === 0) return { class: 'today', text: "Aujourd'hui" };
+            if (diffDays <= 3) return { class: 'soon', text: `Dans ${diffDays}j` };
+            return { class: 'normal', text: `${diffDays} jours` };
+        }
+        
+        function renderContent() {
+            const content = document.getElementById('content');
+            const dueStatus = getDueStatus(currentAction.dueDate);
+            
+            const subtasksDone = currentAction.subtasks.filter(s => s.completed).length;
+            const subtasksTotal = currentAction.subtasks.length;
+            const progress = subtasksTotal > 0 ? Math.round((subtasksDone / subtasksTotal) * 100) : 0;
+            
+            let html = `
+                <!-- Completion status -->
+                <div class="completion-bar">
+                    <div class="completion-checkbox ${currentAction.completed ? 'checked' : ''}" onclick="toggleComplete()"></div>
+                    <div class="completion-text ${currentAction.completed ? 'completed' : ''}">${currentAction.text}</div>
+                </div>
+                
+                <!-- Échéance -->
+                <div class="section">
+                    <div class="section-header">
+                        <span class="section-icon">📅</span>
+                        <span class="section-title">Échéance</span>
+                    </div>
+                    <div class="due-section">
+                        <input type="date" class="due-input" id="dueInput" value="${currentAction.dueDate || ''}" onchange="updateDueDate()">
+                        <span class="due-status ${dueStatus.class}">${dueStatus.text}</span>
+                    </div>
+                </div>
+                
+                <!-- Description -->
+                <div class="section">
+                    <div class="section-header">
+                        <span class="section-icon">📝</span>
+                        <span class="section-title">Description</span>
+                    </div>
+                    <textarea class="editable-text" id="descriptionInput" placeholder="Ajouter une description détaillée..." onchange="updateDescription()">${currentAction.description || ''}</textarea>
+                </div>
+                
+                <!-- Sous-tâches -->
+                <div class="section">
+                    <div class="section-header">
+                        <span class="section-icon">☑️</span>
+                        <span class="section-title">Sous-tâches</span>
+                    </div>
+                    
+                    <div id="subtasksList">
+                        ${currentAction.subtasks.map((st, i) => `
+                            <div class="subtask-item">
+                                <div class="subtask-checkbox ${st.completed ? 'checked' : ''}" onclick="toggleSubtask(${i})"></div>
+                                <div class="subtask-text ${st.completed ? 'completed' : ''}">${st.text}</div>
+                                <div class="subtask-delete" onclick="deleteSubtask(${i})">×</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    ${subtasksTotal > 0 ? `
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${progress}%"></div>
+                        </div>
+                        <div class="progress-text">${subtasksDone}/${subtasksTotal} terminées (${progress}%)</div>
+                    ` : ''}
+                    
+                    <div class="add-subtask">
+                        <input type="text" class="add-subtask-input" id="newSubtaskInput" placeholder="Ajouter une sous-tâche...">
+                        <button class="add-subtask-btn" onclick="addSubtask()">+</button>
+                    </div>
+                </div>
+                
+                <!-- Notes -->
+                <div class="section">
+                    <div class="section-header">
+                        <span class="section-icon">💭</span>
+                        <span class="section-title">Notes</span>
+                    </div>
+                    <textarea class="editable-text" id="notesInput" placeholder="Ajouter des notes, idées, réflexions..." onchange="updateNotes()">${currentAction.notes || ''}</textarea>
+                </div>
+                
+                <button class="save-btn" onclick="saveAndGoBack()">💾 Enregistrer</button>
+            `;
+            
+            content.innerHTML = html;
+            
+            // Event listener pour entrée
+            document.getElementById('newSubtaskInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') addSubtask();
+            });
+        }
+        
+        function toggleComplete() {
+            currentAction.completed = !currentAction.completed;
+            saveTree();
+            renderContent();
+        }
+        
+        function updateDueDate() {
+            currentAction.dueDate = document.getElementById('dueInput').value;
+            saveTree();
+            renderContent();
+        }
+        
+        function updateDescription() {
+            currentAction.description = document.getElementById('descriptionInput').value;
+            saveTree();
+        }
+        
+        function updateNotes() {
+            currentAction.notes = document.getElementById('notesInput').value;
+            saveTree();
+        }
+        
+        function addSubtask() {
+            const input = document.getElementById('newSubtaskInput');
+            const text = input.value.trim();
+            if (!text) return;
+            
+            currentAction.subtasks.push({
+                id: Date.now().toString(),
+                text: text,
+                completed: false
+            });
+            
+            input.value = '';
+            saveTree();
+            renderContent();
+        }
+        
+        function toggleSubtask(index) {
+            currentAction.subtasks[index].completed = !currentAction.subtasks[index].completed;
+            saveTree();
+            renderContent();
+        }
+        
+        function deleteSubtask(index) {
+            currentAction.subtasks.splice(index, 1);
+            saveTree();
+            renderContent();
+        }
+        
+        function deleteAction() {
+            if (!confirm('Supprimer cet objectif ?')) return;
+            
+            const levelData = treeData[currentLevelId];
+            const actionIndex = levelData.actions.findIndex(a => a.id === currentAction.id);
+            if (actionIndex > -1) {
+                levelData.actions.splice(actionIndex, 1);
+                saveTree();
+                window.location.href = 'wu-tree-v2-level-detail.html';
+            }
+        }
+        
+        function saveTree() {
+            const projectId = localStorage.getItem('wutree_current_project');
+            let projects = JSON.parse(localStorage.getItem('wutree_projects') || '[]');
+            const projectIndex = projects.findIndex(p => p.id === projectId);
+            if (projectIndex === -1) return;
+            
+            const subprojectIndex = projects[projectIndex].subprojects.findIndex(sp => sp.id === currentSubproject.id);
+            if (subprojectIndex === -1) return;
+            
+            projects[projectIndex].subprojects[subprojectIndex].tree = treeData;
+            localStorage.setItem('wutree_projects', JSON.stringify(projects));
+        }
+        
+        function saveAndGoBack() {
+            // Sauvegarder les champs actuels
+            currentAction.description = document.getElementById('descriptionInput').value;
+            currentAction.notes = document.getElementById('notesInput').value;
+            currentAction.dueDate = document.getElementById('dueInput').value;
+            saveTree();
+            window.location.href = 'wu-tree-v2-level-detail.html';
+        }
+        
+        function goToTree() { window.location.href = 'wu-tree-v2-subproject-tree.html'; }
+        
+        init();
+    </script>
+</body>
+</html>
