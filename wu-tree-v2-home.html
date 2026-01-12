@@ -102,7 +102,7 @@
             display: flex; justify-content: space-around; align-items: center;
             border-top: 1px solid rgba(255, 255, 255, 0.4); z-index: 90; }
         .menu-item { display: flex; flex-direction: column; align-items: center; gap: 4px;
-            cursor: pointer; padding: 8px 20px; border-radius: 12px; transition: all 0.3s; }
+            cursor: pointer; padding: 8px 12px; border-radius: 12px; transition: all 0.3s; }
         .menu-item.active { background: rgba(255, 255, 255, 0.6); }
         .menu-icon { font-size: 24px; }
         .menu-label { font-size: 10px; color: rgba(74, 90, 79, 0.8); font-weight: 500; }
@@ -121,6 +121,7 @@
         <div class="bottom-menu">
             <div class="menu-item" onclick="goToValues()"><div class="menu-icon">🏛️</div><div class="menu-label">Fondations</div></div>
             <div class="menu-item active"><div class="menu-icon">🌳</div><div class="menu-label">Arbre</div></div>
+            <div class="menu-item" onclick="goToTasks()"><div class="menu-icon">📋</div><div class="menu-label">Tâches</div></div>
             <div class="menu-item" onclick="goToRoots()"><div class="menu-icon">🌿</div><div class="menu-label">Racines</div></div>
         </div>
     </div>
@@ -258,6 +259,7 @@
         function createProject() { window.location.href = 'wu-tree-v2-project-create.html'; }
         function goToValues() { window.location.href = 'wu-tree-v2-values.html'; }
         function goToRoots() { window.location.href = 'wu-tree-v2-roots.html'; }
+        function goToTasks() { window.location.href = 'wu-tree-v2-tasks.html'; }
         
         loadTree();
         if (!localStorage.getItem('wutree_onboarding_complete')) window.location.href = 'wu-tree-v2-values.html';
