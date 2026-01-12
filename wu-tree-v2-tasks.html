@@ -120,6 +120,51 @@
         .empty-icon { font-size: 50px; margin-bottom: 12px; }
         .empty-text { font-size: 14px; color: rgba(255, 255, 255, 0.8); line-height: 1.6; }
         
+        /* FAB rose */
+        .fab { position: absolute; bottom: 90px; right: 20px; width: 56px; height: 56px; border-radius: 50%;
+            background: linear-gradient(135deg, #FFB6C1 0%, #FF69B4 100%);
+            color: white; font-size: 32px; font-weight: 300;
+            cursor: pointer; box-shadow: 0 4px 20px rgba(255, 105, 180, 0.4);
+            z-index: 100; display: flex; align-items: center; justify-content: center;
+            border: 2px solid rgba(255, 255, 255, 0.6); transition: all 0.3s; }
+        .fab:hover { transform: scale(1.05); }
+        .fab:active { transform: scale(0.95); }
+        
+        /* Modal */
+        .modal-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.5); z-index: 200; display: none;
+            align-items: flex-end; justify-content: center; }
+        .modal-overlay.show { display: flex; }
+        .modal { width: 100%; background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+            border-radius: 24px 24px 0 0; overflow: hidden; box-shadow: 0 -10px 40px rgba(0,0,0,0.3);
+            max-height: 85%; display: flex; flex-direction: column; }
+        .modal-header { padding: 16px 20px; background: rgba(255, 255, 255, 0.3);
+            display: flex; align-items: center; gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3); flex-shrink: 0; }
+        .modal-icon { font-size: 24px; }
+        .modal-title { flex: 1; font-family: 'Comfortaa', cursive; font-size: 16px;
+            font-weight: 600; color: white; }
+        .modal-close { width: 32px; height: 32px; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3); display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 18px; color: white; border: 2px solid rgba(255, 255, 255, 0.5); }
+        .modal-content { padding: 20px; overflow-y: auto; padding-bottom: 30px; }
+        .input-group { margin-bottom: 18px; }
+        .input-label { display: block; font-size: 12px; color: rgba(255, 255, 255, 0.9);
+            text-transform: uppercase; font-weight: 600; margin-bottom: 8px; }
+        .input-field { width: 100%; padding: 12px 14px; border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 12px; font-size: 15px; background: rgba(255, 255, 255, 0.3);
+            color: white; }
+        .input-field:focus { outline: none; border-color: rgba(255, 255, 255, 0.7); }
+        .input-field::placeholder { color: rgba(255,255,255,0.5); }
+        select.input-field { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+        select.input-field option { background: #B4A7D6; color: white; }
+        .submit-btn { width: 100%; padding: 16px; background: rgba(255, 255, 255, 0.9);
+            border: none; border-radius: 14px; color: #B4A7D6;
+            font-family: 'Comfortaa', cursive; font-size: 16px; font-weight: 600;
+            cursor: pointer; margin-top: 10px; }
+        .submit-btn:active { transform: scale(0.98); }
+        
         /* Bottom menu */
         .bottom-menu { position: absolute; bottom: 0; left: 0; right: 0; height: 70px;
             background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(20px);
@@ -147,6 +192,43 @@
         <div class="filters" id="filters"></div>
         
         <div class="content" id="content"></div>
+        
+        <!-- FAB rose -->
+        <button class="fab" onclick="openAddModal()">+</button>
+        
+        <!-- Modal ajout objectif -->
+        <div class="modal-overlay" id="addModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-icon">🎯</div>
+                    <div class="modal-title">Nouvel objectif</div>
+                    <div class="modal-close" onclick="closeAddModal()">×</div>
+                </div>
+                <div class="modal-content">
+                    <div class="input-group">
+                        <label class="input-label">Projet</label>
+                        <select class="input-field" id="projectSelect" onchange="updateSubprojects()">
+                            <option value="">Choisir un projet...</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Sous-projet</label>
+                        <select class="input-field" id="subprojectSelect">
+                            <option value="">Choisir un sous-projet...</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Titre de l'objectif</label>
+                        <input type="text" class="input-field" id="objectiveInput" placeholder="Ex: Finaliser le business plan">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Échéance</label>
+                        <input type="date" class="input-field" id="dueDateInput">
+                    </div>
+                    <button class="submit-btn" onclick="addObjective()">✨ Ajouter à l'arbre</button>
+                </div>
+            </div>
+        </div>
         
         <div class="bottom-menu">
             <div class="menu-item" onclick="goToValues()"><div class="menu-icon">🏛️</div><div class="menu-label">Fondations</div></div>
@@ -407,6 +489,142 @@
         function goToHome() { window.location.href = 'wu-tree-v2-home.html'; }
         function goToValues() { window.location.href = 'wu-tree-v2-values.html'; }
         function goToRoots() { window.location.href = 'wu-tree-v2-roots.html'; }
+        
+        // Modal ajout objectif
+        function openAddModal() {
+            const projects = JSON.parse(localStorage.getItem('wutree_projects') || '[]');
+            const projectSelect = document.getElementById('projectSelect');
+            
+            // Remplir la liste des projets
+            projectSelect.innerHTML = '<option value="">Choisir un projet...</option>';
+            projects.forEach(p => {
+                if (p.subprojects && p.subprojects.length > 0) {
+                    const color = p.color || '#FFFFFF';
+                    projectSelect.innerHTML += `<option value="${p.id}" data-color="${color}">${p.emoji} ${p.name}</option>`;
+                }
+            });
+            
+            // Reset les champs
+            document.getElementById('subprojectSelect').innerHTML = '<option value="">Choisir un sous-projet...</option>';
+            document.getElementById('objectiveInput').value = '';
+            
+            // Définir l'échéance par défaut selon le filtre actuel
+            const defaultDue = getDefaultDueDateForLevel(currentFilter);
+            document.getElementById('dueDateInput').value = formatDateForInput(defaultDue);
+            
+            document.getElementById('addModal').classList.add('show');
+        }
+        
+        function closeAddModal() {
+            document.getElementById('addModal').classList.remove('show');
+        }
+        
+        function updateSubprojects() {
+            const projectId = document.getElementById('projectSelect').value;
+            const subprojectSelect = document.getElementById('subprojectSelect');
+            
+            subprojectSelect.innerHTML = '<option value="">Choisir un sous-projet...</option>';
+            
+            if (!projectId) return;
+            
+            const projects = JSON.parse(localStorage.getItem('wutree_projects') || '[]');
+            const project = projects.find(p => p.id === projectId);
+            
+            if (project && project.subprojects) {
+                project.subprojects.forEach(sp => {
+                    subprojectSelect.innerHTML += `<option value="${sp.id}">${sp.emoji} ${sp.name}</option>`;
+                });
+            }
+        }
+        
+        function getDefaultDueDateForLevel(levelId) {
+            const today = new Date();
+            switch(levelId) {
+                case 'today':
+                    return today;
+                case 'week':
+                    const endOfWeek = new Date(today);
+                    endOfWeek.setDate(today.getDate() + (7 - today.getDay()));
+                    return endOfWeek;
+                case 'month':
+                    return new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                case 'quarter':
+                    const quarter = Math.floor(today.getMonth() / 3);
+                    return new Date(today.getFullYear(), (quarter + 1) * 3, 0);
+                case 'semester':
+                    const semester = today.getMonth() < 6 ? 0 : 1;
+                    return new Date(today.getFullYear(), (semester + 1) * 6, 0);
+                case 'year':
+                    return new Date(today.getFullYear(), 11, 31);
+                default:
+                    return today;
+            }
+        }
+        
+        function formatDateForInput(date) {
+            return date.toISOString().split('T')[0];
+        }
+        
+        function addObjective() {
+            const projectId = document.getElementById('projectSelect').value;
+            const subprojectId = document.getElementById('subprojectSelect').value;
+            const title = document.getElementById('objectiveInput').value.trim();
+            const dueDate = document.getElementById('dueDateInput').value;
+            
+            if (!projectId) {
+                alert('Choisis un projet !');
+                return;
+            }
+            if (!subprojectId) {
+                alert('Choisis un sous-projet !');
+                return;
+            }
+            if (!title) {
+                alert('Entre un titre pour ton objectif !');
+                return;
+            }
+            
+            // Récupérer les projets
+            let projects = JSON.parse(localStorage.getItem('wutree_projects') || '[]');
+            const projectIndex = projects.findIndex(p => p.id === projectId);
+            if (projectIndex === -1) return;
+            
+            const subprojectIndex = projects[projectIndex].subprojects.findIndex(sp => sp.id === subprojectId);
+            if (subprojectIndex === -1) return;
+            
+            // Initialiser l'arbre si nécessaire
+            if (!projects[projectIndex].subprojects[subprojectIndex].tree) {
+                projects[projectIndex].subprojects[subprojectIndex].tree = {};
+            }
+            
+            const tree = projects[projectIndex].subprojects[subprojectIndex].tree;
+            
+            // Initialiser le niveau si nécessaire
+            if (!tree[currentFilter]) {
+                tree[currentFilter] = { intention: '', actions: [] };
+            }
+            
+            // Ajouter l'objectif
+            tree[currentFilter].actions.push({
+                id: Date.now().toString(),
+                text: title,
+                description: '',
+                dueDate: dueDate,
+                completed: false,
+                subtasks: [],
+                notes: '',
+                createdAt: new Date().toISOString()
+            });
+            
+            // Sauvegarder
+            localStorage.setItem('wutree_projects', JSON.stringify(projects));
+            
+            // Rafraîchir
+            closeAddModal();
+            collectAllTasks();
+            renderFilters();
+            renderContent();
+        }
         
         init();
     </script>
