@@ -61,11 +61,6 @@
         .branch-emoji { font-size: 30px; }
         .branch-name { font-size: 9px; font-weight: 600; color: white;
             text-shadow: 0 1px 3px rgba(0,0,0,0.2); margin-top: 2px; }
-        .branch-delete { position: absolute; top: -8px; right: -8px; width: 24px; height: 24px;
-            background: #FF6B6B; border-radius: 50%; color: white; font-size: 14px; font-weight: bold;
-            display: none; align-items: center; justify-content: center; cursor: pointer;
-            border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-        .branch:hover .branch-delete { display: flex; }
         
         .roots { position: absolute; bottom: 180px; left: 0; right: 0;
             display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
@@ -106,6 +101,43 @@
         .menu-item.active { background: rgba(255, 255, 255, 0.6); }
         .menu-icon { font-size: 24px; }
         .menu-label { font-size: 10px; color: rgba(74, 90, 79, 0.8); font-weight: 500; }
+        
+        /* Modal édition */
+        .modal-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.5); z-index: 200; display: none;
+            align-items: center; justify-content: center; }
+        .modal-overlay.show { display: flex; }
+        .modal { width: 85%; background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+            border-radius: 24px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+        .modal-header { padding: 16px 20px; background: rgba(255, 255, 255, 0.3);
+            display: flex; align-items: center; gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
+        .modal-icon { font-size: 24px; }
+        .modal-title { flex: 1; font-family: 'Comfortaa', cursive; font-size: 16px;
+            font-weight: 600; color: white; }
+        .modal-close { width: 32px; height: 32px; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3); display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 18px; color: white; border: 2px solid rgba(255, 255, 255, 0.5); }
+        .modal-content { padding: 20px; }
+        .input-group { margin-bottom: 18px; }
+        .input-label { display: block; font-size: 12px; color: rgba(255, 255, 255, 0.9);
+            text-transform: uppercase; font-weight: 600; margin-bottom: 8px; }
+        .input-field { width: 100%; padding: 12px 14px; border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 12px; font-size: 15px; background: rgba(255, 255, 255, 0.3);
+            color: white; }
+        .input-field:focus { outline: none; border-color: rgba(255, 255, 255, 0.7); }
+        .input-field::placeholder { color: rgba(255,255,255,0.5); }
+        .color-picker { display: flex; gap: 10px; flex-wrap: wrap; }
+        .color-option { width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+            border: 3px solid transparent; transition: all 0.3s; }
+        .color-option:hover { transform: scale(1.1); }
+        .color-option.selected { border-color: white; box-shadow: 0 0 10px rgba(255,255,255,0.5); }
+        .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+        .btn { flex: 1; padding: 14px; border: none; border-radius: 14px;
+            font-family: 'Comfortaa', cursive; font-size: 14px; font-weight: 600; cursor: pointer; }
+        .btn-primary { background: rgba(255, 255, 255, 0.9); color: #B4A7D6; }
+        .btn-danger { background: rgba(255, 107, 107, 0.8); color: white; }
+        .btn:active { transform: scale(0.98); }
     </style>
 </head>
 <body>
@@ -118,6 +150,32 @@
             <div class="tree-container" id="treeContainer"></div>
         </div>
         <button class="fab" onclick="createProject()">+</button>
+        
+        <!-- Modal édition projet -->
+        <div class="modal-overlay" id="editModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-icon" id="editModalIcon">✏️</div>
+                    <div class="modal-title">Modifier le projet</div>
+                    <div class="modal-close" onclick="closeEditModal()">×</div>
+                </div>
+                <div class="modal-content">
+                    <div class="input-group">
+                        <label class="input-label">Nom du projet</label>
+                        <input type="text" class="input-field" id="editNameInput" placeholder="Nom...">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Couleur</label>
+                        <div class="color-picker" id="colorPicker"></div>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-danger" onclick="deleteEditingProject()">🗑️ Supprimer</button>
+                        <button class="btn btn-primary" onclick="saveProjectEdit()">💾 Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <div class="bottom-menu">
             <div class="menu-item" onclick="goToValues()"><div class="menu-icon">🏛️</div><div class="menu-label">Fondations</div></div>
             <div class="menu-item active"><div class="menu-icon">🌳</div><div class="menu-label">Arbre</div></div>
@@ -142,10 +200,18 @@
             if (projects.length > 0) {
                 html += '<div class="branches" id="branchesContainer">';
                 projects.forEach(p => {
-                    html += `<div class="branch" data-project-id="${p.id}" onclick="openProject('${p.id}')">
+                    const color = p.color || '#FFFFFF';
+                    html += `<div class="branch" data-project-id="${p.id}" 
+                        style="border-color: ${color}; box-shadow: 0 4px 15px ${color}40;"
+                        onclick="openProject('${p.id}')"
+                        onmousedown="startLongPress('${p.id}')"
+                        onmouseup="cancelLongPress()"
+                        onmouseleave="cancelLongPress()"
+                        ontouchstart="startLongPress('${p.id}')"
+                        ontouchend="cancelLongPress()"
+                        ontouchcancel="cancelLongPress()">
                         <div class="branch-emoji">${p.emoji}</div>
                         <div class="branch-name">${p.name}</div>
-                        <div class="branch-delete" onclick="event.stopPropagation(); deleteProject('${p.id}')">×</div>
                     </div>`;
                 });
                 html += '</div>';
@@ -252,7 +318,111 @@
             }
         }
         
+        // Long press pour éditer
+        let longPressTimer = null;
+        let editingProjectId = null;
+        
+        const COLORS = [
+            { name: 'Blanc', hex: '#FFFFFF' },
+            { name: 'Rose', hex: '#FF69B4' },
+            { name: 'Corail', hex: '#FF6B6B' },
+            { name: 'Orange', hex: '#FFA500' },
+            { name: 'Jaune', hex: '#FFD700' },
+            { name: 'Vert', hex: '#4CAF50' },
+            { name: 'Turquoise', hex: '#40E0D0' },
+            { name: 'Bleu', hex: '#4A90D9' },
+            { name: 'Violet', hex: '#9B59B6' },
+            { name: 'Lavande', hex: '#B4A7D6' }
+        ];
+        
+        function startLongPress(projectId) {
+            longPressTimer = setTimeout(() => {
+                openEditModal(projectId);
+            }, 500);
+        }
+        
+        function cancelLongPress() {
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+            }
+        }
+        
+        function openEditModal(projectId) {
+            cancelLongPress();
+            editingProjectId = projectId;
+            
+            const projects = JSON.parse(localStorage.getItem('wutree_projects') || '[]');
+            const project = projects.find(p => p.id === projectId);
+            if (!project) return;
+            
+            document.getElementById('editModalIcon').textContent = project.emoji;
+            document.getElementById('editNameInput').value = project.name;
+            
+            // Générer le color picker
+            const colorPicker = document.getElementById('colorPicker');
+            const currentColor = project.color || '#FFFFFF';
+            
+            colorPicker.innerHTML = COLORS.map(c => `
+                <div class="color-option ${c.hex === currentColor ? 'selected' : ''}" 
+                     style="background: ${c.hex};"
+                     data-color="${c.hex}"
+                     onclick="selectColor('${c.hex}')"></div>
+            `).join('');
+            
+            document.getElementById('editModal').classList.add('show');
+        }
+        
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('show');
+            editingProjectId = null;
+        }
+        
+        function selectColor(hex) {
+            document.querySelectorAll('.color-option').forEach(el => {
+                el.classList.toggle('selected', el.dataset.color === hex);
+            });
+        }
+        
+        function saveProjectEdit() {
+            if (!editingProjectId) return;
+            
+            const newName = document.getElementById('editNameInput').value.trim();
+            const selectedColor = document.querySelector('.color-option.selected');
+            const newColor = selectedColor ? selectedColor.dataset.color : '#FFFFFF';
+            
+            if (!newName) {
+                alert('Entre un nom pour le projet !');
+                return;
+            }
+            
+            let projects = JSON.parse(localStorage.getItem('wutree_projects') || '[]');
+            const projectIndex = projects.findIndex(p => p.id === editingProjectId);
+            
+            if (projectIndex > -1) {
+                projects[projectIndex].name = newName;
+                projects[projectIndex].color = newColor;
+                localStorage.setItem('wutree_projects', JSON.stringify(projects));
+            }
+            
+            closeEditModal();
+            loadTree();
+        }
+        
+        function deleteEditingProject() {
+            if (!editingProjectId) return;
+            if (confirm('Supprimer ce projet et tous ses sous-projets ?')) {
+                let projects = JSON.parse(localStorage.getItem('wutree_projects') || '[]');
+                projects = projects.filter(p => p.id !== editingProjectId);
+                localStorage.setItem('wutree_projects', JSON.stringify(projects));
+                closeEditModal();
+                loadTree();
+            }
+        }
+        
         function openProject(id) {
+            // Ne pas ouvrir si on est en train de faire un long press
+            if (longPressTimer) return;
             localStorage.setItem('wutree_current_project', id);
             window.location.href = 'wu-tree-v2-project-domain.html';
         }
