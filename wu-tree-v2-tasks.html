@@ -167,7 +167,7 @@
         };
         
         let allTasks = [];
-        let currentFilter = 'all';
+        let currentFilter = 'today';
         
         function init() {
             collectAllTasks();
@@ -219,22 +219,17 @@
         function renderFilters() {
             const filters = document.getElementById('filters');
             
-            // Compter les tâches par filtre
+            // Compter les tâches par temporalité
             const counts = {
-                all: allTasks.filter(t => !t.completed).length,
                 today: allTasks.filter(t => !t.completed && t.levelId === 'today').length,
                 week: allTasks.filter(t => !t.completed && t.levelId === 'week').length,
                 month: allTasks.filter(t => !t.completed && t.levelId === 'month').length,
-                overdue: allTasks.filter(t => !t.completed && isOverdue(t.dueDate)).length
+                quarter: allTasks.filter(t => !t.completed && t.levelId === 'quarter').length,
+                semester: allTasks.filter(t => !t.completed && t.levelId === 'semester').length,
+                year: allTasks.filter(t => !t.completed && t.levelId === 'year').length
             };
             
             filters.innerHTML = `
-                <div class="filter-btn ${currentFilter === 'all' ? 'active' : ''}" onclick="setFilter('all')">
-                    Tout<span class="filter-badge">${counts.all}</span>
-                </div>
-                <div class="filter-btn ${currentFilter === 'overdue' ? 'active' : ''}" onclick="setFilter('overdue')">
-                    ⚠️ Retard<span class="filter-badge">${counts.overdue}</span>
-                </div>
                 <div class="filter-btn ${currentFilter === 'today' ? 'active' : ''}" onclick="setFilter('today')">
                     💧 Aujourd'hui<span class="filter-badge">${counts.today}</span>
                 </div>
@@ -243,6 +238,15 @@
                 </div>
                 <div class="filter-btn ${currentFilter === 'month' ? 'active' : ''}" onclick="setFilter('month')">
                     🍂 Mois<span class="filter-badge">${counts.month}</span>
+                </div>
+                <div class="filter-btn ${currentFilter === 'quarter' ? 'active' : ''}" onclick="setFilter('quarter')">
+                    🍃 Trimestre<span class="filter-badge">${counts.quarter}</span>
+                </div>
+                <div class="filter-btn ${currentFilter === 'semester' ? 'active' : ''}" onclick="setFilter('semester')">
+                    🌿 Semestre<span class="filter-badge">${counts.semester}</span>
+                </div>
+                <div class="filter-btn ${currentFilter === 'year' ? 'active' : ''}" onclick="setFilter('year')">
+                    🌱 Année<span class="filter-badge">${counts.year}</span>
                 </div>
             `;
         }
@@ -281,16 +285,12 @@
         function renderContent() {
             const content = document.getElementById('content');
             
-            // Filtrer les tâches
-            let filteredTasks = allTasks;
-            if (currentFilter === 'overdue') {
-                filteredTasks = allTasks.filter(t => !t.completed && isOverdue(t.dueDate));
-            } else if (currentFilter !== 'all') {
-                filteredTasks = allTasks.filter(t => t.levelId === currentFilter);
-            }
+            // Filtrer les tâches par temporalité
+            let filteredTasks = allTasks.filter(t => t.levelId === currentFilter);
             
             const pendingTasks = filteredTasks.filter(t => !t.completed);
             const completedTasks = filteredTasks.filter(t => t.completed);
+            const overdueTasks = pendingTasks.filter(t => isOverdue(t.dueDate));
             
             let html = '';
             
@@ -299,14 +299,14 @@
                 <div class="quick-stats">
                     <div class="quick-stat">
                         <div class="quick-stat-number">${pendingTasks.length}</div>
-                        <div class="quick-stat-label">En cours</div>
+                        <div class="quick-stat-label">À faire</div>
                     </div>
                     <div class="quick-stat">
                         <div class="quick-stat-number">${completedTasks.length}</div>
                         <div class="quick-stat-label">Terminées</div>
                     </div>
                     <div class="quick-stat">
-                        <div class="quick-stat-number">${allTasks.filter(t => !t.completed && isOverdue(t.dueDate)).length}</div>
+                        <div class="quick-stat-number">${overdueTasks.length}</div>
                         <div class="quick-stat-label">En retard</div>
                     </div>
                 </div>
