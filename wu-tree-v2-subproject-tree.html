@@ -18,25 +18,35 @@
             border-radius: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.4);
             position: relative; overflow: hidden;
         }
+        
+        /* Pétales */
         .petal { position: absolute; width: 10px; height: 10px;
             background: linear-gradient(135deg, rgba(255, 182, 193, 0.8), rgba(255, 105, 180, 0.6));
             border-radius: 50% 0 50% 0; animation: fall linear infinite; pointer-events: none; z-index: 50; }
         .petal:nth-child(1) { left: 10%; animation-duration: 12s; width: 8px; }
-        .petal:nth-child(2) { left: 20%; animation-duration: 14s; animation-delay: 2s; }
-        .petal:nth-child(3) { left: 30%; animation-duration: 16s; animation-delay: 4s; }
+        .petal:nth-child(2) { left: 25%; animation-duration: 14s; animation-delay: 2s; }
+        .petal:nth-child(3) { left: 40%; animation-duration: 16s; animation-delay: 4s; }
+        .petal:nth-child(4) { left: 55%; animation-duration: 13s; animation-delay: 1s; }
+        .petal:nth-child(5) { left: 70%; animation-duration: 15s; animation-delay: 3s; }
+        .petal:nth-child(6) { left: 85%; animation-duration: 17s; animation-delay: 5s; }
         @keyframes fall { 0% { transform: translateY(-50px) rotate(0deg); opacity: 0.8; }
             100% { transform: translateY(812px) rotate(360deg); opacity: 0; } }
-        .cloud { position: absolute; color: white; font-size: 40px; opacity: 0.6;
+        
+        /* Nuages */
+        .cloud { position: absolute; color: white; font-size: 45px; opacity: 0.6;
             animation: float-cloud linear infinite; pointer-events: none; z-index: 40; }
-        .cloud:nth-child(4) { top: 80px; animation-duration: 200s; }
+        .cloud:nth-child(7) { top: 80px; animation-duration: 200s; }
+        .cloud:nth-child(8) { top: 150px; animation-duration: 240s; animation-delay: -80s; font-size: 35px; }
         @keyframes float-cloud { 0% { transform: translateX(-80px); } 100% { transform: translateX(455px); } }
+        
         .status-bar { position: absolute; top: 0; left: 0; right: 0; height: 44px;
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 20px; color: rgba(255,255,255,0.95); font-size: 14px; z-index: 100; }
         
-        .header { position: absolute; top: 44px; left: 0; right: 0; height: 60px;
+        /* Header */
+        .header { position: absolute; top: 44px; left: 0; right: 0; height: 55px;
             display: flex; align-items: center; padding: 0 15px; z-index: 90;
-            background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
         .back-button { width: 36px; height: 36px; border-radius: 50%;
             background: rgba(255, 255, 255, 0.3); display: flex; align-items: center; justify-content: center;
@@ -44,60 +54,133 @@
             transition: all 0.3s; }
         .back-button:active { transform: scale(0.95); }
         .header-title { flex: 1; text-align: center; font-family: 'Comfortaa', cursive;
-            font-size: 18px; font-weight: 600; color: white; text-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            font-size: 16px; font-weight: 600; color: white; text-shadow: 0 2px 6px rgba(0,0,0,0.1);
             display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .header-emoji { font-size: 24px; }
-        .header-spacer { width: 36px; }
+        .header-emoji { font-size: 22px; }
+        .settings-btn { width: 36px; height: 36px; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3); display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 16px; color: white; border: 2px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.3s; }
+        .settings-btn:active { transform: scale(0.95); }
         
-        .content { position: absolute; top: 104px; left: 0; right: 0; bottom: 70px;
-            overflow-y: auto; padding: 15px; z-index: 60; }
+        /* Contenu principal */
+        .content { position: absolute; top: 99px; left: 0; right: 0; bottom: 70px;
+            overflow: hidden; z-index: 60; }
         
-        .level-card { background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px);
-            border-radius: 16px; margin-bottom: 12px; overflow: hidden;
-            border: 2px solid rgba(255, 255, 255, 0.4); transition: all 0.3s; }
+        .tree-container { width: 100%; height: 100%; position: relative; }
         
-        .level-header { padding: 14px 16px; display: flex; align-items: center; gap: 12px;
-            cursor: pointer; user-select: none; }
-        .level-header:active { background: rgba(255, 255, 255, 0.1); }
+        svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
         
-        .level-icon { font-size: 24px; }
-        .level-info { flex: 1; }
-        .level-title { font-size: 14px; font-weight: 600; color: white;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 2px; }
-        .level-subtitle { font-size: 11px; color: rgba(255, 255, 255, 0.8); }
-        .level-toggle { font-size: 16px; color: white; transition: transform 0.3s; }
-        .level-toggle.expanded { transform: rotate(180deg); }
+        /* Bulles des niveaux */
+        .levels-container { position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            display: flex; flex-direction: column; justify-content: space-evenly;
+            align-items: center; padding: 20px 0; z-index: 10; }
         
-        .level-content { padding: 0 16px 14px 16px; display: none; }
-        .level-content.show { display: block; }
+        .level-bubble { width: 70px; height: 70px; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(10px);
+            border: 3px solid rgba(255, 255, 255, 0.6);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: all 0.3s;
+            position: relative; }
+        .level-bubble:active { transform: scale(0.95); }
+        .level-bubble.has-content { border-color: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.55); }
+        .level-bubble.disabled { opacity: 0.4; pointer-events: none; }
         
-        .level-intention { background: rgba(255, 255, 255, 0.2); border-radius: 10px;
-            padding: 10px 12px; margin-bottom: 10px; border: 1px solid rgba(255, 255, 255, 0.3); }
-        .intention-label { font-size: 10px; color: rgba(255, 255, 255, 0.9);
-            text-transform: uppercase; font-weight: 600; margin-bottom: 4px; }
-        .intention-text { font-size: 13px; color: white; font-style: italic;
-            line-height: 1.4; }
-        .intention-empty { font-size: 12px; color: rgba(255, 255, 255, 0.6); }
+        .level-emoji { font-size: 24px; }
+        .level-name { font-size: 8px; font-weight: 600; color: white;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2); margin-top: 2px; text-align: center; }
         
-        .actions-list { margin-top: 8px; }
-        .action-item { background: rgba(255, 255, 255, 0.15); border-radius: 8px;
-            padding: 10px 12px; margin-bottom: 6px; display: flex; align-items: center; gap: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.25); }
-        .action-bullet { width: 6px; height: 6px; border-radius: 50%;
-            background: rgba(255, 255, 255, 0.7); }
-        .action-text { flex: 1; font-size: 12px; color: white; line-height: 1.4; }
-        .action-delete { width: 24px; height: 24px; border-radius: 50%;
-            background: rgba(255, 107, 107, 0.8); color: white; font-size: 14px;
+        .level-badge { position: absolute; top: -5px; right: -5px; min-width: 20px; height: 20px;
+            background: linear-gradient(135deg, #FFB6C1 0%, #FF69B4 100%);
+            border-radius: 10px; color: white; font-size: 11px; font-weight: bold;
+            display: flex; align-items: center; justify-content: center; padding: 0 5px;
+            border: 2px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
+        
+        /* Modal détail niveau */
+        .modal-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.5); z-index: 200; display: none;
+            align-items: center; justify-content: center; }
+        .modal-overlay.show { display: flex; }
+        
+        .modal { width: 90%; max-height: 80%; background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+            border-radius: 24px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            display: flex; flex-direction: column; }
+        
+        .modal-header { padding: 16px 20px; background: rgba(255, 255, 255, 0.3);
+            display: flex; align-items: center; gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
+        .modal-icon { font-size: 28px; }
+        .modal-title { flex: 1; font-family: 'Comfortaa', cursive; font-size: 18px;
+            font-weight: 600; color: white; text-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .modal-close { width: 32px; height: 32px; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3); display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 18px; color: white; border: 2px solid rgba(255, 255, 255, 0.5); }
+        
+        .modal-content { flex: 1; overflow-y: auto; padding: 16px 20px; }
+        
+        .intention-section { margin-bottom: 16px; }
+        .section-label { font-size: 11px; color: rgba(255, 255, 255, 0.9);
+            text-transform: uppercase; font-weight: 600; margin-bottom: 8px; letter-spacing: 1px; }
+        .intention-input { width: 100%; padding: 12px 14px; border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 12px; font-size: 14px; background: rgba(255, 255, 255, 0.3);
+            color: white; resize: none; min-height: 60px; }
+        .intention-input:focus { outline: none; border-color: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.4); }
+        .intention-input::placeholder { color: rgba(255,255,255,0.6); }
+        
+        .actions-section { margin-top: 16px; }
+        .action-item { background: rgba(255, 255, 255, 0.25); border-radius: 10px;
+            padding: 10px 12px; margin-bottom: 8px; display: flex; align-items: center; gap: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3); }
+        .action-bullet { width: 8px; height: 8px; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.8); flex-shrink: 0; }
+        .action-text { flex: 1; font-size: 13px; color: white; line-height: 1.4; }
+        .action-delete { width: 26px; height: 26px; border-radius: 50%;
+            background: rgba(255, 107, 107, 0.8); color: white; font-size: 16px;
             display: flex; align-items: center; justify-content: center; cursor: pointer;
-            border: 1px solid white; }
+            border: 2px solid white; flex-shrink: 0; }
         
-        .add-action-btn { width: 100%; padding: 8px; background: rgba(255, 255, 255, 0.15);
-            border: 1px dashed rgba(255, 255, 255, 0.4); border-radius: 8px;
-            color: white; font-size: 12px; cursor: pointer; margin-top: 6px;
-            transition: all 0.2s; }
-        .add-action-btn:hover { background: rgba(255, 255, 255, 0.2); }
-        .add-action-btn:active { transform: scale(0.98); }
+        .add-action-row { display: flex; gap: 8px; margin-top: 12px; }
+        .add-action-input { flex: 1; padding: 10px 14px; border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 10px; font-size: 13px; background: rgba(255, 255, 255, 0.25);
+            color: white; }
+        .add-action-input:focus { outline: none; border-color: rgba(255, 255, 255, 0.6); }
+        .add-action-input::placeholder { color: rgba(255,255,255,0.5); }
+        .add-action-btn { width: 44px; height: 44px; border-radius: 50%;
+            background: linear-gradient(135deg, #FFB6C1 0%, #FF69B4 100%);
+            color: white; font-size: 24px; border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 10px rgba(255, 105, 180, 0.4); }
+        .add-action-btn:active { transform: scale(0.95); }
         
+        .modal-footer { padding: 12px 20px; background: rgba(255, 255, 255, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.3); }
+        .save-btn { width: 100%; padding: 14px; background: rgba(255, 255, 255, 0.9);
+            border: none; border-radius: 14px; color: #B4A7D6;
+            font-family: 'Comfortaa', cursive; font-size: 15px; font-weight: 600;
+            cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .save-btn:active { transform: scale(0.98); }
+        
+        /* Modal settings niveaux */
+        .settings-modal { width: 85%; background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+            border-radius: 20px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+        .settings-list { padding: 10px 16px; }
+        .settings-item { display: flex; align-items: center; gap: 12px; padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
+        .settings-item:last-child { border-bottom: none; }
+        .settings-emoji { font-size: 22px; width: 32px; text-align: center; }
+        .settings-name { flex: 1; font-size: 14px; color: white; font-weight: 500; }
+        .settings-toggle { width: 50px; height: 28px; border-radius: 14px;
+            background: rgba(255, 255, 255, 0.3); position: relative; cursor: pointer;
+            border: 2px solid rgba(255, 255, 255, 0.4); transition: all 0.3s; }
+        .settings-toggle.active { background: rgba(255, 255, 255, 0.7); }
+        .settings-toggle::after { content: ''; position: absolute; width: 20px; height: 20px;
+            border-radius: 50%; background: white; top: 2px; left: 2px;
+            transition: all 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .settings-toggle.active::after { left: 24px; }
+        
+        /* Bottom menu */
         .bottom-menu { position: absolute; bottom: 0; left: 0; right: 0; height: 70px;
             background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(20px);
             display: flex; justify-content: space-around; align-items: center;
@@ -111,8 +194,12 @@
 </head>
 <body>
     <div class="phone-frame">
+        <!-- Pétales -->
         <div class="petal"></div><div class="petal"></div><div class="petal"></div>
-        <div class="cloud">☁️</div>
+        <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+        <!-- Nuages -->
+        <div class="cloud">☁️</div><div class="cloud">☁️</div>
+        
         <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
         
         <div class="header">
@@ -121,31 +208,74 @@
                 <span class="header-emoji" id="headerEmoji">💻</span>
                 <span id="headerName">Crypto</span>
             </div>
-            <div class="header-spacer"></div>
+            <div class="settings-btn" onclick="openSettings()">⚙️</div>
         </div>
         
-        <div class="content" id="content">
-            <!-- Niveaux temporels -->
+        <div class="content">
+            <div class="tree-container" id="treeContainer"></div>
+        </div>
+        
+        <!-- Modal détail niveau -->
+        <div class="modal-overlay" id="levelModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-icon" id="modalIcon">🌱</div>
+                    <div class="modal-title" id="modalTitle">Année</div>
+                    <div class="modal-close" onclick="closeModal()">×</div>
+                </div>
+                <div class="modal-content">
+                    <div class="intention-section">
+                        <div class="section-label">✨ Intention</div>
+                        <textarea class="intention-input" id="intentionInput" placeholder="Quelle est ton intention pour ce niveau ?"></textarea>
+                    </div>
+                    <div class="actions-section">
+                        <div class="section-label">🎯 Actions</div>
+                        <div id="actionsList"></div>
+                        <div class="add-action-row">
+                            <input type="text" class="add-action-input" id="newActionInput" placeholder="Nouvelle action...">
+                            <button class="add-action-btn" onclick="addAction()">+</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="save-btn" onclick="saveAndClose()">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal settings -->
+        <div class="modal-overlay" id="settingsModal">
+            <div class="settings-modal">
+                <div class="modal-header">
+                    <div class="modal-icon">⚙️</div>
+                    <div class="modal-title">Niveaux actifs</div>
+                    <div class="modal-close" onclick="closeSettings()">×</div>
+                </div>
+                <div class="settings-list" id="settingsList"></div>
+            </div>
         </div>
         
         <div class="bottom-menu">
             <div class="menu-item" onclick="goToProject()"><div class="menu-icon">🌿</div><div class="menu-label">Domaine</div></div>
             <div class="menu-item active"><div class="menu-icon">📅</div><div class="menu-label">Arbre</div></div>
-            <div class="menu-item"><div class="menu-icon">⚙️</div><div class="menu-label">Options</div></div>
         </div>
     </div>
+    
     <script>
-        const LEVELS = [
+        // Niveaux disponibles (du plus haut au plus bas)
+        const ALL_LEVELS = [
             { id: 'year', icon: '🌱', name: 'Année', subtitle: 'Vision large' },
             { id: 'semester', icon: '🌿', name: 'Semestre', subtitle: 'Jalons' },
             { id: 'quarter', icon: '🍃', name: 'Trimestre', subtitle: 'Orientation' },
             { id: 'month', icon: '🍂', name: 'Mois', subtitle: 'Rythme' },
             { id: 'week', icon: '🌾', name: 'Semaine', subtitle: 'Présence' },
-            { id: 'today', icon: '💧', name: 'Aujourd\'hui', subtitle: 'Action' }
+            { id: 'today', icon: '💧', name: "Aujourd'hui", subtitle: 'Action' }
         ];
         
         let currentSubproject = null;
         let treeData = {};
+        let activeLevels = ['year', 'month', 'week', 'today']; // Par défaut
+        let currentLevelId = null;
         
         function init() {
             const subprojectId = localStorage.getItem('wutree_current_subproject');
@@ -173,82 +303,192 @@
             document.getElementById('headerName').textContent = currentSubproject.name;
             
             treeData = currentSubproject.tree || {};
-            renderLevels();
+            activeLevels = currentSubproject.activeLevels || ['year', 'month', 'week', 'today'];
+            
+            renderTree();
         }
         
-        function renderLevels() {
-            const content = document.getElementById('content');
-            content.innerHTML = LEVELS.map(level => {
-                const levelData = treeData[level.id] || { intention: '', actions: [], visible: true, expanded: false };
+        function renderTree() {
+            const container = document.getElementById('treeContainer');
+            const visibleLevels = ALL_LEVELS.filter(l => activeLevels.includes(l.id));
+            
+            // Inverser pour avoir Aujourd'hui en bas et Année en haut
+            const orderedLevels = [...visibleLevels].reverse();
+            
+            let html = '<div class="levels-container" id="levelsContainer">';
+            
+            orderedLevels.forEach((level, index) => {
+                const levelData = treeData[level.id] || { intention: '', actions: [] };
+                const hasContent = levelData.intention || levelData.actions.length > 0;
+                const actionCount = levelData.actions.length;
                 
-                return `
-                    <div class="level-card" data-level="${level.id}">
-                        <div class="level-header" onclick="toggleLevel('${level.id}')">
-                            <div class="level-icon">${level.icon}</div>
-                            <div class="level-info">
-                                <div class="level-title">${level.name}</div>
-                                <div class="level-subtitle">${level.subtitle}</div>
-                            </div>
-                            <div class="level-toggle ${levelData.expanded ? 'expanded' : ''}">▼</div>
-                        </div>
-                        <div class="level-content ${levelData.expanded ? 'show' : ''}" id="content-${level.id}">
-                            <div class="level-intention" onclick="editIntention('${level.id}')">
-                                <div class="intention-label">Intention</div>
-                                ${levelData.intention ? 
-                                    `<div class="intention-text">${levelData.intention}</div>` :
-                                    `<div class="intention-empty">Définir une intention...</div>`
-                                }
-                            </div>
-                            <div class="actions-list" id="actions-${level.id}">
-                                ${levelData.actions.map((action, i) => `
-                                    <div class="action-item">
-                                        <div class="action-bullet"></div>
-                                        <div class="action-text">${action}</div>
-                                        <div class="action-delete" onclick="deleteAction('${level.id}', ${i})">×</div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                            <button class="add-action-btn" onclick="addAction('${level.id}')">+ Ajouter une action</button>
-                        </div>
+                html += `
+                    <div class="level-bubble ${hasContent ? 'has-content' : ''}" 
+                         data-level="${level.id}" 
+                         onclick="openLevel('${level.id}')">
+                        <div class="level-emoji">${level.icon}</div>
+                        <div class="level-name">${level.name}</div>
+                        ${actionCount > 0 ? `<div class="level-badge">${actionCount}</div>` : ''}
                     </div>
                 `;
-            }).join('');
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+            
+            // Dessiner les lignes après un court délai
+            setTimeout(drawLines, 50);
         }
         
-        function toggleLevel(levelId) {
-            if (!treeData[levelId]) treeData[levelId] = { intention: '', actions: [], visible: true, expanded: false };
-            treeData[levelId].expanded = !treeData[levelId].expanded;
+        function drawLines() {
+            const container = document.getElementById('treeContainer');
+            const bubbles = container.querySelectorAll('.level-bubble');
+            
+            if (bubbles.length < 2) return;
+            
+            const containerRect = container.getBoundingClientRect();
+            const centerX = container.offsetWidth / 2;
+            
+            // Récupérer les positions des bulles
+            const positions = Array.from(bubbles).map(el => {
+                const rect = el.getBoundingClientRect();
+                return {
+                    x: rect.left + rect.width / 2 - containerRect.left,
+                    y: rect.top + rect.height / 2 - containerRect.top,
+                    top: rect.top - containerRect.top,
+                    bottom: rect.bottom - containerRect.top
+                };
+            });
+            
+            let svgContent = '';
+            
+            // Relier chaque bulle à la suivante avec une courbe
+            for (let i = 0; i < positions.length - 1; i++) {
+                const current = positions[i];
+                const next = positions[i + 1];
+                
+                // Point de départ (bas de la bulle courante)
+                const startX = current.x;
+                const startY = current.bottom + 5;
+                
+                // Point d'arrivée (haut de la bulle suivante)
+                const endX = next.x;
+                const endY = next.top - 5;
+                
+                // Points de contrôle pour la courbe
+                const midY = (startY + endY) / 2;
+                
+                svgContent += `<path d="M ${startX} ${startY} Q ${startX} ${midY} ${centerX} ${midY} Q ${endX} ${midY} ${endX} ${endY}" 
+                    stroke="rgba(255,255,255,0.45)" stroke-width="3" fill="none" stroke-linecap="round"/>`;
+            }
+            
+            // Supprimer l'ancien SVG
+            const existingSvg = container.querySelector('svg');
+            if (existingSvg) existingSvg.remove();
+            
+            // Créer le nouveau SVG
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.innerHTML = svgContent;
+            container.insertBefore(svg, container.firstChild);
+        }
+        
+        function openLevel(levelId) {
+            currentLevelId = levelId;
+            const level = ALL_LEVELS.find(l => l.id === levelId);
+            const levelData = treeData[levelId] || { intention: '', actions: [] };
+            
+            document.getElementById('modalIcon').textContent = level.icon;
+            document.getElementById('modalTitle').textContent = level.name;
+            document.getElementById('intentionInput').value = levelData.intention || '';
+            
+            renderActions(levelData.actions);
+            
+            document.getElementById('levelModal').classList.add('show');
+        }
+        
+        function renderActions(actions) {
+            const list = document.getElementById('actionsList');
+            list.innerHTML = actions.map((action, i) => `
+                <div class="action-item">
+                    <div class="action-bullet"></div>
+                    <div class="action-text">${action}</div>
+                    <div class="action-delete" onclick="deleteAction(${i})">×</div>
+                </div>
+            `).join('');
+        }
+        
+        function addAction() {
+            const input = document.getElementById('newActionInput');
+            const action = input.value.trim();
+            if (!action) return;
+            
+            if (!treeData[currentLevelId]) {
+                treeData[currentLevelId] = { intention: '', actions: [] };
+            }
+            treeData[currentLevelId].actions.push(action);
+            
+            input.value = '';
+            renderActions(treeData[currentLevelId].actions);
+        }
+        
+        function deleteAction(index) {
+            treeData[currentLevelId].actions.splice(index, 1);
+            renderActions(treeData[currentLevelId].actions);
+        }
+        
+        function saveAndClose() {
+            const intention = document.getElementById('intentionInput').value.trim();
+            
+            if (!treeData[currentLevelId]) {
+                treeData[currentLevelId] = { intention: '', actions: [] };
+            }
+            treeData[currentLevelId].intention = intention;
+            
             saveTree();
-            renderLevels();
+            closeModal();
+            renderTree();
         }
         
-        function editIntention(levelId) {
-            const current = treeData[levelId]?.intention || '';
-            const newIntention = prompt('Intention pour ce niveau :', current);
-            if (newIntention !== null) {
-                if (!treeData[levelId]) treeData[levelId] = { intention: '', actions: [], visible: true, expanded: true };
-                treeData[levelId].intention = newIntention.trim();
-                saveTree();
-                renderLevels();
-            }
+        function closeModal() {
+            document.getElementById('levelModal').classList.remove('show');
+            currentLevelId = null;
         }
         
-        function addAction(levelId) {
-            const action = prompt('Nouvelle action :');
-            if (action && action.trim()) {
-                if (!treeData[levelId]) treeData[levelId] = { intention: '', actions: [], visible: true, expanded: true };
-                treeData[levelId].actions.push(action.trim());
-                saveTree();
-                renderLevels();
-            }
+        function openSettings() {
+            const list = document.getElementById('settingsList');
+            list.innerHTML = ALL_LEVELS.map(level => `
+                <div class="settings-item">
+                    <div class="settings-emoji">${level.icon}</div>
+                    <div class="settings-name">${level.name}</div>
+                    <div class="settings-toggle ${activeLevels.includes(level.id) ? 'active' : ''}" 
+                         onclick="toggleLevel('${level.id}', this)"></div>
+                </div>
+            `).join('');
+            
+            document.getElementById('settingsModal').classList.add('show');
         }
         
-        function deleteAction(levelId, index) {
-            if (confirm('Supprimer cette action ?')) {
-                treeData[levelId].actions.splice(index, 1);
-                saveTree();
-                renderLevels();
+        function toggleLevel(levelId, el) {
+            const index = activeLevels.indexOf(levelId);
+            if (index > -1) {
+                // Ne pas permettre de désactiver si moins de 2 niveaux
+                if (activeLevels.length <= 2) {
+                    alert('Tu dois garder au moins 2 niveaux actifs !');
+                    return;
+                }
+                activeLevels.splice(index, 1);
+                el.classList.remove('active');
+            } else {
+                activeLevels.push(levelId);
+                el.classList.add('active');
             }
+            
+            saveTree();
+            renderTree();
+        }
+        
+        function closeSettings() {
+            document.getElementById('settingsModal').classList.remove('show');
         }
         
         function saveTree() {
@@ -261,11 +501,17 @@
             if (subprojectIndex === -1) return;
             
             projects[projectIndex].subprojects[subprojectIndex].tree = treeData;
+            projects[projectIndex].subprojects[subprojectIndex].activeLevels = activeLevels;
             localStorage.setItem('wutree_projects', JSON.stringify(projects));
         }
         
         function goBack() { window.location.href = 'wu-tree-v2-project-domain.html'; }
         function goToProject() { window.location.href = 'wu-tree-v2-project-domain.html'; }
+        
+        // Gérer la touche Entrée pour ajouter une action
+        document.getElementById('newActionInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') addAction();
+        });
         
         init();
     </script>
