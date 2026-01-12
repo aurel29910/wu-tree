@@ -85,10 +85,11 @@
         
         /* Task item */
         .task-item { background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(10px);
-            border-radius: 14px; padding: 12px 14px; margin-bottom: 8px;
-            border: 2px solid rgba(255, 255, 255, 0.4); transition: all 0.3s; }
+            border-radius: 0 14px 14px 0; padding: 12px 14px; margin-bottom: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.4); border-left: 4px solid white;
+            transition: all 0.3s; }
         .task-item.completed { opacity: 0.5; }
-        .task-item.overdue { border-color: rgba(255, 107, 107, 0.6); }
+        .task-item.overdue { border-right-color: rgba(255, 107, 107, 0.6); }
         
         .task-top { display: flex; align-items: center; gap: 10px; }
         .task-checkbox { width: 24px; height: 24px; border-radius: 50%;
@@ -105,9 +106,8 @@
         .task-item.completed .task-title { text-decoration: line-through; }
         
         .task-meta { display: flex; align-items: center; gap: 8px; margin-top: 5px; flex-wrap: wrap; }
-        .task-path { font-size: 10px; color: rgba(255, 255, 255, 0.7);
-            background: rgba(255, 255, 255, 0.2); padding: 3px 8px; border-radius: 10px;
-            display: flex; align-items: center; gap: 4px; }
+        .task-path { font-size: 10px; color: rgba(255, 255, 255, 0.85);
+            padding: 3px 8px; display: flex; align-items: center; gap: 4px; }
         .task-due { font-size: 10px; padding: 3px 8px; border-radius: 10px;
             display: flex; align-items: center; gap: 3px; }
         .task-due.overdue { background: rgba(255, 107, 107, 0.5); color: white; }
@@ -197,6 +197,7 @@
                                 projectId: project.id,
                                 projectName: project.name,
                                 projectEmoji: project.emoji,
+                                projectColor: project.color || '#FFFFFF',
                                 subprojectId: subproject.id,
                                 subprojectName: subproject.name,
                                 subprojectEmoji: subproject.emoji
@@ -356,17 +357,19 @@
         function renderTaskItem(task) {
             const dueStatus = getDueStatus(task.dueDate);
             const isTaskOverdue = isOverdue(task.dueDate) && !task.completed;
+            const borderColor = task.projectColor || '#FFFFFF';
             
             return `
-                <div class="task-item ${task.completed ? 'completed' : ''} ${isTaskOverdue ? 'overdue' : ''}" data-task-id="${task.id}">
+                <div class="task-item ${task.completed ? 'completed' : ''} ${isTaskOverdue ? 'overdue' : ''}" 
+                     data-task-id="${task.id}"
+                     style="border-left: 4px solid ${borderColor};">
                     <div class="task-top">
                         <div class="task-checkbox ${task.completed ? 'checked' : ''}" 
                              onclick="event.stopPropagation(); toggleTask('${task.projectId}', '${task.subprojectId}', '${task.levelId}', '${task.id}')"></div>
                         <div class="task-content" onclick="openTask('${task.projectId}', '${task.subprojectId}', '${task.levelId}', '${task.id}')">
                             <div class="task-title">${task.text}</div>
                             <div class="task-meta">
-                                <span class="task-path">${task.subprojectEmoji} ${task.subprojectName}</span>
-                                ${task.levelInfo ? `<span class="task-path">${task.levelInfo.icon} ${task.levelInfo.name}</span>` : ''}
+                                <span class="task-path" style="border-left: 3px solid ${borderColor}; padding-left: 6px;">${task.subprojectEmoji} ${task.subprojectName}</span>
                                 ${task.dueDate ? `<span class="task-due ${dueStatus.class}">${dueStatus.icon} ${dueStatus.text}</span>` : ''}
                             </div>
                         </div>
