@@ -53,20 +53,22 @@
         .header-emoji { font-size: 26px; }
         .header-spacer { width: 36px; }
         
-        .date-banner { position: absolute; top: 99px; left: 0; right: 0; height: 40px;
-            background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px);
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            font-size: 13px; color: white; z-index: 85; }
-        .date-icon { font-size: 16px; }
+        .date-selector { position: absolute; top: 99px; left: 0; right: 0; height: 50px;
+            display: flex; align-items: center; justify-content: center; gap: 15px;
+            background: rgba(255, 255, 255, 0.2); border-bottom: 1px solid rgba(255, 255, 255, 0.2); z-index: 85; }
+        .date-arrow { width: 30px; height: 30px; border-radius: 50%; background: rgba(255, 255, 255, 0.3);
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            font-size: 16px; color: white; border: 2px solid rgba(255, 255, 255, 0.4); }
+        .date-arrow:active { transform: scale(0.95); }
+        .date-display { font-size: 14px; color: white; font-weight: 600; min-width: 180px; text-align: center;
+            cursor: pointer; padding: 6px 12px; border-radius: 12px; background: rgba(255, 255, 255, 0.2); }
         
-        .content { position: absolute; top: 139px; left: 0; right: 0; bottom: 70px;
+        .content { position: absolute; top: 149px; left: 0; right: 0; bottom: 70px;
             overflow-y: auto; padding: 15px 20px; z-index: 60; }
         
-        .intention-section { margin-bottom: 20px; }
+        .intention-section { margin-bottom: 15px; }
         .section-label { font-size: 11px; color: rgba(255, 255, 255, 0.9);
-            text-transform: uppercase; font-weight: 600; margin-bottom: 8px; letter-spacing: 1px;
-            display: flex; align-items: center; gap: 6px; }
+            text-transform: uppercase; font-weight: 600; margin-bottom: 8px; letter-spacing: 1px; }
         .intention-card { background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(10px);
             border-radius: 14px; padding: 14px; border: 2px solid rgba(255, 255, 255, 0.4);
             cursor: pointer; transition: all 0.3s; }
@@ -74,45 +76,45 @@
         .intention-text { font-size: 14px; color: white; font-style: italic; line-height: 1.5; }
         .intention-empty { font-size: 13px; color: rgba(255, 255, 255, 0.6); }
         
-        .stats { display: flex; justify-content: center; gap: 15px; margin-bottom: 18px; }
+        .stats { display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; }
         .stat { background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px);
             border-radius: 12px; padding: 10px 18px; text-align: center;
             border: 2px solid rgba(255, 255, 255, 0.3); }
         .stat-number { font-size: 22px; font-weight: 700; color: white; }
         .stat-label { font-size: 9px; color: rgba(255, 255, 255, 0.8); text-transform: uppercase; margin-top: 2px; }
         
-        .actions-section { margin-top: 20px; }
+        .actions-section { margin-top: 15px; }
         
-        .action-item { background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(10px);
-            border-radius: 14px; padding: 12px 14px; margin-bottom: 10px;
-            border: 2px solid rgba(255, 255, 255, 0.4); transition: all 0.3s; }
-        .action-item.completed { opacity: 0.6; }
-        .action-item.completed .action-title { text-decoration: line-through; }
-        .action-item.overdue { border-color: rgba(255, 107, 107, 0.6); }
+        .task-item { background: rgba(255, 255, 255, 0.3); backdrop-filter: blur(10px);
+            border-radius: 0 14px 14px 0; padding: 12px 14px; margin-bottom: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.4); border-left: 4px solid white;
+            transition: all 0.3s; position: relative; }
+        .task-item.completed { opacity: 0.5; }
+        .task-item.completed .task-title { text-decoration: line-through; }
         
-        .action-top { display: flex; align-items: center; gap: 10px; }
-        .action-checkbox { width: 24px; height: 24px; border-radius: 50%;
+        .task-top { display: flex; align-items: flex-start; gap: 10px; }
+        .task-checkbox { width: 24px; height: 24px; border-radius: 50%;
             border: 3px solid rgba(255, 255, 255, 0.7); display: flex;
             align-items: center; justify-content: center; cursor: pointer;
-            background: rgba(255, 255, 255, 0.2); transition: all 0.3s; flex-shrink: 0; }
-        .action-checkbox.checked { background: rgba(255, 255, 255, 0.8); border-color: white; }
-        .action-checkbox::after { content: '✓'; color: #B4A7D6; font-size: 12px;
+            background: rgba(255, 255, 255, 0.2); transition: all 0.3s; flex-shrink: 0; margin-top: 2px; }
+        .task-checkbox.checked { background: rgba(255, 255, 255, 0.8); border-color: white; }
+        .task-checkbox::after { content: '✓'; color: #B4A7D6; font-size: 12px;
             font-weight: bold; opacity: 0; transition: opacity 0.3s; }
-        .action-checkbox.checked::after { opacity: 1; }
+        .task-checkbox.checked::after { opacity: 1; }
         
-        .action-content { flex: 1; cursor: pointer; }
-        .action-title { font-size: 14px; color: white; font-weight: 500; line-height: 1.3; }
-        .action-meta { display: flex; align-items: center; gap: 10px; margin-top: 4px; flex-wrap: wrap; }
-        .action-due { font-size: 11px; color: rgba(255, 255, 255, 0.8);
-            background: rgba(255, 255, 255, 0.2); padding: 3px 8px; border-radius: 10px;
-            display: flex; align-items: center; gap: 4px; }
-        .action-due.overdue { background: rgba(255, 107, 107, 0.5); color: white; }
-        .action-due.today { background: rgba(255, 193, 7, 0.5); color: white; }
-        .action-due.soon { background: rgba(76, 175, 80, 0.4); color: white; }
-        .action-subtasks { font-size: 11px; color: rgba(255, 255, 255, 0.7);
-            display: flex; align-items: center; gap: 4px; }
-        
-        .action-arrow { font-size: 16px; color: rgba(255, 255, 255, 0.6); }
+        .task-content { flex: 1; cursor: pointer; }
+        .task-title { font-size: 14px; color: white; font-weight: 500; line-height: 1.3; }
+        .task-details { font-size: 12px; color: rgba(255, 255, 255, 0.75); margin-top: 4px; 
+            line-height: 1.4; white-space: pre-wrap; }
+        .task-meta { display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+        .task-due { font-size: 10px; color: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.2); padding: 3px 8px; border-radius: 10px; }
+        .task-due.overdue { background: rgba(255, 107, 107, 0.5); }
+        .task-due.today { background: rgba(255, 193, 7, 0.5); }
+        .task-due.soon { background: rgba(76, 175, 80, 0.4); }
+        .task-subtasks { font-size: 10px; color: rgba(255, 255, 255, 0.8); }
+        .task-link { font-size: 9px; color: rgba(255, 255, 255, 0.9); background: rgba(255,255,255,0.25);
+            padding: 2px 6px; border-radius: 8px; }
         
         .empty-state { text-align: center; padding: 50px 20px; }
         .empty-icon { font-size: 50px; margin-bottom: 12px; }
@@ -130,44 +132,64 @@
             background: rgba(0, 0, 0, 0.5); z-index: 200; display: none;
             align-items: flex-end; justify-content: center; }
         .modal-overlay.show { display: flex; }
-        
         .modal { width: 100%; background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
             border-radius: 24px 24px 0 0; overflow: hidden; box-shadow: 0 -10px 40px rgba(0,0,0,0.3);
-            padding-bottom: 30px; }
-        
+            max-height: 85%; display: flex; flex-direction: column; }
         .modal-header { padding: 14px 20px; background: rgba(255, 255, 255, 0.3);
             display: flex; align-items: center; gap: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3); flex-shrink: 0; }
         .modal-icon { font-size: 22px; }
-        .modal-title { flex: 1; font-family: 'Comfortaa', cursive; font-size: 15px;
-            font-weight: 600; color: white; }
+        .modal-title { flex: 1; font-family: 'Comfortaa', cursive; font-size: 15px; font-weight: 600; color: white; }
         .modal-close { width: 30px; height: 30px; border-radius: 50%;
             background: rgba(255, 255, 255, 0.3); display: flex; align-items: center; justify-content: center;
             cursor: pointer; font-size: 16px; color: white; border: 2px solid rgba(255, 255, 255, 0.5); }
-        
-        .modal-content { padding: 16px 20px; }
-        
+        .modal-content { padding: 16px 20px; overflow-y: auto; padding-bottom: 30px; }
         .input-group { margin-bottom: 14px; }
         .input-label { display: block; font-size: 11px; color: rgba(255, 255, 255, 0.9);
             text-transform: uppercase; font-weight: 600; margin-bottom: 6px; }
-        .input-field { width: 100%; padding: 12px 14px; border: 2px solid rgba(255, 255, 255, 0.4);
-            border-radius: 12px; font-size: 14px; background: rgba(255, 255, 255, 0.3);
-            color: white; }
+        .input-field { width: 100%; padding: 11px 12px; border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 12px; font-size: 14px; background: rgba(255, 255, 255, 0.3); color: white; }
         .input-field:focus { outline: none; border-color: rgba(255, 255, 255, 0.7); }
         .input-field::placeholder { color: rgba(255,255,255,0.5); }
-        
+        textarea.input-field { min-height: 80px; resize: vertical; font-family: inherit; }
         .submit-btn { width: 100%; padding: 14px; background: rgba(255, 255, 255, 0.9);
             border: none; border-radius: 14px; color: #B4A7D6;
-            font-family: 'Comfortaa', cursive; font-size: 15px; font-weight: 600;
-            cursor: pointer; margin-top: 8px; }
+            font-family: 'Comfortaa', cursive; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 8px; }
         .submit-btn:active { transform: scale(0.98); }
+        
+        .action-buttons { display: flex; gap: 10px; margin-top: 15px; }
+        .action-btn { flex: 1; padding: 14px; border: none; border-radius: 14px;
+            font-family: 'Comfortaa', cursive; font-size: 14px; font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .action-btn.edit { background: rgba(255, 255, 255, 0.9); color: #B4A7D6; }
+        .action-btn.delete { background: rgba(255, 107, 107, 0.8); color: white; }
+        .action-btn:active { transform: scale(0.98); }
+        
+        .calendar { background: rgba(255, 255, 255, 0.2); border-radius: 12px; padding: 12px; }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .calendar-title { font-size: 14px; color: white; font-weight: 600; }
+        .calendar-nav { display: flex; gap: 8px; }
+        .calendar-nav-btn { width: 28px; height: 28px; border-radius: 50%; background: rgba(255,255,255,0.3);
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            font-size: 12px; color: white; border: none; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+        .calendar-day-header { font-size: 10px; color: rgba(255,255,255,0.7); text-align: center; padding: 4px; }
+        .calendar-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+            font-size: 12px; color: white; border-radius: 50%; cursor: pointer; transition: all 0.2s; }
+        .calendar-day:hover { background: rgba(255,255,255,0.3); }
+        .calendar-day.other-month { color: rgba(255,255,255,0.4); }
+        .calendar-day.today { border: 2px solid rgba(255,255,255,0.6); }
+        .calendar-day.selected { background: rgba(255,255,255,0.6); font-weight: 700; }
+        .calendar-day.has-tasks { position: relative; }
+        .calendar-day.has-tasks::after { content: ''; position: absolute; bottom: 2px; width: 4px; height: 4px;
+            background: #FF69B4; border-radius: 50%; }
         
         .bottom-menu { position: absolute; bottom: 0; left: 0; right: 0; height: 70px;
             background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(20px);
             display: flex; justify-content: space-around; align-items: center;
             border-top: 1px solid rgba(255, 255, 255, 0.4); z-index: 90; }
         .menu-item { display: flex; flex-direction: column; align-items: center; gap: 4px;
-            cursor: pointer; padding: 8px 20px; border-radius: 12px; transition: all 0.3s; }
+            cursor: pointer; padding: 8px 16px; border-radius: 12px; transition: all 0.3s; }
         .menu-item.active { background: rgba(255, 255, 255, 0.6); }
         .menu-icon { font-size: 24px; }
         .menu-label { font-size: 10px; color: rgba(74, 90, 79, 0.8); font-weight: 500; }
@@ -184,21 +206,23 @@
         <div class="header">
             <div class="back-button" onclick="goBack()">←</div>
             <div class="header-title">
-                <span class="header-emoji" id="headerEmoji">💧</span>
-                <span id="headerName">Aujourd'hui</span>
+                <span class="header-emoji" id="levelEmoji">💧</span>
+                <span id="levelName">Aujourd'hui</span>
             </div>
             <div class="header-spacer"></div>
         </div>
         
-        <div class="date-banner">
-            <span class="date-icon">📅</span>
-            <span id="dateBanner">Échéance : Aujourd'hui</span>
+        <div class="date-selector">
+            <div class="date-arrow" onclick="previousPeriod()">‹</div>
+            <div class="date-display" id="dateDisplay" onclick="openCalendarModal()">Aujourd'hui</div>
+            <div class="date-arrow" onclick="nextPeriod()">›</div>
         </div>
         
         <div class="content" id="content"></div>
         
         <button class="fab" onclick="openAddModal()">+</button>
         
+        <!-- Modal ajout -->
         <div class="modal-overlay" id="addModal">
             <div class="modal">
                 <div class="modal-header">
@@ -208,204 +232,384 @@
                 </div>
                 <div class="modal-content">
                     <div class="input-group">
-                        <label class="input-label">Titre de l'objectif</label>
-                        <input type="text" class="input-field" id="actionInput" placeholder="Ex: Finaliser le business plan">
+                        <label class="input-label">Titre</label>
+                        <input type="text" class="input-field" id="actionInput" placeholder="Ex: Séance de sport">
                     </div>
                     <div class="input-group">
-                        <label class="input-label">Échéance</label>
+                        <label class="input-label">Détails (actions à réaliser)</label>
+                        <textarea class="input-field" id="detailsInput" placeholder="Ex:&#10;- 20 min cardio&#10;- 30 min musculation&#10;- Étirements"></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Date</label>
                         <input type="date" class="input-field" id="dueDateInput">
                     </div>
-                    <button class="submit-btn" onclick="addAction()">Ajouter</button>
+                    <button class="submit-btn" onclick="addAction()">✨ Ajouter</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal édition/suppression -->
+        <div class="modal-overlay" id="editModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-icon">✏️</div>
+                    <div class="modal-title">Modifier l'objectif</div>
+                    <div class="modal-close" onclick="closeEditModal()">×</div>
+                </div>
+                <div class="modal-content">
+                    <div class="input-group">
+                        <label class="input-label">Titre</label>
+                        <input type="text" class="input-field" id="editTitleInput">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Détails (actions à réaliser)</label>
+                        <textarea class="input-field" id="editDetailsInput"></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Date</label>
+                        <input type="date" class="input-field" id="editDueDateInput">
+                    </div>
+                    <div class="action-buttons">
+                        <button class="action-btn delete" onclick="deleteAction()">🗑️ Supprimer</button>
+                        <button class="action-btn edit" onclick="saveEdit()">💾 Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal calendrier -->
+        <div class="modal-overlay" id="calendarModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-icon">📅</div>
+                    <div class="modal-title">Choisir une date</div>
+                    <div class="modal-close" onclick="closeCalendarModal()">×</div>
+                </div>
+                <div class="modal-content">
+                    <div class="calendar" id="calendarContainer"></div>
                 </div>
             </div>
         </div>
         
         <div class="bottom-menu">
-            <div class="menu-item" onclick="goToTree()"><div class="menu-icon">📅</div><div class="menu-label">Arbre</div></div>
-            <div class="menu-item active"><div class="menu-icon">✅</div><div class="menu-label">Actions</div></div>
+            <div class="menu-item" onclick="goToValues()"><div class="menu-icon">🏛️</div><div class="menu-label">Fondations</div></div>
+            <div class="menu-item" onclick="goToHome()"><div class="menu-icon">🌳</div><div class="menu-label">Arbre</div></div>
+            <div class="menu-item" onclick="goToTasks()"><div class="menu-icon">📋</div><div class="menu-label">Tâches</div></div>
+            <div class="menu-item" onclick="goToRoots()"><div class="menu-icon">🌿</div><div class="menu-label">Racines</div></div>
         </div>
     </div>
     
     <script>
-        const ALL_LEVELS = [
-            { id: 'year', icon: '🌱', name: 'Année' },
-            { id: 'semester', icon: '🌿', name: 'Semestre' },
-            { id: 'quarter', icon: '🍃', name: 'Trimestre' },
-            { id: 'month', icon: '🍂', name: 'Mois' },
-            { id: 'week', icon: '🌾', name: 'Semaine' },
-            { id: 'today', icon: '💧', name: "Aujourd'hui" }
-        ];
+        const LEVEL_INFO = {
+            'today': { icon: '💧', name: "Aujourd'hui", order: 0 },
+            'week': { icon: '🌾', name: 'Semaine', order: 1 },
+            'month': { icon: '🍂', name: 'Mois', order: 2 },
+            'quarter': { icon: '🍃', name: 'Trimestre', order: 3 },
+            'semester': { icon: '🌿', name: 'Semestre', order: 4 },
+            'year': { icon: '🌱', name: 'Année', order: 5 }
+        };
         
+        let currentLevelId = '';
         let currentSubproject = null;
-        let currentLevelId = null;
+        let currentProject = null;
         let treeData = {};
+        let selectedDate = new Date();
+        let calendarDate = new Date();
+        let longPressTimer = null;
+        let editingActionId = null;
         
         function init() {
-            currentLevelId = localStorage.getItem('wutree_current_level');
-            const subprojectId = localStorage.getItem('wutree_current_subproject');
             const projectId = localStorage.getItem('wutree_current_project');
-            
-            if (!currentLevelId || !subprojectId || !projectId) {
-                window.location.href = 'wu-tree-v2-subproject-tree.html';
-                return;
-            }
+            const subprojectId = localStorage.getItem('wutree_current_subproject');
+            currentLevelId = localStorage.getItem('wutree_current_level') || 'today';
             
             const projects = JSON.parse(localStorage.getItem('wutree_projects') || '[]');
-            const project = projects.find(p => p.id === projectId);
-            if (!project) { window.location.href = 'wu-tree-v2-home.html'; return; }
+            currentProject = projects.find(p => p.id === projectId);
+            if (!currentProject) { goBack(); return; }
             
-            currentSubproject = project.subprojects?.find(sp => sp.id === subprojectId);
-            if (!currentSubproject) { window.location.href = 'wu-tree-v2-project-domain.html'; return; }
+            currentSubproject = currentProject.subprojects?.find(sp => sp.id === subprojectId);
+            if (!currentSubproject) { goBack(); return; }
             
             treeData = currentSubproject.tree || {};
             
-            const level = ALL_LEVELS.find(l => l.id === currentLevelId);
-            if (level) {
-                document.getElementById('headerEmoji').textContent = level.icon;
-                document.getElementById('headerName').textContent = level.name;
-            }
+            const level = LEVEL_INFO[currentLevelId];
+            document.getElementById('levelEmoji').textContent = level.icon;
+            document.getElementById('levelName').textContent = level.name;
             
-            // Définir l'échéance par défaut selon le niveau
-            const defaultDue = getDefaultDueDate(currentLevelId);
-            document.getElementById('dueDateInput').value = formatDateForInput(defaultDue);
-            document.getElementById('dateBanner').textContent = `Échéance : ${formatDateDisplay(defaultDue)}`;
-            
+            updateDateDisplay();
             renderContent();
         }
         
-        function getDefaultDueDate(levelId) {
-            const today = new Date();
+        function getPeriodBounds(levelId, date) {
+            const d = new Date(date);
+            let start, end;
+            
             switch(levelId) {
                 case 'today':
-                    return today;
+                    start = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+                    end = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59);
+                    break;
                 case 'week':
-                    const endOfWeek = new Date(today);
-                    endOfWeek.setDate(today.getDate() + (7 - today.getDay()));
-                    return endOfWeek;
+                    const dayOfWeek = d.getDay();
+                    const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+                    start = new Date(d.getFullYear(), d.getMonth(), d.getDate() + diffToMonday);
+                    end = new Date(start);
+                    end.setDate(start.getDate() + 6);
+                    end.setHours(23, 59, 59);
+                    break;
                 case 'month':
-                    return new Date(today.getFullYear(), today.getMonth() + 1, 0);
+                    start = new Date(d.getFullYear(), d.getMonth(), 1);
+                    end = new Date(d.getFullYear(), d.getMonth() + 1, 0, 23, 59, 59);
+                    break;
                 case 'quarter':
-                    const quarter = Math.floor(today.getMonth() / 3);
-                    return new Date(today.getFullYear(), (quarter + 1) * 3, 0);
+                    const q = Math.floor(d.getMonth() / 3);
+                    start = new Date(d.getFullYear(), q * 3, 1);
+                    end = new Date(d.getFullYear(), (q + 1) * 3, 0, 23, 59, 59);
+                    break;
                 case 'semester':
-                    const semester = today.getMonth() < 6 ? 0 : 1;
-                    return new Date(today.getFullYear(), (semester + 1) * 6, 0);
+                    const s = d.getMonth() < 6 ? 0 : 1;
+                    start = new Date(d.getFullYear(), s * 6, 1);
+                    end = new Date(d.getFullYear(), (s + 1) * 6, 0, 23, 59, 59);
+                    break;
                 case 'year':
-                    return new Date(today.getFullYear(), 11, 31);
+                    start = new Date(d.getFullYear(), 0, 1);
+                    end = new Date(d.getFullYear(), 11, 31, 23, 59, 59);
+                    break;
                 default:
-                    return today;
+                    start = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+                    end = new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59);
             }
+            return { start, end };
         }
         
-        function formatDateForInput(date) {
-            return date.toISOString().split('T')[0];
+        function updateDateDisplay() {
+            const display = document.getElementById('dateDisplay');
+            const today = new Date();
+            const period = getPeriodBounds(currentLevelId, selectedDate);
+            const opts = { day: 'numeric', month: 'short' };
+            
+            let text = '';
+            switch(currentLevelId) {
+                case 'today':
+                    text = isSameDay(selectedDate, today) ? "Aujourd'hui" : 
+                           selectedDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+                    break;
+                case 'week':
+                    text = `${period.start.toLocaleDateString('fr-FR', opts)} - ${period.end.toLocaleDateString('fr-FR', opts)}`;
+                    break;
+                case 'month':
+                    text = selectedDate.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' });
+                    break;
+                case 'quarter':
+                    text = `T${Math.floor(selectedDate.getMonth() / 3) + 1} ${selectedDate.getFullYear()}`;
+                    break;
+                case 'semester':
+                    text = `S${selectedDate.getMonth() < 6 ? 1 : 2} ${selectedDate.getFullYear()}`;
+                    break;
+                case 'year':
+                    text = `Année ${selectedDate.getFullYear()}`;
+                    break;
+            }
+            display.textContent = text;
         }
         
-        function formatDateDisplay(date) {
-            const options = { weekday: 'short', day: 'numeric', month: 'short' };
-            return date.toLocaleDateString('fr-FR', options);
+        function isSameDay(d1, d2) {
+            return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
+        }
+        
+        function previousPeriod() {
+            switch(currentLevelId) {
+                case 'today': selectedDate.setDate(selectedDate.getDate() - 1); break;
+                case 'week': selectedDate.setDate(selectedDate.getDate() - 7); break;
+                case 'month': selectedDate.setMonth(selectedDate.getMonth() - 1); break;
+                case 'quarter': selectedDate.setMonth(selectedDate.getMonth() - 3); break;
+                case 'semester': selectedDate.setMonth(selectedDate.getMonth() - 6); break;
+                case 'year': selectedDate.setFullYear(selectedDate.getFullYear() - 1); break;
+            }
+            updateDateDisplay();
+            renderContent();
+        }
+        
+        function nextPeriod() {
+            switch(currentLevelId) {
+                case 'today': selectedDate.setDate(selectedDate.getDate() + 1); break;
+                case 'week': selectedDate.setDate(selectedDate.getDate() + 7); break;
+                case 'month': selectedDate.setMonth(selectedDate.getMonth() + 1); break;
+                case 'quarter': selectedDate.setMonth(selectedDate.getMonth() + 3); break;
+                case 'semester': selectedDate.setMonth(selectedDate.getMonth() + 6); break;
+                case 'year': selectedDate.setFullYear(selectedDate.getFullYear() + 1); break;
+            }
+            updateDateDisplay();
+            renderContent();
+        }
+        
+        function getTasksForPeriod() {
+            const levelData = treeData[currentLevelId] || { intention: '', actions: [] };
+            const period = getPeriodBounds(currentLevelId, selectedDate);
+            
+            return levelData.actions.filter(action => {
+                if (!action.dueDate) return false;
+                const taskDate = new Date(action.dueDate);
+                return taskDate >= period.start && taskDate <= period.end;
+            });
         }
         
         function getDueStatus(dueDate) {
-            if (!dueDate) return { class: '', text: '' };
-            
+            if (!dueDate) return { class: '', text: '', icon: '' };
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             const due = new Date(dueDate);
-            due.setHours(0, 0, 0, 0);
-            
             const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
             
-            if (diffDays < 0) {
-                return { class: 'overdue', text: `En retard (${Math.abs(diffDays)}j)`, icon: '⚠️' };
-            } else if (diffDays === 0) {
-                return { class: 'today', text: "Aujourd'hui", icon: '🔥' };
-            } else if (diffDays <= 3) {
-                return { class: 'soon', text: `Dans ${diffDays}j`, icon: '⏰' };
-            } else {
-                return { class: '', text: formatDateDisplay(due), icon: '📅' };
-            }
+            if (diffDays < 0) return { class: 'overdue', text: `${Math.abs(diffDays)}j retard`, icon: '⚠️' };
+            if (diffDays === 0) return { class: 'today', text: "Aujourd'hui", icon: '🔥' };
+            if (diffDays <= 3) return { class: 'soon', text: `${diffDays}j`, icon: '⏰' };
+            return { class: '', text: `${diffDays}j`, icon: '📅' };
         }
         
         function renderContent() {
-            const levelData = treeData[currentLevelId] || { intention: '', actions: [] };
             const content = document.getElementById('content');
+            const levelData = treeData[currentLevelId] || { intention: '', actions: [] };
+            const filteredActions = getTasksForPeriod();
             
-            const completedCount = levelData.actions.filter(a => a.completed).length;
-            const totalCount = levelData.actions.length;
+            const projectColor = currentProject.color || '#FFFFFF';
+            const pendingActions = filteredActions.filter(a => !a.completed);
+            const completedActions = filteredActions.filter(a => a.completed);
             
             let html = '';
             
-            if (totalCount > 0) {
-                html += `
-                    <div class="stats">
-                        <div class="stat">
-                            <div class="stat-number">${completedCount}</div>
-                            <div class="stat-label">Terminées</div>
-                        </div>
-                        <div class="stat">
-                            <div class="stat-number">${totalCount - completedCount}</div>
-                            <div class="stat-label">En cours</div>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            html += `
-                <div class="intention-section">
-                    <div class="section-label">✨ Intention</div>
-                    <div class="intention-card" onclick="editIntention()">
-                        ${levelData.intention ? 
-                            `<div class="intention-text">"${levelData.intention}"</div>` :
-                            `<div class="intention-empty">Définir une intention...</div>`
-                        }
-                    </div>
+            html += `<div class="intention-section">
+                <div class="section-label">✨ Intention</div>
+                <div class="intention-card" onclick="editIntention()">
+                    ${levelData.intention ? 
+                        `<div class="intention-text">"${levelData.intention}"</div>` :
+                        `<div class="intention-empty">Définir une intention...</div>`}
                 </div>
-            `;
+            </div>`;
             
-            html += `<div class="actions-section">`;
-            html += `<div class="section-label">🎯 Objectifs & Actions</div>`;
+            const total = filteredActions.length;
+            const done = completedActions.length;
+            const percent = total > 0 ? Math.round((done / total) * 100) : 0;
             
-            if (levelData.actions.length === 0) {
-                html += `
-                    <div class="empty-state">
-                        <div class="empty-icon">🌱</div>
-                        <div class="empty-text">Aucun objectif pour le moment.<br>Clique sur + pour en ajouter !</div>
-                    </div>
-                `;
+            html += `<div class="stats">
+                <div class="stat"><div class="stat-number">${pendingActions.length}</div><div class="stat-label">À faire</div></div>
+                <div class="stat"><div class="stat-number">${done}</div><div class="stat-label">Terminées</div></div>
+                <div class="stat"><div class="stat-number">${percent}%</div><div class="stat-label">Progression</div></div>
+            </div>`;
+            
+            html += `<div class="actions-section"><div class="section-label">🎯 Objectifs</div>`;
+            
+            if (filteredActions.length === 0) {
+                html += `<div class="empty-state">
+                    <div class="empty-icon">🌱</div>
+                    <div class="empty-text">Aucun objectif pour cette période.<br>Clique sur + pour en ajouter !</div>
+                </div>`;
             } else {
-                const sortedActions = [...levelData.actions].sort((a, b) => {
+                const sortedActions = [...filteredActions].sort((a, b) => {
                     if (a.completed !== b.completed) return a.completed ? 1 : -1;
-                    if (a.dueDate && b.dueDate) return new Date(a.dueDate) - new Date(b.dueDate);
                     return 0;
                 });
                 
-                sortedActions.forEach((action, idx) => {
-                    const realIndex = levelData.actions.findIndex(a => a.id === action.id);
+                sortedActions.forEach(action => {
                     const dueStatus = getDueStatus(action.dueDate);
-                    const subtaskCount = action.subtasks ? action.subtasks.length : 0;
-                    const subtaskDone = action.subtasks ? action.subtasks.filter(s => s.completed).length : 0;
+                    const subtaskCount = action.subtasks?.length || 0;
+                    const subtaskDone = action.subtasks?.filter(s => s.completed).length || 0;
+                    const hasDetails = action.description && action.description.trim();
+                    const linkedInfo = action.linkedToWeekObjective ? `<span class="task-link">🔗 Lié</span>` : '';
                     
-                    html += `
-                        <div class="action-item ${action.completed ? 'completed' : ''} ${dueStatus.class === 'overdue' && !action.completed ? 'overdue' : ''}">
-                            <div class="action-top">
-                                <div class="action-checkbox ${action.completed ? 'checked' : ''}" onclick="event.stopPropagation(); toggleAction('${action.id}')"></div>
-                                <div class="action-content" onclick="openActionDetail('${action.id}')">
-                                    <div class="action-title">${action.text}</div>
-                                    <div class="action-meta">
-                                        ${action.dueDate ? `<span class="action-due ${dueStatus.class}">${dueStatus.icon} ${dueStatus.text}</span>` : ''}
-                                        ${subtaskCount > 0 ? `<span class="action-subtasks">☑️ ${subtaskDone}/${subtaskCount}</span>` : ''}
-                                    </div>
+                    html += `<div class="task-item ${action.completed ? 'completed' : ''}" 
+                         data-action-id="${action.id}"
+                         style="border-left-color: ${projectColor};"
+                         onmousedown="startLongPress('${action.id}')"
+                         onmouseup="cancelLongPress()"
+                         onmouseleave="cancelLongPress()"
+                         ontouchstart="startLongPress('${action.id}')"
+                         ontouchend="cancelLongPress()">
+                        <div class="task-top">
+                            <div class="task-checkbox ${action.completed ? 'checked' : ''}" 
+                                 onclick="event.stopPropagation(); toggleAction('${action.id}')"></div>
+                            <div class="task-content" onclick="openActionDetail('${action.id}')">
+                                <div class="task-title">${action.text}</div>
+                                ${hasDetails ? `<div class="task-details">${action.description}</div>` : ''}
+                                <div class="task-meta">
+                                    ${action.dueDate ? `<span class="task-due ${dueStatus.class}">${dueStatus.icon} ${dueStatus.text}</span>` : ''}
+                                    ${subtaskCount > 0 ? `<span class="task-subtasks">☑️ ${subtaskDone}/${subtaskCount}</span>` : ''}
+                                    ${linkedInfo}
                                 </div>
-                                <div class="action-arrow" onclick="openActionDetail('${action.id}')">›</div>
                             </div>
                         </div>
-                    `;
+                    </div>`;
                 });
             }
             
             html += `</div>`;
             content.innerHTML = html;
+        }
+        
+        function startLongPress(actionId) {
+            longPressTimer = setTimeout(() => {
+                navigator.vibrate && navigator.vibrate(50);
+                openEditModal(actionId);
+            }, 600);
+        }
+        
+        function cancelLongPress() {
+            if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+        }
+        
+        function openEditModal(actionId) {
+            cancelLongPress();
+            editingActionId = actionId;
+            
+            const levelData = treeData[currentLevelId] || { intention: '', actions: [] };
+            const action = levelData.actions.find(a => a.id === actionId);
+            if (!action) return;
+            
+            document.getElementById('editTitleInput').value = action.text;
+            document.getElementById('editDetailsInput').value = action.description || '';
+            document.getElementById('editDueDateInput').value = action.dueDate || '';
+            
+            document.getElementById('editModal').classList.add('show');
+        }
+        
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('show');
+            editingActionId = null;
+        }
+        
+        function saveEdit() {
+            if (!editingActionId) return;
+            
+            const title = document.getElementById('editTitleInput').value.trim();
+            const details = document.getElementById('editDetailsInput').value.trim();
+            const dueDate = document.getElementById('editDueDateInput').value;
+            
+            if (!title) { alert('Entre un titre !'); return; }
+            
+            const action = treeData[currentLevelId].actions.find(a => a.id === editingActionId);
+            if (action) {
+                action.text = title;
+                action.description = details;
+                action.dueDate = dueDate;
+                saveTree();
+            }
+            
+            closeEditModal();
+            renderContent();
+        }
+        
+        function deleteAction() {
+            if (!editingActionId) return;
+            if (!confirm('Supprimer cet objectif ?')) return;
+            
+            const idx = treeData[currentLevelId].actions.findIndex(a => a.id === editingActionId);
+            if (idx > -1) {
+                treeData[currentLevelId].actions.splice(idx, 1);
+                saveTree();
+            }
+            
+            closeEditModal();
+            renderContent();
         }
         
         function editIntention() {
@@ -421,19 +625,18 @@
         }
         
         function openAddModal() {
-            const defaultDue = getDefaultDueDate(currentLevelId);
-            document.getElementById('dueDateInput').value = formatDateForInput(defaultDue);
+            document.getElementById('dueDateInput').value = formatDateForInput(selectedDate);
+            document.getElementById('actionInput').value = '';
+            document.getElementById('detailsInput').value = '';
             document.getElementById('addModal').classList.add('show');
             document.getElementById('actionInput').focus();
         }
         
-        function closeAddModal() {
-            document.getElementById('addModal').classList.remove('show');
-            document.getElementById('actionInput').value = '';
-        }
+        function closeAddModal() { document.getElementById('addModal').classList.remove('show'); }
         
         function addAction() {
             const text = document.getElementById('actionInput').value.trim();
+            const details = document.getElementById('detailsInput').value.trim();
             const dueDate = document.getElementById('dueDateInput').value;
             
             if (!text) { alert('Entre un objectif !'); return; }
@@ -443,7 +646,7 @@
             treeData[currentLevelId].actions.push({
                 id: Date.now().toString(),
                 text: text,
-                description: '',
+                description: details,
                 dueDate: dueDate,
                 completed: false,
                 subtasks: [],
@@ -460,14 +663,84 @@
             const action = treeData[currentLevelId].actions.find(a => a.id === actionId);
             if (action) {
                 action.completed = !action.completed;
+                action.completedAt = action.completed ? new Date().toISOString() : null;
                 saveTree();
                 renderContent();
             }
         }
         
         function openActionDetail(actionId) {
+            if (longPressTimer) return;
             localStorage.setItem('wutree_current_action', actionId);
             window.location.href = 'wu-tree-v2-action-detail.html';
+        }
+        
+        function formatDateForInput(date) { return date.toISOString().split('T')[0]; }
+        
+        function openCalendarModal() {
+            calendarDate = new Date(selectedDate);
+            renderCalendar();
+            document.getElementById('calendarModal').classList.add('show');
+        }
+        
+        function closeCalendarModal() { document.getElementById('calendarModal').classList.remove('show'); }
+        
+        function renderCalendar() {
+            const container = document.getElementById('calendarContainer');
+            const year = calendarDate.getFullYear();
+            const month = calendarDate.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDay = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1;
+            
+            const monthNames = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+            const levelData = treeData[currentLevelId] || { intention: '', actions: [] };
+            const taskDates = levelData.actions.map(a => a.dueDate).filter(Boolean);
+            
+            let html = `<div class="calendar-header">
+                <div class="calendar-title">${monthNames[month]} ${year}</div>
+                <div class="calendar-nav">
+                    <button class="calendar-nav-btn" onclick="prevMonth()">‹</button>
+                    <button class="calendar-nav-btn" onclick="nextMonth()">›</button>
+                </div>
+            </div>
+            <div class="calendar-grid">
+                <div class="calendar-day-header">L</div><div class="calendar-day-header">M</div>
+                <div class="calendar-day-header">M</div><div class="calendar-day-header">J</div>
+                <div class="calendar-day-header">V</div><div class="calendar-day-header">S</div>
+                <div class="calendar-day-header">D</div>`;
+            
+            const prevMonth2 = new Date(year, month, 0);
+            for (let i = startDay - 1; i >= 0; i--) {
+                html += `<div class="calendar-day other-month" onclick="selectCalendarDate(${year}, ${month - 1}, ${prevMonth2.getDate() - i})">${prevMonth2.getDate() - i}</div>`;
+            }
+            
+            const today = new Date();
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+                const isSelected = day === selectedDate.getDate() && month === selectedDate.getMonth() && year === selectedDate.getFullYear();
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const hasTasks = taskDates.includes(dateStr);
+                html += `<div class="calendar-day ${isToday ? 'today' : ''} ${isSelected ? 'selected' : ''} ${hasTasks ? 'has-tasks' : ''}" onclick="selectCalendarDate(${year}, ${month}, ${day})">${day}</div>`;
+            }
+            
+            const remaining = 42 - (startDay + lastDay.getDate());
+            for (let day = 1; day <= remaining; day++) {
+                html += `<div class="calendar-day other-month" onclick="selectCalendarDate(${year}, ${month + 1}, ${day})">${day}</div>`;
+            }
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+        
+        function prevMonth() { calendarDate.setMonth(calendarDate.getMonth() - 1); renderCalendar(); }
+        function nextMonth() { calendarDate.setMonth(calendarDate.getMonth() + 1); renderCalendar(); }
+        
+        function selectCalendarDate(year, month, day) {
+            selectedDate = new Date(year, month, day);
+            closeCalendarModal();
+            updateDateDisplay();
+            renderContent();
         }
         
         function saveTree() {
@@ -484,7 +757,10 @@
         }
         
         function goBack() { window.location.href = 'wu-tree-v2-subproject-tree.html'; }
-        function goToTree() { window.location.href = 'wu-tree-v2-subproject-tree.html'; }
+        function goToHome() { window.location.href = 'wu-tree-v2-home.html'; }
+        function goToValues() { window.location.href = 'wu-tree-v2-values.html'; }
+        function goToRoots() { window.location.href = 'wu-tree-v2-roots.html'; }
+        function goToTasks() { window.location.href = 'wu-tree-v2-tasks.html'; }
         
         document.getElementById('actionInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') addAction();
