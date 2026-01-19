@@ -1011,31 +1011,36 @@
                         projects[projIdx].subprojects[subIdx].tree['today'] = { intention: '', actions: [] };
                     }
                     
-                    // Get week bounds
+                    // Get week bounds (starts on Monday)
                     const weekBounds = getPeriodBounds('week', selectedDate);
+                    const mondayDate = new Date(weekBounds.start);
                     
                     // Generate a task for each selected day
                     days.forEach(dayNum => {
-                        // Find the date for this day in the current week
-                        const dayDate = new Date(weekBounds.start);
-                        const startDayNum = weekBounds.start.getDay();
-                        const diff = dayNum - startDayNum;
-                        dayDate.setDate(dayDate.getDate() + (diff < 0 ? diff + 7 : diff));
-                        
-                        // Only if date is within this week
-                        if (dayDate >= weekBounds.start && dayDate <= weekBounds.end) {
-                            projects[projIdx].subprojects[subIdx].tree['today'].actions.push({
-                                id: Date.now().toString() + '_' + dayNum,
-                                text: title,
-                                description,
-                                dueDate: formatDate(dayDate),
-                                startTime,
-                                endTime,
-                                completed: false,
-                                linkedToWeekId: weekTaskId,
-                                createdAt: new Date().toISOString()
-                            });
+                        // dayNum: 0=Dimanche, 1=Lundi, 2=Mardi, etc.
+                        // Calculate offset from Monday (which is day 1)
+                        // Monday=0, Tuesday=1, Wednesday=2, Thursday=3, Friday=4, Saturday=5, Sunday=6
+                        let offset;
+                        if (dayNum === 0) {
+                            offset = 6; // Dimanche = 6 jours après lundi
+                        } else {
+                            offset = dayNum - 1; // Lundi=0, Mardi=1, etc.
                         }
+                        
+                        const dayDate = new Date(mondayDate);
+                        dayDate.setDate(mondayDate.getDate() + offset);
+                        
+                        projects[projIdx].subprojects[subIdx].tree['today'].actions.push({
+                            id: Date.now().toString() + '_' + dayNum,
+                            text: title,
+                            description,
+                            dueDate: formatDate(dayDate),
+                            startTime,
+                            endTime,
+                            completed: false,
+                            linkedToWeekId: weekTaskId,
+                            createdAt: new Date().toISOString()
+                        });
                     });
                 }
                 
@@ -1051,6 +1056,7 @@
                 // If WEEK level with days selected → auto-generate daily tasks
                 if (currentFilter === 'week' && days.length > 0) {
                     const weekBounds = getPeriodBounds('week', selectedDate);
+                    const mondayDate = new Date(weekBounds.start);
                     
                     // Add week-level task
                     obligations.push({
@@ -1070,26 +1076,30 @@
                     
                     // Generate daily tasks
                     days.forEach(dayNum => {
-                        const dayDate = new Date(weekBounds.start);
-                        const startDayNum = weekBounds.start.getDay();
-                        const diff = dayNum - startDayNum;
-                        dayDate.setDate(dayDate.getDate() + (diff < 0 ? diff + 7 : diff));
-                        
-                        if (dayDate >= weekBounds.start && dayDate <= weekBounds.end) {
-                            obligations.push({
-                                id: Date.now().toString() + '_' + dayNum,
-                                type: 'obligation',
-                                levelId: 'today',
-                                text: title,
-                                description,
-                                dueDate: formatDate(dayDate),
-                                startTime,
-                                endTime,
-                                completed: false,
-                                linkedToWeekId: weekTaskId,
-                                createdAt: new Date().toISOString()
-                            });
+                        // dayNum: 0=Dimanche, 1=Lundi, 2=Mardi, etc.
+                        let offset;
+                        if (dayNum === 0) {
+                            offset = 6; // Dimanche = 6 jours après lundi
+                        } else {
+                            offset = dayNum - 1; // Lundi=0, Mardi=1, etc.
                         }
+                        
+                        const dayDate = new Date(mondayDate);
+                        dayDate.setDate(mondayDate.getDate() + offset);
+                        
+                        obligations.push({
+                            id: Date.now().toString() + '_' + dayNum,
+                            type: 'obligation',
+                            levelId: 'today',
+                            text: title,
+                            description,
+                            dueDate: formatDate(dayDate),
+                            startTime,
+                            endTime,
+                            completed: false,
+                            linkedToWeekId: weekTaskId,
+                            createdAt: new Date().toISOString()
+                        });
                     });
                 } else {
                     obligations.push({
