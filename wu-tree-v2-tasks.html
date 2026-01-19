@@ -341,23 +341,9 @@
                         </div>
                     </div>
                     
-                    <!-- For week level: target count -->
-                    <div class="input-group" id="targetCountGroup" style="display:none;">
-                        <label class="input-label">Objectif hebdomadaire</label>
-                        <div class="target-row">
-                            <input type="number" class="input-field" id="targetCountInput" value="3" min="1" max="20">
-                            <span class="target-label">fois cette semaine</span>
-                        </div>
-                    </div>
+                    <!-- Target count is now automatic based on days selected -->
                     
-                    <!-- For today level: link to week -->
-                    <div class="link-section" id="linkWeekSection" style="display:none;">
-                        <div class="link-header">
-                            <div class="link-toggle" id="linkToggle" onclick="toggleLink()"></div>
-                            <span class="link-label">Lier à un objectif semaine</span>
-                        </div>
-                        <div class="link-options" id="linkOptions"></div>
-                    </div>
+                    <!-- Link section removed - now automatic when creating week tasks with days -->
                     
                     <button class="submit-btn" onclick="addTask()">✨ Ajouter</button>
                 </div>
@@ -895,6 +881,13 @@
                 if (actions) {
                     const idx = actions.findIndex(a => a.id === editingTask.taskId);
                     if (idx > -1) {
+                        // If week task, also delete linked daily tasks
+                        if (editingTask.levelId === 'week') {
+                            const todayActions = subproject?.tree?.['today']?.actions;
+                            if (todayActions) {
+                                subproject.tree['today'].actions = todayActions.filter(a => a.linkedToWeekId !== editingTask.taskId);
+                            }
+                        }
                         actions.splice(idx, 1);
                         localStorage.setItem('wutree_projects', JSON.stringify(projects));
                     }
@@ -903,7 +896,12 @@
                 let obligations = getObligations();
                 const idx = obligations.findIndex(t => t.id === editingTask.taskId);
                 if (idx > -1) {
-                    obligations.splice(idx, 1);
+                    // If week task, also delete linked daily tasks
+                    if (editingTask.levelId === 'week') {
+                        obligations = obligations.filter(t => t.linkedToWeekId !== editingTask.taskId);
+                    }
+                    const finalIdx = obligations.findIndex(t => t.id === editingTask.taskId);
+                    if (finalIdx > -1) obligations.splice(finalIdx, 1);
                     saveObligations(obligations);
                 }
             }
@@ -922,38 +920,6 @@
         
         function toggleDay(el) { el.classList.toggle('active'); }
         
-        function toggleLink() {
-            const toggle = document.getElementById('linkToggle');
-            const options = document.getElementById('linkOptions');
-            toggle.classList.toggle('active');
-            if (toggle.classList.contains('active')) {
-                loadWeekGoalsForLink();
-                options.classList.add('show');
-            } else {
-                options.classList.remove('show');
-            }
-        }
-        
-        function loadWeekGoalsForLink() {
-            const options = document.getElementById('linkOptions');
-            const weeklyGoals = getWeeklyGoalsWithProgress();
-            if (weeklyGoals.length === 0) {
-                options.innerHTML = '<div style="font-size:12px;color:rgba(255,255,255,0.7);text-align:center;padding:10px;">Aucun objectif semaine</div>';
-                return;
-            }
-            options.innerHTML = weeklyGoals.map(g => `
-                <div class="link-option" data-id="${g.id}" onclick="selectLinkOption('${g.id}', this)">
-                    <div class="link-option-title">${g.text}</div>
-                    <div class="link-option-progress">${g.completedCount}/${g.targetCount} réalisés</div>
-                </div>
-            `).join('');
-        }
-        
-        function selectLinkOption(id, el) {
-            document.querySelectorAll('.link-option').forEach(o => o.classList.remove('selected'));
-            el.classList.add('selected');
-        }
-        
         function openAddModal() {
             // Reset form
             currentTaskType = 'project';
@@ -966,15 +932,6 @@
             document.getElementById('endTimeInput').value = '';
             document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('timeConflict').classList.remove('show');
-            
-            // Target count (for week)
-            document.getElementById('targetCountGroup').style.display = currentFilter === 'week' ? 'block' : 'none';
-            document.getElementById('targetCountInput').value = '3';
-            
-            // Link section (for today)
-            document.getElementById('linkWeekSection').style.display = currentFilter === 'today' ? 'block' : 'none';
-            document.getElementById('linkToggle').classList.remove('active');
-            document.getElementById('linkOptions').classList.remove('show');
             
             // Load projects
             const projectSelect = document.getElementById('projectSelect');
@@ -1032,8 +989,9 @@
                     projects[projIdx].subprojects[subIdx].tree[currentFilter] = { intention: '', actions: [] };
                 }
                 
+                const weekTaskId = Date.now().toString();
                 const newTask = {
-                    id: Date.now().toString(),
+                    id: weekTaskId,
                     text: title,
                     description,
                     dueDate,
@@ -1044,35 +1002,110 @@
                     createdAt: new Date().toISOString()
                 };
                 
-                // Target count for week level
-                if (currentFilter === 'week') {
-                    newTask.targetCount = parseInt(document.getElementById('targetCountInput').value) || 3;
+                // If WEEK level with days selected → auto-generate daily tasks
+                if (currentFilter === 'week' && days.length > 0) {
+                    newTask.targetCount = days.length;
+                    
+                    // Ensure today level exists
+                    if (!projects[projIdx].subprojects[subIdx].tree['today']) {
+                        projects[projIdx].subprojects[subIdx].tree['today'] = { intention: '', actions: [] };
+                    }
+                    
+                    // Get week bounds
+                    const weekBounds = getPeriodBounds('week', selectedDate);
+                    
+                    // Generate a task for each selected day
+                    days.forEach(dayNum => {
+                        // Find the date for this day in the current week
+                        const dayDate = new Date(weekBounds.start);
+                        const startDayNum = weekBounds.start.getDay();
+                        const diff = dayNum - startDayNum;
+                        dayDate.setDate(dayDate.getDate() + (diff < 0 ? diff + 7 : diff));
+                        
+                        // Only if date is within this week
+                        if (dayDate >= weekBounds.start && dayDate <= weekBounds.end) {
+                            projects[projIdx].subprojects[subIdx].tree['today'].actions.push({
+                                id: Date.now().toString() + '_' + dayNum,
+                                text: title,
+                                description,
+                                dueDate: formatDate(dayDate),
+                                startTime,
+                                endTime,
+                                completed: false,
+                                linkedToWeekId: weekTaskId,
+                                createdAt: new Date().toISOString()
+                            });
+                        }
+                    });
                 }
                 
-                // Link to week for today level
-                if (currentFilter === 'today' && document.getElementById('linkToggle').classList.contains('active')) {
-                    const selected = document.querySelector('.link-option.selected');
-                    if (selected) newTask.linkedToWeekId = selected.dataset.id;
-                }
+                // Link to week is now automatic when creating week tasks with days selected
                 
                 projects[projIdx].subprojects[subIdx].tree[currentFilter].actions.push(newTask);
                 localStorage.setItem('wutree_projects', JSON.stringify(projects));
             } else {
                 // Obligation
                 let obligations = getObligations();
-                obligations.push({
-                    id: Date.now().toString(),
-                    type: 'obligation',
-                    levelId: currentFilter,
-                    text: title,
-                    description,
-                    dueDate,
-                    startTime,
-                    endTime,
-                    days,
-                    completed: false,
-                    createdAt: new Date().toISOString()
-                });
+                const weekTaskId = Date.now().toString();
+                
+                // If WEEK level with days selected → auto-generate daily tasks
+                if (currentFilter === 'week' && days.length > 0) {
+                    const weekBounds = getPeriodBounds('week', selectedDate);
+                    
+                    // Add week-level task
+                    obligations.push({
+                        id: weekTaskId,
+                        type: 'obligation',
+                        levelId: 'week',
+                        text: title,
+                        description,
+                        dueDate,
+                        startTime,
+                        endTime,
+                        days,
+                        targetCount: days.length,
+                        completed: false,
+                        createdAt: new Date().toISOString()
+                    });
+                    
+                    // Generate daily tasks
+                    days.forEach(dayNum => {
+                        const dayDate = new Date(weekBounds.start);
+                        const startDayNum = weekBounds.start.getDay();
+                        const diff = dayNum - startDayNum;
+                        dayDate.setDate(dayDate.getDate() + (diff < 0 ? diff + 7 : diff));
+                        
+                        if (dayDate >= weekBounds.start && dayDate <= weekBounds.end) {
+                            obligations.push({
+                                id: Date.now().toString() + '_' + dayNum,
+                                type: 'obligation',
+                                levelId: 'today',
+                                text: title,
+                                description,
+                                dueDate: formatDate(dayDate),
+                                startTime,
+                                endTime,
+                                completed: false,
+                                linkedToWeekId: weekTaskId,
+                                createdAt: new Date().toISOString()
+                            });
+                        }
+                    });
+                } else {
+                    obligations.push({
+                        id: weekTaskId,
+                        type: 'obligation',
+                        levelId: currentFilter,
+                        text: title,
+                        description,
+                        dueDate,
+                        startTime,
+                        endTime,
+                        days,
+                        completed: false,
+                        createdAt: new Date().toISOString()
+                    });
+                }
                 saveObligations(obligations);
             }
             
