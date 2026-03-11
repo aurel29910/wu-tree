@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wu Tree - Bien-être</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Comfortaa', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(180deg, #87CEEB 0%, #FFB6C1 100%);
+            min-height: 100vh; display: flex; justify-content: center; align-items: center;
+        }
+        .phone-frame {
+            width: 375px; height: 812px;
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+            border-radius: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            position: relative; overflow: hidden;
+        }
+        
+        /* Pétales flottants */
+        .petal { position: absolute; width: 10px; height: 10px;
+            background: linear-gradient(135deg, rgba(255, 182, 193, 0.8), rgba(255, 105, 180, 0.6));
+            border-radius: 50% 0 50% 0; animation: fall linear infinite; pointer-events: none; z-index: 50; }
+        .petal:nth-child(1) { left: 10%; animation-duration: 12s; width: 8px; }
+        .petal:nth-child(2) { left: 25%; animation-duration: 14s; animation-delay: 2s; }
+        .petal:nth-child(3) { left: 40%; animation-duration: 16s; animation-delay: 4s; }
+        .petal:nth-child(4) { left: 55%; animation-duration: 13s; animation-delay: 1s; }
+        .petal:nth-child(5) { left: 70%; animation-duration: 15s; animation-delay: 3s; }
+        .petal:nth-child(6) { left: 85%; animation-duration: 17s; animation-delay: 5s; }
+        @keyframes fall { 0% { transform: translateY(-50px) rotate(0deg); opacity: 0.8; }
+            100% { transform: translateY(812px) rotate(360deg); opacity: 0; } }
+        
+        /* Nuages */
+        .cloud { position: absolute; color: white; font-size: 50px; opacity: 0.6;
+            animation: float-cloud linear infinite; pointer-events: none; z-index: 40; }
+        .cloud:nth-child(7) { top: 80px; animation-duration: 180s; }
+        .cloud:nth-child(8) { top: 150px; animation-duration: 220s; animation-delay: -60s; font-size: 40px; }
+        @keyframes float-cloud { 0% { transform: translateX(-80px); } 100% { transform: translateX(455px); } }
+        
+        .status-bar { position: absolute; top: 0; left: 0; right: 0; height: 44px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 20px; color: rgba(255,255,255,0.95); font-size: 14px; z-index: 100; }
+        
+        .content { 
+            position: relative; height: calc(100% - 44px - 70px); margin-top: 44px; 
+            z-index: 60; overflow: hidden;
+            display: flex; flex-direction: column; align-items: center;
+            padding-top: 60px;
+        }
+        
+        .page-title {
+            font-size: 24px; font-weight: 600; color: white;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            margin-bottom: 60px;
+        }
+        
+        .bubbles-container {
+            display: flex; gap: 40px; justify-content: center;
+            flex-wrap: wrap; padding: 0 30px;
+        }
+        
+        /* Bulles flottantes */
+        .bubble {
+            width: 120px; height: 120px; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.35);
+            backdrop-filter: blur(15px);
+            border: 3px solid rgba(255, 255, 255, 0.6);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            cursor: pointer;
+            box-shadow: 
+                0 8px 32px rgba(0,0,0,0.1),
+                inset 0 2px 10px rgba(255,255,255,0.4);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+        
+        .bubble:active {
+            transform: scale(0.95);
+        }
+        
+        /* Animation flottante - chaque bulle a son propre rythme */
+        .bubble-1 {
+            animation: float1 6s ease-in-out infinite;
+        }
+        .bubble-2 {
+            animation: float2 7s ease-in-out infinite;
+            animation-delay: -2s;
+        }
+        
+        @keyframes float1 {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(8px, -12px) rotate(2deg); }
+            50% { transform: translate(-5px, -8px) rotate(-1deg); }
+            75% { transform: translate(10px, -15px) rotate(1deg); }
+        }
+        
+        @keyframes float2 {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(-10px, -10px) rotate(-2deg); }
+            50% { transform: translate(6px, -18px) rotate(1deg); }
+            75% { transform: translate(-8px, -6px) rotate(-1deg); }
+        }
+        
+        .bubble-emoji {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+        
+        .bubble-label {
+            font-size: 11px; font-weight: 600;
+            color: white;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+            text-align: center;
+            line-height: 1.3;
+        }
+        
+        /* Effet de brillance subtil */
+        .bubble::before {
+            content: '';
+            position: absolute;
+            top: 10%; left: 15%;
+            width: 30%; height: 20%;
+            background: rgba(255,255,255,0.5);
+            border-radius: 50%;
+            filter: blur(5px);
+        }
+        
+        /* Bottom menu */
+        .bottom-menu { position: absolute; bottom: 0; left: 0; right: 0; height: 70px;
+            background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(20px);
+            display: flex; justify-content: space-around; align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.4); z-index: 90; }
+        .menu-item { display: flex; flex-direction: column; align-items: center; gap: 4px;
+            cursor: pointer; padding: 8px 16px; border-radius: 12px; transition: all 0.3s; }
+        .menu-item.active { background: rgba(255, 255, 255, 0.6); }
+        .menu-icon { font-size: 24px; }
+        .menu-label { font-size: 10px; color: rgba(74, 90, 79, 0.8); font-weight: 500; }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <!-- Pétales -->
+        <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+        <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+        <!-- Nuages -->
+        <div class="cloud">☁️</div><div class="cloud">☁️</div>
+        
+        <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
+        
+        <div class="content">
+            <h1 class="page-title">✨ Bien-être</h1>
+            
+            <div class="bubbles-container">
+                <div class="bubble bubble-1" onclick="goToHabits()">
+                    <div class="bubble-emoji">🌱</div>
+                    <div class="bubble-label">Nouvelles<br>habitudes</div>
+                </div>
+                
+                <div class="bubble bubble-2" onclick="goToCoherence()">
+                    <div class="bubble-emoji">🫀</div>
+                    <div class="bubble-label">Cohérence<br>cardiaque</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bottom-menu">
+            <div class="menu-item active"><div class="menu-icon">✨</div><div class="menu-label">Bien-être</div></div>
+            <div class="menu-item" onclick="goToTree()"><div class="menu-icon">🌳</div><div class="menu-label">Organisation</div></div>
+            <div class="menu-item" onclick="goToValues()"><div class="menu-icon">💎</div><div class="menu-label">Valeurs</div></div>
+        </div>
+    </div>
+    
+    <script>
+        function goToHabits() {
+            window.location.href = 'wu-tree-v2-habits.html';
+        }
+        
+        function goToCoherence() {
+            window.location.href = 'wu-tree-v2-coherence.html';
+        }
+        
+        function goToTree() {
+            window.location.href = 'wu-tree-v2-home.html';
+        }
+        
+        function goToValues() {
+            window.location.href = 'wu-tree-v2-values.html';
+        }
+    </script>
+</body>
+</html>
