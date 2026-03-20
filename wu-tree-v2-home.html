@@ -177,21 +177,18 @@
         </div>
         
         <div class="bottom-menu">
-            <div class="menu-item" onclick="goToValues()"><div class="menu-icon">🏛️</div><div class="menu-label">Fondations</div></div>
+            <div class="menu-item" onclick="goToWellbeing()"><div class="menu-icon">✨</div><div class="menu-label">Bien-être</div></div>
             <div class="menu-item active"><div class="menu-icon">🌳</div><div class="menu-label">Arbre</div></div>
             <div class="menu-item" onclick="goToTasks()"><div class="menu-icon">📋</div><div class="menu-label">Tâches</div></div>
-            <div class="menu-item" onclick="goToRoots()"><div class="menu-icon">🌿</div><div class="menu-label">Racines</div></div>
         </div>
     </div>
     <script>
         function loadTree() {
-            const values = JSON.parse(localStorage.getItem('wutree_values') || '[]');
-            const roots = JSON.parse(localStorage.getItem('wutree_roots') || '[]');
             const projects = JSON.parse(localStorage.getItem('wutree_projects') || '[]');
             const container = document.getElementById('treeContainer');
             
-            if (values.length === 0 && roots.length === 0) {
-                container.innerHTML = '<div class="empty"><div class="empty-icon">🌿</div><p class="empty-text">Clique sur 🏛️ Fondations pour commencer</p></div>';
+            if (projects.length === 0) {
+                container.innerHTML = '<div class="empty"><div class="empty-icon">🌳</div><p class="empty-text">Ton arbre est prêt à grandir</p></div>';
                 return;
             }
             
@@ -216,25 +213,7 @@
                 html += '</div>';
             }
             
-            if (roots.length > 0) {
-                html += '<div class="roots" id="rootsContainer">';
-                roots.forEach((r, i) => {
-                    html += `<div class="root" data-root-index="${i}" onclick="goToRoots()">${r.emoji}</div>`;
-                });
-                html += '</div>';
-            }
-            
-            if (values.length > 0) {
-                html += '<div class="foundations">';
-                values.forEach(v => html += `<div class="foundation" onclick="goToValues()">${v.emoji}</div>`);
-                html += '</div>';
-            }
-            
             container.innerHTML = html;
-            
-            if (projects.length > 0 && roots.length > 0) {
-                setTimeout(drawLines, 50);
-            }
         }
         
         function drawLines() {
@@ -437,12 +416,10 @@
             window.location.href = 'wu-tree-v2-project-domain.html';
         }
         function createProject() { window.location.href = 'wu-tree-v2-project-create.html'; }
-        function goToValues() { window.location.href = 'wu-tree-v2-values.html'; }
-        function goToRoots() { window.location.href = 'wu-tree-v2-roots.html'; }
+        function goToWellbeing() { window.location.href = 'wu-tree-v2-wellbeing.html'; }
         function goToTasks() { window.location.href = 'wu-tree-v2-tasks.html'; }
         
         loadTree();
-        if (!localStorage.getItem('wutree_onboarding_complete')) window.location.href = 'wu-tree-v2-values.html';
     </script>
 </body>
 </html>
