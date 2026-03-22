@@ -1,74 +1,143 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Wu Tree - Bien-être</title>
-    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
         body {
-            font-family: 'Comfortaa', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(180deg, #87CEEB 0%, #FFB6C1 100%);
-            min-height: 100vh; display: flex; justify-content: center; align-items: center;
-        }
-        .phone-frame {
-            width: 375px; height: 812px;
+            font-family: 'Comfortaa', sans-serif;
             background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
-            border-radius: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-            position: relative; overflow: hidden;
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            padding: 20px;
+        }
+        
+        .phone-frame {
+            width: 100%; max-width: 390px;
+            height: 844px; max-height: 95vh;
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+            border-radius: 45px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.15);
         }
         
         /* Pétales flottants */
-        .petal { position: absolute; width: 10px; height: 10px;
+        .petal {
+            position: absolute;
+            width: 10px; height: 10px;
             background: linear-gradient(135deg, rgba(255, 182, 193, 0.8), rgba(255, 105, 180, 0.6));
-            border-radius: 50% 0 50% 0; animation: fall linear infinite; pointer-events: none; z-index: 50; }
+            border-radius: 50% 0 50% 0;
+            animation: fall linear infinite;
+            pointer-events: none;
+            z-index: 10;
+        }
         .petal:nth-child(1) { left: 10%; animation-duration: 12s; width: 8px; }
         .petal:nth-child(2) { left: 25%; animation-duration: 14s; animation-delay: 2s; }
         .petal:nth-child(3) { left: 40%; animation-duration: 16s; animation-delay: 4s; }
         .petal:nth-child(4) { left: 55%; animation-duration: 13s; animation-delay: 1s; }
         .petal:nth-child(5) { left: 70%; animation-duration: 15s; animation-delay: 3s; }
         .petal:nth-child(6) { left: 85%; animation-duration: 17s; animation-delay: 5s; }
-        @keyframes fall { 0% { transform: translateY(-50px) rotate(0deg); opacity: 0.8; }
-            100% { transform: translateY(812px) rotate(360deg); opacity: 0; } }
         
-        /* Nuages */
-        .cloud { position: absolute; color: white; font-size: 50px; opacity: 0.6;
-            animation: float-cloud linear infinite; pointer-events: none; z-index: 40; }
-        .cloud:nth-child(7) { top: 80px; animation-duration: 180s; }
-        .cloud:nth-child(8) { top: 150px; animation-duration: 220s; animation-delay: -60s; font-size: 40px; }
-        @keyframes float-cloud { 0% { transform: translateX(-80px); } 100% { transform: translateX(455px); } }
-        
-        .status-bar { position: absolute; top: 0; left: 0; right: 0; height: 44px;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 20px; color: rgba(255,255,255,0.95); font-size: 14px; z-index: 100; }
-        
-        .content { 
-            position: relative; height: calc(100% - 44px - 70px); margin-top: 44px; 
-            z-index: 60; overflow: hidden;
-            display: flex; flex-direction: column; align-items: center;
-            padding-top: 60px;
+        @keyframes fall {
+            0% { transform: translateY(-50px) rotate(0deg); opacity: 0.8; }
+            100% { transform: translateY(900px) rotate(360deg); opacity: 0; }
         }
         
-        .page-title {
-            font-size: 24px; font-weight: 600; color: white;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.15);
-            margin-bottom: 60px;
+        /* Nuages */
+        .cloud {
+            position: absolute;
+            color: white;
+            font-size: 50px;
+            opacity: 0.5;
+            animation: float-cloud linear infinite;
+            pointer-events: none;
+            z-index: 5;
+        }
+        .cloud:nth-child(7) { top: 100px; animation-duration: 180s; }
+        .cloud:nth-child(8) { top: 200px; animation-duration: 220s; animation-delay: -60s; font-size: 40px; }
+        
+        @keyframes float-cloud {
+            0% { transform: translateX(-80px); }
+            100% { transform: translateX(470px); }
+        }
+        
+        .status-bar {
+            height: 47px;
+            padding: 15px 25px 0;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(0,0,0,0.6);
+            position: relative;
+            z-index: 100;
+        }
+        
+        .header {
+            padding: 10px 20px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            z-index: 100;
+        }
+        
+        .back-btn {
+            width: 44px; height: 44px;
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 50%;
+            color: #333;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .header-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        /* Bubbles container */
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: calc(100% - 200px);
+            position: relative;
+            z-index: 50;
         }
         
         .bubbles-container {
-            display: flex; gap: 40px; justify-content: center;
-            flex-wrap: wrap; padding: 0 30px;
+            display: flex;
+            gap: 50px;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 0 30px;
         }
         
         /* Bulles flottantes */
         .bubble {
-            width: 120px; height: 120px; border-radius: 50%;
-            background: rgba(255, 255, 255, 0.35);
+            width: 130px; height: 130px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
             backdrop-filter: blur(15px);
             border: 3px solid rgba(255, 255, 255, 0.6);
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
             box-shadow: 
                 0 8px 32px rgba(0,0,0,0.1),
@@ -77,14 +146,21 @@
             position: relative;
         }
         
-        .bubble:active {
-            transform: scale(0.95);
+        .bubble:hover {
+            box-shadow: 
+                0 15px 40px rgba(0,0,0,0.15),
+                inset 0 2px 10px rgba(255,255,255,0.4);
         }
         
-        /* Animation flottante - chaque bulle a son propre rythme */
+        .bubble:active {
+            transform: scale(0.95) !important;
+        }
+        
+        /* Animation flottante organique */
         .bubble-1 {
             animation: float1 6s ease-in-out infinite;
         }
+        
         .bubble-2 {
             animation: float2 7s ease-in-out infinite;
             animation-delay: -2s;
@@ -105,19 +181,19 @@
         }
         
         .bubble-emoji {
-            font-size: 40px;
+            font-size: 45px;
             margin-bottom: 8px;
         }
         
         .bubble-label {
-            font-size: 11px; font-weight: 600;
-            color: white;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+            font-size: 11px;
+            font-weight: 600;
+            color: #333;
             text-align: center;
             line-height: 1.3;
         }
         
-        /* Effet de brillance subtil */
+        /* Effet de brillance */
         .bubble::before {
             content: '';
             position: absolute;
@@ -128,16 +204,22 @@
             filter: blur(5px);
         }
         
-        /* Bottom menu */
-        .bottom-menu { position: absolute; bottom: 0; left: 0; right: 0; height: 70px;
-            background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(20px);
-            display: flex; justify-content: space-around; align-items: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.4); z-index: 90; }
-        .menu-item { display: flex; flex-direction: column; align-items: center; gap: 4px;
-            cursor: pointer; padding: 8px 16px; border-radius: 12px; transition: all 0.3s; }
-        .menu-item.active { background: rgba(255, 255, 255, 0.6); }
-        .menu-icon { font-size: 24px; }
-        .menu-label { font-size: 10px; color: rgba(74, 90, 79, 0.8); font-weight: 500; }
+        /* Quote */
+        .quote-container {
+            position: absolute;
+            bottom: 40px;
+            left: 30px;
+            right: 30px;
+            text-align: center;
+            z-index: 50;
+        }
+        
+        .quote-text {
+            font-size: 12px;
+            color: rgba(0,0,0,0.4);
+            font-style: italic;
+            line-height: 1.5;
+        }
     </style>
 </head>
 <body>
@@ -150,44 +232,46 @@
         
         <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
         
+        <div class="header">
+            <button class="back-btn" onclick="goBack()">←</button>
+            <div class="header-title">✨ Bien-être</div>
+        </div>
+        
         <div class="content">
-            <h1 class="page-title">✨ Bien-être</h1>
-            
             <div class="bubbles-container">
-                <div class="bubble bubble-1" onclick="goToHabits()">
+                <div class="bubble bubble-1" onclick="goTo('habits')">
                     <div class="bubble-emoji">🌱</div>
                     <div class="bubble-label">Nouvelles<br>habitudes</div>
                 </div>
                 
-                <div class="bubble bubble-2" onclick="goToCoherence()">
-                    <div class="bubble-emoji">🫀</div>
-                    <div class="bubble-label">Cohérence<br>cardiaque</div>
+                <div class="bubble bubble-2" onclick="goTo('visualization')">
+                    <div class="bubble-emoji">✨</div>
+                    <div class="bubble-label">Visualisation<br>guidée</div>
                 </div>
             </div>
         </div>
         
-        <div class="bottom-menu">
-            <div class="menu-item active"><div class="menu-icon">✨</div><div class="menu-label">Bien-être</div></div>
-            <div class="menu-item" onclick="goToTree()"><div class="menu-icon">🌳</div><div class="menu-label">Organisation</div></div>
-            <div class="menu-item" onclick="goToValues()"><div class="menu-icon">💎</div><div class="menu-label">Valeurs</div></div>
+        <div class="quote-container">
+            <div class="quote-text">
+                « Prends soin de ton intérieur,<br>et l'extérieur suivra. »
+            </div>
         </div>
     </div>
     
     <script>
-        function goToHabits() {
-            window.location.href = 'wu-tree-v2-habits.html';
-        }
-        
-        function goToCoherence() {
-            window.location.href = 'wu-tree-v2-coherence.html';
-        }
-        
-        function goToTree() {
+        function goBack() {
             window.location.href = 'wu-tree-v2-home.html';
         }
         
-        function goToValues() {
-            window.location.href = 'wu-tree-v2-values.html';
+        function goTo(page) {
+            switch(page) {
+                case 'habits':
+                    window.location.href = 'wu-tree-v2-habits.html';
+                    break;
+                case 'visualization':
+                    window.location.href = 'wu-tree-v2-visualization.html';
+                    break;
+            }
         }
     </script>
 </body>
