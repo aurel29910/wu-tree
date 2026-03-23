@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Wu Tree - Progression</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'Comfortaa', sans-serif;
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+            padding: 20px;
+        }
+        
+        .phone-frame {
+            width: 100%; max-width: 390px;
+            height: 844px; max-height: 95vh;
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+            border-radius: 45px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.2);
+        }
+        
+        .status-bar {
+            height: 47px; padding: 15px 25px 0;
+            display: flex; justify-content: space-between;
+            font-size: 14px; font-weight: 600; color: #333;
+        }
+        
+        .header {
+            padding: 10px 20px 15px;
+            display: flex; align-items: center; gap: 15px;
+        }
+        
+        .back-btn {
+            width: 40px; height: 40px;
+            background: rgba(255,255,255,0.5);
+            border: none; border-radius: 50%;
+            color: #333; font-size: 20px;
+            cursor: pointer;
+        }
+        
+        .header-title {
+            font-size: 18px; font-weight: 600; color: #333;
+        }
+        
+        .content {
+            padding: 0 20px 20px;
+            height: calc(100% - 120px);
+            overflow-y: auto;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 20px;
+            padding: 18px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card.wide {
+            grid-column: span 2;
+        }
+        
+        .stat-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #6B4E9B;
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            font-size: 11px;
+            color: rgba(0,0,0,0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Bilan Averages */
+        .bilan-card {
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 20px;
+            padding: 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        .bilan-title {
+            font-size: 13px;
+            color: rgba(0,0,0,0.6);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .bilan-row {
+            display: flex;
+            justify-content: space-around;
+            gap: 15px;
+        }
+        
+        .bilan-item {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .bilan-emoji {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        
+        .bilan-score {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .bilan-score span {
+            font-size: 12px;
+            color: rgba(0,0,0,0.4);
+            font-weight: 400;
+        }
+        
+        .bilan-label {
+            font-size: 10px;
+            color: rgba(0,0,0,0.5);
+            margin-top: 4px;
+        }
+        
+        /* Calendar */
+        .calendar-card {
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 20px;
+            padding: 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .calendar-month {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .calendar-nav button {
+            width: 32px; height: 32px;
+            background: rgba(255,255,255,0.6);
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 50%;
+            color: #333;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .weekday {
+            text-align: center;
+            font-size: 10px;
+            color: rgba(0,0,0,0.4);
+            text-transform: uppercase;
+        }
+        
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: rgba(0,0,0,0.6);
+            border-radius: 50%;
+            position: relative;
+        }
+        
+        .calendar-day.completed {
+            background: rgba(76, 175, 80, 0.5);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .calendar-day.completed::after {
+            content: '✓';
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            font-size: 8px;
+            color: #2E7D32;
+        }
+        
+        .calendar-day.today {
+            border: 2px solid #6B4E9B;
+            color: #6B4E9B;
+            font-weight: 600;
+        }
+        
+        .calendar-day.today.completed {
+            background: rgba(107, 78, 155, 0.4);
+            border-color: #6B4E9B;
+            color: white;
+        }
+        
+        .calendar-day.other-month {
+            color: rgba(0,0,0,0.2);
+        }
+        
+        /* Quote */
+        .quote-card {
+            background: rgba(255,255,255,0.5);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        .quote-text {
+            font-size: 13px;
+            color: rgba(0,0,0,0.7);
+            font-style: italic;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+        
+        .quote-author {
+            font-size: 11px;
+            color: #6B4E9B;
+        }
+        
+        /* Start Button */
+        .start-session-btn {
+            position: absolute;
+            bottom: 30px;
+            left: 20px;
+            right: 20px;
+            padding: 16px;
+            background: rgba(255,255,255,0.6);
+            border: 2px solid rgba(255,255,255,0.8);
+            border-radius: 25px;
+            font-family: 'Comfortaa', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        .start-session-btn:hover {
+            background: rgba(255,255,255,0.8);
+            transform: translateY(-2px);
+        }
+        
+        /* Progress bar for streak */
+        .streak-progress {
+            margin-top: 10px;
+        }
+        
+        .streak-bar {
+            height: 6px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .streak-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6B4E9B, #9B6B9B);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+        
+        .streak-goal {
+            font-size: 9px;
+            color: rgba(0,0,0,0.4);
+            text-align: right;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
+        
+        <div class="header">
+            <button class="back-btn" onclick="goBack()">←</button>
+            <div class="header-title">📊 Ma Progression</div>
+        </div>
+        
+        <div class="content">
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">🔥</div>
+                    <div class="stat-value" id="streakCount">0</div>
+                    <div class="stat-label">Jours consécutifs</div>
+                    <div class="streak-progress">
+                        <div class="streak-bar">
+                            <div class="streak-fill" id="streakFill" style="width: 0%"></div>
+                        </div>
+                        <div class="streak-goal">Objectif : 21 jours</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">✨</div>
+                    <div class="stat-value" id="totalSessions">0</div>
+                    <div class="stat-label">Sessions totales</div>
+                </div>
+            </div>
+            
+            <!-- Bilan Averages -->
+            <div class="bilan-card">
+                <div class="bilan-title">Moyennes de tes bilans</div>
+                <div class="bilan-row">
+                    <div class="bilan-item">
+                        <div class="bilan-emoji" id="emotionEmoji">😶</div>
+                        <div class="bilan-score"><span id="emotionScore">-</span><span>/5</span></div>
+                        <div class="bilan-label">Intensité émotionnelle</div>
+                    </div>
+                    <div class="bilan-item">
+                        <div class="bilan-emoji" id="clarityEmoji">🌫️</div>
+                        <div class="bilan-score"><span id="clarityScore">-</span><span>/5</span></div>
+                        <div class="bilan-label">Clarté de vision</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Calendar -->
+            <div class="calendar-card">
+                <div class="calendar-header">
+                    <button class="calendar-nav" onclick="previousMonth()">◀</button>
+                    <div class="calendar-month" id="calendarMonth">Mars 2026</div>
+                    <button class="calendar-nav" onclick="nextMonth()">▶</button>
+                </div>
+                <div class="calendar-weekdays">
+                    <div class="weekday">Lun</div>
+                    <div class="weekday">Mar</div>
+                    <div class="weekday">Mer</div>
+                    <div class="weekday">Jeu</div>
+                    <div class="weekday">Ven</div>
+                    <div class="weekday">Sam</div>
+                    <div class="weekday">Dim</div>
+                </div>
+                <div class="calendar-days" id="calendarDays">
+                    <!-- Filled by JS -->
+                </div>
+            </div>
+            
+            <!-- Quote -->
+            <div class="quote-card">
+                <div class="quote-text" id="quoteText">
+                    « Tu es déjà où tu veux être. »
+                </div>
+                <div class="quote-author">— Wu Tree</div>
+            </div>
+        </div>
+        
+        <button class="start-session-btn" onclick="startSession()">
+            ✨ Commencer une session
+        </button>
+    </div>
+    
+    <script>
+        // ========== DATA ==========
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        
+        const monthNames = [
+            'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
+            'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
+        ];
+        
+        const quotes = [
+            { text: "Tu es déjà où tu veux être.", author: "Wu Tree" },
+            { text: "Le Tao ne fait rien, et pourtant rien n'est laissé défait.", author: "Tao Te Ching" },
+            { text: "Ce qui est désormais démontré n'était autrefois qu'imaginé.", author: "William Blake" },
+            { text: "Assume the feeling of the wish fulfilled.", author: "Neville Goddard" },
+            { text: "Change your conception of yourself and you will automatically change the world.", author: "Neville Goddard" }
+        ];
+        
+        const emotionEmojis = ['😶', '🙂', '😊', '🥹', '🤩'];
+        const clarityEmojis = ['🌫️', '🌥️', '⛅', '🌤️', '☀️'];
+        
+        // ========== STATS ==========
+        function loadStats() {
+            const sessions = JSON.parse(localStorage.getItem('wutree_visualization_sessions') || '[]');
+            const tracker = JSON.parse(localStorage.getItem('wutree_visualization_tracker') || '[]');
+            
+            // Total sessions
+            document.getElementById('totalSessions').textContent = sessions.length;
+            
+            // Streak
+            const streak = calculateStreak(tracker);
+            document.getElementById('streakCount').textContent = streak;
+            document.getElementById('streakFill').style.width = Math.min((streak / 21) * 100, 100) + '%';
+            
+            // Bilan averages
+            calculateBilanAverages(sessions);
+        }
+        
+        function calculateStreak(completedDays) {
+            const today = new Date();
+            const todayStr = today.toISOString().split('T')[0];
+            
+            let streak = 0;
+            let checkDate = new Date(today);
+            
+            // If today is not completed, start from yesterday
+            if (!completedDays.includes(todayStr)) {
+                checkDate.setDate(checkDate.getDate() - 1);
+            }
+            
+            while (true) {
+                const dateStr = checkDate.toISOString().split('T')[0];
+                if (completedDays.includes(dateStr)) {
+                    streak++;
+                    checkDate.setDate(checkDate.getDate() - 1);
+                } else {
+                    break;
+                }
+            }
+            
+            return streak;
+        }
+        
+        function calculateBilanAverages(sessions) {
+            const sessionsWithBilan = sessions.filter(s => s.bilan && (s.bilan.emotion > 0 || s.bilan.clarity > 0));
+            
+            if (sessionsWithBilan.length === 0) {
+                document.getElementById('emotionScore').textContent = '-';
+                document.getElementById('clarityScore').textContent = '-';
+                return;
+            }
+            
+            let totalEmotion = 0;
+            let totalClarity = 0;
+            let emotionCount = 0;
+            let clarityCount = 0;
+            
+            sessionsWithBilan.forEach(s => {
+                if (s.bilan.emotion > 0) {
+                    totalEmotion += s.bilan.emotion;
+                    emotionCount++;
+                }
+                if (s.bilan.clarity > 0) {
+                    totalClarity += s.bilan.clarity;
+                    clarityCount++;
+                }
+            });
+            
+            const avgEmotion = emotionCount > 0 ? (totalEmotion / emotionCount).toFixed(1) : '-';
+            const avgClarity = clarityCount > 0 ? (totalClarity / clarityCount).toFixed(1) : '-';
+            
+            document.getElementById('emotionScore').textContent = avgEmotion;
+            document.getElementById('clarityScore').textContent = avgClarity;
+            
+            // Update emojis
+            if (avgEmotion !== '-') {
+                const emotionIndex = Math.min(Math.round(avgEmotion) - 1, 4);
+                document.getElementById('emotionEmoji').textContent = emotionEmojis[Math.max(0, emotionIndex)];
+            }
+            
+            if (avgClarity !== '-') {
+                const clarityIndex = Math.min(Math.round(avgClarity) - 1, 4);
+                document.getElementById('clarityEmoji').textContent = clarityEmojis[Math.max(0, clarityIndex)];
+            }
+        }
+        
+        // ========== CALENDAR ==========
+        function renderCalendar() {
+            const tracker = JSON.parse(localStorage.getItem('wutree_visualization_tracker') || '[]');
+            const today = new Date();
+            const todayStr = today.toISOString().split('T')[0];
+            
+            // Update month title
+            document.getElementById('calendarMonth').textContent = 
+                monthNames[currentMonth] + ' ' + currentYear;
+            
+            // Get first day of month
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+            
+            // Adjust for Monday start (0 = Monday, 6 = Sunday)
+            let startDay = firstDay.getDay() - 1;
+            if (startDay < 0) startDay = 6;
+            
+            const daysContainer = document.getElementById('calendarDays');
+            daysContainer.innerHTML = '';
+            
+            // Previous month days
+            const prevMonthLastDay = new Date(currentYear, currentMonth, 0).getDate();
+            for (let i = startDay - 1; i >= 0; i--) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day other-month';
+                day.textContent = prevMonthLastDay - i;
+                daysContainer.appendChild(day);
+            }
+            
+            // Current month days
+            for (let d = 1; d <= lastDay.getDate(); d++) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day';
+                day.textContent = d;
+                
+                const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                
+                if (tracker.includes(dateStr)) {
+                    day.classList.add('completed');
+                }
+                
+                if (dateStr === todayStr) {
+                    day.classList.add('today');
+                }
+                
+                daysContainer.appendChild(day);
+            }
+            
+            // Next month days
+            const totalCells = daysContainer.children.length;
+            const remainingCells = 42 - totalCells; // 6 rows × 7 days
+            for (let i = 1; i <= remainingCells && totalCells + i <= 42; i++) {
+                const day = document.createElement('div');
+                day.className = 'calendar-day other-month';
+                day.textContent = i;
+                daysContainer.appendChild(day);
+            }
+        }
+        
+        function previousMonth() {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderCalendar();
+        }
+        
+        function nextMonth() {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar();
+        }
+        
+        // ========== QUOTE ==========
+        function loadRandomQuote() {
+            const quote = quotes[Math.floor(Math.random() * quotes.length)];
+            document.getElementById('quoteText').textContent = `« ${quote.text} »`;
+            document.querySelector('.quote-author').textContent = `— ${quote.author}`;
+        }
+        
+        // ========== NAVIGATION ==========
+        function goBack() {
+            window.location.href = 'wu-tree-v2-visualization.html';
+        }
+        
+        function startSession() {
+            window.location.href = 'wu-tree-v2-session.html';
+        }
+        
+        // ========== INIT ==========
+        loadStats();
+        renderCalendar();
+        loadRandomQuote();
+    </script>
+</body>
+</html>
