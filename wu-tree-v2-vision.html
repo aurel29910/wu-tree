@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Wu Tree - Ma Vision</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: 'Comfortaa', sans-serif;
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            padding: 20px;
+        }
+        
+        .phone-frame {
+            width: 100%; max-width: 390px;
+            height: 844px; max-height: 95vh;
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+            border-radius: 45px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.15);
+        }
+        
+        /* Pétales flottants */
+        .petal {
+            position: absolute;
+            width: 10px; height: 10px;
+            background: linear-gradient(135deg, rgba(255, 182, 193, 0.8), rgba(255, 105, 180, 0.6));
+            border-radius: 50% 0 50% 0;
+            animation: fall linear infinite;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .petal:nth-child(1) { left: 10%; animation-duration: 12s; width: 8px; }
+        .petal:nth-child(2) { left: 25%; animation-duration: 14s; animation-delay: 2s; }
+        .petal:nth-child(3) { left: 40%; animation-duration: 16s; animation-delay: 4s; }
+        .petal:nth-child(4) { left: 55%; animation-duration: 13s; animation-delay: 1s; }
+        .petal:nth-child(5) { left: 70%; animation-duration: 15s; animation-delay: 3s; }
+        .petal:nth-child(6) { left: 85%; animation-duration: 17s; animation-delay: 5s; }
+        
+        @keyframes fall {
+            0% { transform: translateY(-50px) rotate(0deg); opacity: 0.8; }
+            100% { transform: translateY(900px) rotate(360deg); opacity: 0; }
+        }
+        
+        /* Nuages */
+        .cloud {
+            position: absolute;
+            color: white;
+            font-size: 50px;
+            opacity: 0.5;
+            animation: float-cloud linear infinite;
+            pointer-events: none;
+            z-index: 5;
+        }
+        .cloud:nth-child(7) { top: 100px; animation-duration: 180s; }
+        .cloud:nth-child(8) { top: 200px; animation-duration: 220s; animation-delay: -60s; font-size: 40px; }
+        
+        @keyframes float-cloud {
+            0% { transform: translateX(-80px); }
+            100% { transform: translateX(470px); }
+        }
+        
+        .status-bar {
+            height: 47px;
+            padding: 15px 25px 0;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(0,0,0,0.6);
+            position: relative;
+            z-index: 100;
+        }
+        
+        .header {
+            padding: 10px 20px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            z-index: 100;
+        }
+        
+        .back-btn {
+            width: 44px; height: 44px;
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 50%;
+            color: #333;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .header-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .content {
+            position: relative;
+            z-index: 50;
+            padding: 0 20px;
+            height: calc(100% - 140px);
+            overflow-y: auto;
+        }
+        
+        /* Écran de choix */
+        .choice-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 40px;
+        }
+        
+        .choice-intro {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .choice-emoji {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+        
+        .choice-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .choice-subtitle {
+            font-size: 13px;
+            color: rgba(0,0,0,0.5);
+            line-height: 1.6;
+            padding: 0 20px;
+        }
+        
+        .choice-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+        }
+        
+        .choice-btn {
+            padding: 25px;
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .choice-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .choice-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .choice-btn-emoji {
+            font-size: 35px;
+        }
+        
+        .choice-btn-content {
+            flex: 1;
+            text-align: left;
+        }
+        
+        .choice-btn-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .choice-btn-desc {
+            font-size: 12px;
+            color: rgba(0,0,0,0.5);
+            line-height: 1.4;
+        }
+        
+        /* Écran d'écriture */
+        .write-screen {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .write-screen.active {
+            display: flex;
+        }
+        
+        .write-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .write-hint {
+            font-size: 11px;
+            color: rgba(0,0,0,0.4);
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+        
+        .vision-textarea {
+            flex: 1;
+            min-height: 200px;
+            background: rgba(255,255,255,0.6);
+            border: 2px solid rgba(255,255,255,0.8);
+            border-radius: 20px;
+            padding: 20px;
+            font-family: 'Comfortaa', sans-serif;
+            font-size: 14px;
+            color: #333;
+            line-height: 1.7;
+            resize: none;
+            outline: none;
+        }
+        
+        .vision-textarea::placeholder {
+            color: rgba(0,0,0,0.3);
+        }
+        
+        .vision-textarea:focus {
+            border-color: #6B4E9B;
+        }
+        
+        .write-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            padding-bottom: 20px;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 16px;
+            border-radius: 20px;
+            font-family: 'Comfortaa', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+        
+        .action-btn.secondary {
+            background: rgba(255,255,255,0.5);
+            color: #333;
+        }
+        
+        .action-btn.primary {
+            background: linear-gradient(135deg, #6B4E9B 0%, #9B6B9B 100%);
+            color: white;
+        }
+        
+        .action-btn:active {
+            transform: scale(0.97);
+        }
+        
+        /* Écran de vision existante */
+        .view-screen {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .view-screen.active {
+            display: flex;
+        }
+        
+        .vision-card {
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 24px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .vision-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .vision-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .vision-card-date {
+            font-size: 11px;
+            color: rgba(0,0,0,0.4);
+        }
+        
+        .vision-card-text {
+            font-size: 14px;
+            color: #333;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+        
+        .essence-section {
+            margin-top: 10px;
+        }
+        
+        .essence-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #6B4E9B;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .essence-card {
+            background: rgba(107, 78, 155, 0.1);
+            border: 2px solid rgba(107, 78, 155, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+        }
+        
+        .essence-text {
+            font-size: 15px;
+            color: #333;
+            line-height: 1.6;
+            font-weight: 500;
+            white-space: pre-wrap;
+        }
+        
+        .view-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: auto;
+            padding-bottom: 20px;
+        }
+        
+        .view-actions .action-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        /* Empty essence state */
+        .essence-empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: rgba(0,0,0,0.4);
+            font-size: 13px;
+            font-style: italic;
+        }
+        
+        .generate-essence-btn {
+            background: rgba(107, 78, 155, 0.15);
+            border: 2px dashed rgba(107, 78, 155, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            font-family: 'Comfortaa', sans-serif;
+            font-size: 13px;
+            color: #6B4E9B;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .generate-essence-btn:hover {
+            background: rgba(107, 78, 155, 0.25);
+        }
+        
+        /* Loading state */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+            color: #6B4E9B;
+            font-size: 13px;
+        }
+        
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(107, 78, 155, 0.2);
+            border-top-color: #6B4E9B;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <!-- Pétales -->
+        <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+        <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+        <!-- Nuages -->
+        <div class="cloud">☁️</div><div class="cloud">☁️</div>
+        
+        <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
+        
+        <div class="header">
+            <button class="back-btn" onclick="goBack()">←</button>
+            <div class="header-title">✨ Ma Vision</div>
+        </div>
+        
+        <div class="content">
+            <!-- Écran de choix (si pas de vision) -->
+            <div class="choice-screen" id="choiceScreen">
+                <div class="choice-intro">
+                    <div class="choice-emoji">🔮</div>
+                    <div class="choice-title">Crée ta vision</div>
+                    <div class="choice-subtitle">
+                        Décris ta vie idéale en détail.<br>
+                        Comment tu te sens, ce que tu fais,<br>
+                        où tu es, qui tu es devenu.
+                    </div>
+                </div>
+                
+                <div class="choice-buttons">
+                    <div class="choice-btn" onclick="startWriting()">
+                        <div class="choice-btn-emoji">✍️</div>
+                        <div class="choice-btn-content">
+                            <div class="choice-btn-title">J'écris moi-même</div>
+                            <div class="choice-btn-desc">Tu sais déjà ce que tu veux, rédige ta vision librement</div>
+                        </div>
+                    </div>
+                    
+                    <div class="choice-btn" onclick="startGuided()">
+                        <div class="choice-btn-emoji">🌳</div>
+                        <div class="choice-btn-content">
+                            <div class="choice-btn-title">Guidé par l'assistant</div>
+                            <div class="choice-btn-desc">L'IA te pose les bonnes questions et t'aide à construire ta vision</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Écran d'écriture -->
+            <div class="write-screen" id="writeScreen">
+                <div class="write-label">Ta vision :</div>
+                <div class="write-hint">Écris au présent, comme si tu y étais déjà. Décris ce que tu vois, ressens, fais...</div>
+                <textarea class="vision-textarea" id="visionTextarea" placeholder="Je me réveille dans mon appartement à Chiang Mai. La lumière du matin passe à travers les rideaux. Je me sens calme, reposé, libre..."></textarea>
+                <div class="write-actions">
+                    <button class="action-btn secondary" onclick="cancelWriting()">Annuler</button>
+                    <button class="action-btn primary" onclick="saveVision()">Enregistrer</button>
+                </div>
+            </div>
+            
+            <!-- Écran de vision existante -->
+            <div class="view-screen" id="viewScreen">
+                <div class="vision-card">
+                    <div class="vision-card-header">
+                        <div class="vision-card-title">📝 Ma vision complète</div>
+                        <div class="vision-card-date" id="visionDate"></div>
+                    </div>
+                    <div class="vision-card-text" id="visionText"></div>
+                </div>
+                
+                <div class="essence-section">
+                    <div class="essence-label">✨ Texte essence</div>
+                    <div id="essenceContainer">
+                        <!-- Filled dynamically -->
+                    </div>
+                </div>
+                
+                <div class="view-actions">
+                    <button class="action-btn secondary" onclick="editVision()">✏️ Modifier</button>
+                    <button class="action-btn primary" onclick="startVisualization()">✨ Visualiser</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ========== DATA ==========
+        let visionData = JSON.parse(localStorage.getItem('wutree_vision') || 'null');
+        
+        // ========== INIT ==========
+        function init() {
+            if (visionData && visionData.text) {
+                showViewScreen();
+            } else {
+                showChoiceScreen();
+            }
+        }
+        
+        // ========== SCREENS ==========
+        function showChoiceScreen() {
+            document.getElementById('choiceScreen').style.display = 'flex';
+            document.getElementById('writeScreen').classList.remove('active');
+            document.getElementById('viewScreen').classList.remove('active');
+        }
+        
+        function showWriteScreen() {
+            document.getElementById('choiceScreen').style.display = 'none';
+            document.getElementById('writeScreen').classList.add('active');
+            document.getElementById('viewScreen').classList.remove('active');
+        }
+        
+        function showViewScreen() {
+            document.getElementById('choiceScreen').style.display = 'none';
+            document.getElementById('writeScreen').classList.remove('active');
+            document.getElementById('viewScreen').classList.add('active');
+            renderVision();
+        }
+        
+        // ========== ACTIONS ==========
+        function startWriting() {
+            document.getElementById('visionTextarea').value = visionData?.text || '';
+            showWriteScreen();
+        }
+        
+        function startGuided() {
+            // Redirect to assistant with vision context
+            localStorage.setItem('wutree_assistant_mode', 'vision');
+            window.location.href = 'wu-tree-v2-assistant.html';
+        }
+        
+        function cancelWriting() {
+            if (visionData && visionData.text) {
+                showViewScreen();
+            } else {
+                showChoiceScreen();
+            }
+        }
+        
+        function saveVision() {
+            const text = document.getElementById('visionTextarea').value.trim();
+            if (!text) {
+                alert('Écris ta vision avant d\'enregistrer');
+                return;
+            }
+            
+            visionData = {
+                text: text,
+                essence: visionData?.essence || null,
+                createdAt: visionData?.createdAt || new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+            
+            localStorage.setItem('wutree_vision', JSON.stringify(visionData));
+            showViewScreen();
+        }
+        
+        function editVision() {
+            document.getElementById('visionTextarea').value = visionData.text;
+            showWriteScreen();
+        }
+        
+        function renderVision() {
+            if (!visionData) return;
+            
+            document.getElementById('visionText').textContent = visionData.text;
+            
+            const date = new Date(visionData.updatedAt || visionData.createdAt);
+            document.getElementById('visionDate').textContent = 
+                `Modifié le ${date.toLocaleDateString('fr-FR')}`;
+            
+            const essenceContainer = document.getElementById('essenceContainer');
+            
+            if (visionData.essence) {
+                essenceContainer.innerHTML = `
+                    <div class="essence-card">
+                        <div class="essence-text">${visionData.essence}</div>
+                    </div>
+                `;
+            } else {
+                essenceContainer.innerHTML = `
+                    <button class="generate-essence-btn" onclick="generateEssence()">
+                        <span>🪄</span>
+                        <span>Générer le texte essence avec l'IA</span>
+                    </button>
+                `;
+            }
+        }
+        
+        function generateEssence() {
+            const container = document.getElementById('essenceContainer');
+            container.innerHTML = `
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <span>L'IA condense ta vision...</span>
+                </div>
+            `;
+            
+            // Simulated - in real app, call Claude API
+            setTimeout(() => {
+                // For now, create a placeholder
+                // In production, this would call the Claude API
+                const essence = generateEssencePlaceholder(visionData.text);
+                visionData.essence = essence;
+                localStorage.setItem('wutree_vision', JSON.stringify(visionData));
+                renderVision();
+            }, 2000);
+        }
+        
+        function generateEssencePlaceholder(text) {
+            // Placeholder - extract first meaningful sentences
+            // In production, Claude API would do this properly
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 10);
+            if (sentences.length <= 3) {
+                return text;
+            }
+            return sentences.slice(0, 3).join('. ').trim() + '.';
+        }
+        
+        function startVisualization() {
+            window.location.href = 'wu-tree-v2-visualization.html';
+        }
+        
+        // ========== NAVIGATION ==========
+        function goBack() {
+            window.location.href = 'wu-tree-v2-visualization.html';
+        }
+        
+        // ========== START ==========
+        init();
+    </script>
+</body>
+</html>
