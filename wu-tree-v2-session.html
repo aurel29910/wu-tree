@@ -1,27 +1,49 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wu Tree - Visualisation Guidée</title>
-    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Wu Tree - Session</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
         body {
-            font-family: 'Comfortaa', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
-            min-height: 100vh; display: flex; justify-content: center; align-items: center;
+            font-family: 'Comfortaa', sans-serif;
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
             padding: 20px;
+            transition: background 1s;
         }
+        
+        body.mode-day {
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+        }
+        
+        body.mode-night {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+        
         .phone-frame {
             width: 100%; max-width: 390px;
             height: 844px; max-height: 95vh;
-            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
-            border-radius: 45px; box-shadow: 0 25px 80px rgba(0,0,0,0.15);
-            position: relative; overflow: hidden;
+            border-radius: 45px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.15);
+            transition: background 1s;
         }
         
-        /* Pétales flottants */
+        .phone-frame.mode-day {
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+        }
+        
+        .phone-frame.mode-night {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+        
+        /* Pétales (jour) */
         .petal {
             position: absolute;
             width: 10px; height: 10px;
@@ -30,8 +52,10 @@
             animation: fall linear infinite;
             pointer-events: none;
             z-index: 10;
+            transition: opacity 1s;
         }
-        .petal:nth-child(1) { left: 10%; animation-duration: 12s; width: 8px; }
+        .mode-night .petal { opacity: 0; }
+        .petal:nth-child(1) { left: 10%; animation-duration: 12s; }
         .petal:nth-child(2) { left: 25%; animation-duration: 14s; animation-delay: 2s; }
         .petal:nth-child(3) { left: 40%; animation-duration: 16s; animation-delay: 4s; }
         .petal:nth-child(4) { left: 55%; animation-duration: 13s; animation-delay: 1s; }
@@ -43,1461 +67,842 @@
             100% { transform: translateY(900px) rotate(360deg); opacity: 0; }
         }
         
-        /* Nuages */
-        .cloud {
+        /* Étoiles (nuit) */
+        .stars {
             position: absolute;
-            color: white;
-            font-size: 50px;
-            opacity: 0.5;
-            animation: float-cloud linear infinite;
+            top: 0; left: 0; right: 0; bottom: 0;
             pointer-events: none;
             z-index: 5;
+            opacity: 0;
+            transition: opacity 1s;
         }
-        .cloud:nth-child(7) { top: 100px; animation-duration: 180s; }
-        .cloud:nth-child(8) { top: 200px; animation-duration: 220s; animation-delay: -60s; font-size: 40px; }
+        .mode-night .stars { opacity: 1; }
         
-        @keyframes float-cloud {
-            0% { transform: translateX(-80px); }
-            100% { transform: translateX(470px); }
+        .star {
+            position: absolute;
+            width: 2px; height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite;
         }
         
-        .status-bar { 
-            position: absolute; top: 0; left: 0; right: 0; height: 44px;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 20px; color: rgba(0,0,0,0.6); font-size: 14px; z-index: 100; 
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
         }
+        
+        .status-bar {
+            height: 47px;
+            padding: 15px 25px 0;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+            position: relative;
+            z-index: 100;
+            transition: color 1s;
+        }
+        .mode-day .status-bar { color: rgba(0,0,0,0.6); }
+        .mode-night .status-bar { color: rgba(255,255,255,0.6); }
         
         .header {
-            position: absolute; top: 44px; left: 0; right: 0; height: 60px;
-            display: flex; align-items: center; padding: 0 20px; z-index: 80;
+            padding: 10px 20px 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            z-index: 100;
         }
+        
         .back-btn {
-            width: 40px; height: 40px; border-radius: 50%;
-            background: rgba(255,255,255,0.5); border: 2px solid rgba(255,255,255,0.6);
-            font-size: 20px; cursor: pointer; display: flex;
-            align-items: center; justify-content: center; color: #333;
+            width: 44px; height: 44px;
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: all 0.3s;
         }
-        .back-btn:hover { background: rgba(255,255,255,0.7); }
+        .mode-day .back-btn {
+            background: rgba(255,255,255,0.5);
+            border: 2px solid rgba(255,255,255,0.6);
+            color: #333;
+        }
+        .mode-night .back-btn {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: white;
+        }
         
         .header-title {
-            flex: 1; text-align: center; font-size: 16px;
-            font-weight: 600; color: #333;
-        }
-        
-        .progress-btn {
-            width: 40px; height: 40px;
-            background: rgba(255,255,255,0.5);
-            border: 2px solid rgba(255,255,255,0.6);
-            border-radius: 50%;
             font-size: 18px;
-            cursor: pointer;
+            font-weight: 600;
+            transition: color 1s;
         }
+        .mode-day .header-title { color: #333; }
+        .mode-night .header-title { color: white; }
         
-        /* Progress bar */
-        .progress-container {
-            position: absolute; top: 104px; left: 20px; right: 20px;
-            z-index: 80;
-        }
-        .progress-phases {
-            display: flex; justify-content: space-between; margin-bottom: 8px;
-        }
-        .phase-dot {
-            width: 10px; height: 10px; border-radius: 50%;
-            background: rgba(255,255,255,0.5);
-            border: 2px solid rgba(255,255,255,0.7);
-            transition: all 0.5s;
-        }
-        .phase-dot.active {
-            background: #6B4E9B;
-            border-color: #6B4E9B;
-            box-shadow: 0 0 15px rgba(107, 78, 155, 0.6);
-        }
-        .phase-dot.completed {
-            background: #4CAF50;
-            border-color: #4CAF50;
-        }
-        .progress-bar {
-            height: 3px; background: rgba(255,255,255,0.5);
-            border-radius: 2px; overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%; width: 0%;
-            background: linear-gradient(90deg, #6B4E9B, #9B6B9B);
-            transition: width 0.3s;
-        }
-        
-        /* Main content */
         .content {
-            position: absolute; top: 140px; left: 0; right: 0; bottom: 100px;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            padding: 20px; z-index: 60;
+            position: relative;
+            z-index: 50;
+            padding: 0 20px;
+            height: calc(100% - 130px);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
         }
         
-        /* Central orb */
-        .orb-container {
-            position: relative; width: 200px; height: 200px;
-            display: flex; align-items: center; justify-content: center;
+        /* ========== ÉCRAN CHOIX MODE ========== */
+        .mode-select {
+            display: flex;
+            flex-direction: column;
+            padding-top: 20px;
         }
         
-        .orb {
-            width: 150px; height: 150px; border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, 
-                rgba(255, 215, 0, 0.8) 0%, 
-                rgba(255, 140, 0, 0.6) 40%,
-                rgba(255, 69, 0, 0.4) 70%,
-                rgba(255, 69, 0, 0.1) 100%);
-            box-shadow: 
-                0 0 60px rgba(255, 140, 0, 0.4),
-                0 0 120px rgba(255, 69, 0, 0.2),
-                inset 0 0 30px rgba(255, 255, 255, 0.3);
-            animation: pulse-orb 4s ease-in-out infinite;
-            transition: all 1s ease;
+        .mode-select.hidden { display: none; }
+        
+        .mode-intro {
+            text-align: center;
+            margin-bottom: 25px;
         }
         
-        /* Different orb states for each phase */
-        .orb.coherence {
-            background: radial-gradient(circle at 30% 30%, 
-                rgba(100, 200, 255, 0.8) 0%, 
-                rgba(50, 150, 220, 0.6) 40%,
-                rgba(30, 100, 180, 0.4) 70%,
-                rgba(20, 60, 140, 0.1) 100%);
-            box-shadow: 
-                0 0 60px rgba(100, 180, 255, 0.4),
-                0 0 120px rgba(50, 120, 200, 0.2),
-                inset 0 0 30px rgba(255, 255, 255, 0.3);
+        .mode-intro-emoji {
+            font-size: 50px;
+            margin-bottom: 12px;
         }
         
-        .orb.heart {
-            background: radial-gradient(circle at 30% 30%, 
-                rgba(255, 100, 150, 0.9) 0%, 
-                rgba(220, 50, 100, 0.7) 40%,
-                rgba(180, 30, 80, 0.5) 70%,
-                rgba(140, 20, 60, 0.2) 100%);
-            box-shadow: 
-                0 0 60px rgba(255, 100, 150, 0.5),
-                0 0 120px rgba(220, 50, 100, 0.3),
-                inset 0 0 30px rgba(255, 255, 255, 0.4);
-        }
-        
-        .orb.vision {
-            background: radial-gradient(circle at 30% 30%, 
-                rgba(255, 215, 0, 0.9) 0%, 
-                rgba(255, 180, 0, 0.7) 40%,
-                rgba(255, 140, 0, 0.5) 70%,
-                rgba(200, 100, 0, 0.2) 100%);
-            box-shadow: 
-                0 0 80px rgba(255, 200, 0, 0.5),
-                0 0 150px rgba(255, 140, 0, 0.3),
-                inset 0 0 40px rgba(255, 255, 255, 0.5);
-        }
-        
-        .orb.gratitude {
-            background: radial-gradient(circle at 30% 30%, 
-                rgba(150, 255, 150, 0.9) 0%, 
-                rgba(100, 220, 100, 0.7) 40%,
-                rgba(50, 180, 80, 0.5) 70%,
-                rgba(30, 140, 60, 0.2) 100%);
-            box-shadow: 
-                0 0 80px rgba(100, 255, 100, 0.5),
-                0 0 150px rgba(50, 200, 80, 0.3),
-                inset 0 0 40px rgba(255, 255, 255, 0.5);
-        }
-        
-        @keyframes pulse-orb {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.08); }
-        }
-        
-        /* Breathing animation for coherence phase */
-        .orb.breathing-in {
-            animation: breathe-in 5s ease-in-out forwards;
-        }
-        .orb.breathing-out {
-            animation: breathe-out 5s ease-in-out forwards;
-        }
-        @keyframes breathe-in {
-            from { transform: scale(1); }
-            to { transform: scale(1.3); }
-        }
-        @keyframes breathe-out {
-            from { transform: scale(1.3); }
-            to { transform: scale(1); }
-        }
-        
-        /* Heart beat for heart phase */
-        .orb.heartbeat {
-            animation: heartbeat 1.5s ease-in-out infinite;
-        }
-        @keyframes heartbeat {
-            0%, 100% { transform: scale(1); }
-            15% { transform: scale(1.15); }
-            30% { transform: scale(1); }
-            45% { transform: scale(1.1); }
-        }
-        
-        /* Glow expansion for vision */
-        .orb.expanding {
-            animation: expand-glow 8s ease-in-out infinite;
-        }
-        @keyframes expand-glow {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 80px rgba(255, 200, 0, 0.5), 0 0 150px rgba(255, 140, 0, 0.3); }
-            50% { transform: scale(1.15); box-shadow: 0 0 120px rgba(255, 200, 0, 0.7), 0 0 200px rgba(255, 140, 0, 0.5); }
-        }
-        
-        /* Rings around orb */
-        .ring {
-            position: absolute; border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            animation: ring-pulse 4s ease-out infinite;
-        }
-        .ring:nth-child(1) { width: 180px; height: 180px; animation-delay: 0s; }
-        .ring:nth-child(2) { width: 220px; height: 220px; animation-delay: 1s; }
-        .ring:nth-child(3) { width: 260px; height: 260px; animation-delay: 2s; }
-        
-        @keyframes ring-pulse {
-            0% { transform: scale(0.8); opacity: 0.6; }
-            100% { transform: scale(1.5); opacity: 0; }
-        }
-        
-        /* Phase info */
-        .phase-info {
-            text-align: center; margin-top: 30px;
-        }
-        .phase-emoji {
-            font-size: 40px; margin-bottom: 10px;
-        }
-        .phase-title {
-            font-size: 22px; font-weight: 600;
-            color: #333; margin-bottom: 8px;
-        }
-        .phase-subtitle {
-            font-size: 13px; color: rgba(0,0,0,0.6);
-            line-height: 1.5; max-width: 280px;
-        }
-        
-        /* Breathing guide text */
-        .breathing-guide {
-            font-size: 18px; font-weight: 500;
+        .mode-intro-title {
+            font-size: 18px;
+            font-weight: 600;
             color: #333;
-            margin-top: 15px;
-            opacity: 0;
-            transition: opacity 0.5s;
-        }
-        .breathing-guide.visible { opacity: 1; }
-        
-        /* Timer */
-        .timer {
-            font-size: 32px; font-weight: 600;
-            color: #333;
-            margin-top: 20px;
+            margin-bottom: 6px;
         }
         
-        /* Bottom controls */
-        .controls {
-            position: absolute; bottom: 20px; left: 0; right: 0;
-            display: flex; flex-direction: column;
-            align-items: center; gap: 15px;
-            z-index: 90; padding: 0 20px;
+        .mode-intro-subtitle {
+            font-size: 11px;
+            color: rgba(0,0,0,0.5);
         }
         
-        .duration-selection {
-            display: flex; gap: 10px;
+        .mode-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
-        .duration-btn {
-            padding: 10px 20px;
+        
+        .mode-card {
+            padding: 20px;
             background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(15px);
             border: 2px solid rgba(255,255,255,0.6);
-            border-radius: 20px;
-            font-family: 'Comfortaa', sans-serif;
-            font-size: 13px; color: #333;
-            cursor: pointer; transition: all 0.3s;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
-        .duration-btn.active {
-            background: rgba(255,255,255,0.8);
-            border-color: #6B4E9B;
+        
+        .mode-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .mode-card:active {
+            transform: scale(0.98);
+        }
+        
+        .mode-card-emoji {
+            font-size: 36px;
+            width: 50px;
+            text-align: center;
+        }
+        
+        .mode-card-content {
+            flex: 1;
+        }
+        
+        .mode-card-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .mode-card-desc {
+            font-size: 11px;
+            color: rgba(0,0,0,0.5);
+            line-height: 1.4;
+        }
+        
+        .mode-card-duration {
+            font-size: 11px;
             color: #6B4E9B;
             font-weight: 600;
         }
         
-        .voice-btn {
-            padding: 10px 14px;
-            font-size: 16px;
-        }
-        .voice-btn.muted {
-            opacity: 0.5;
+        .no-vision-msg {
+            text-align: center;
+            padding: 30px 20px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 20px;
+            margin-top: 20px;
         }
         
-        .start-btn {
-            padding: 16px 60px;
-            background: linear-gradient(135deg, #6B4E9B 0%, #9B6B9B 100%);
-            border: 2px solid rgba(255,255,255,0.4);
-            border-radius: 30px;
+        .no-vision-msg p {
+            font-size: 13px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .no-vision-btn {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            border: none;
+            border-radius: 20px;
+            color: white;
             font-family: 'Comfortaa', sans-serif;
-            font-size: 16px; font-weight: 600;
-            color: white; cursor: pointer;
-            box-shadow: 0 6px 25px rgba(107, 78, 155, 0.4);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        /* ========== SESSION MATIN/SOIR ========== */
+        .session-simple {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .session-simple.active {
+            display: flex;
+        }
+        
+        .session-phase-label {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            transition: color 1s;
+        }
+        .mode-day .session-phase-label { color: #6B4E9B; }
+        .mode-night .session-phase-label { color: rgba(255,255,255,0.6); }
+        
+        .vision-display {
+            flex: 1;
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 24px;
+            padding: 25px;
+            overflow-y: auto;
+            transition: all 1s;
+        }
+        
+        .mode-night .vision-display {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.15);
+        }
+        
+        .vision-text {
+            font-size: 15px;
+            line-height: 1.9;
+            white-space: pre-wrap;
+            transition: color 1s;
+        }
+        .mode-day .vision-text { color: #333; }
+        .mode-night .vision-text { color: rgba(255,255,255,0.9); }
+        
+        /* Highlight pendant lecture */
+        .vision-text.reading {
+            opacity: 0.6;
+        }
+        
+        .vision-text .current-sentence {
+            opacity: 1;
+            font-weight: 600;
+        }
+        
+        .session-controls {
+            display: flex;
+            gap: 10px;
+            padding: 20px 0;
+            justify-content: center;
+        }
+        
+        .control-btn {
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: all 0.3s;
         }
-        .start-btn:active { transform: scale(0.97); }
-        .start-btn.stop {
-            background: linear-gradient(135deg, rgba(255,100,100,0.8) 0%, rgba(200,50,50,0.8) 100%);
-            box-shadow: 0 6px 25px rgba(200, 50, 50, 0.4);
-        }
         
-        /* Intro screen */
-        .intro-screen {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            padding: 40px; z-index: 200;
-            text-align: center;
-        }
-        .intro-screen.hidden { display: none; }
-        
-        .intro-emoji { font-size: 60px; margin-bottom: 20px; }
-        .intro-title {
-            font-size: 24px; font-weight: 600;
-            color: #333; margin-bottom: 15px;
-        }
-        .intro-text {
-            font-size: 14px; color: rgba(0,0,0,0.6);
-            line-height: 1.7; margin-bottom: 30px;
-        }
-        .intro-phases {
-            width: 100%; text-align: left;
+        .control-btn.voice {
             background: rgba(255,255,255,0.5);
-            border-radius: 16px; padding: 20px;
-            margin-bottom: 30px;
+            border: 2px solid rgba(255,255,255,0.6);
         }
-        .intro-phase {
-            display: flex; align-items: center; gap: 12px;
-            margin-bottom: 12px; font-size: 13px;
-            color: #333;
+        .mode-night .control-btn.voice {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.2);
         }
-        .intro-phase:last-child { margin-bottom: 0; }
-        .intro-phase-icon { font-size: 20px; }
         
-        /* Completion screen / Bilan */
-        .completion-screen {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
-            display: none; flex-direction: column;
-            align-items: center; justify-content: flex-start;
-            padding: 30px 25px; z-index: 200;
+        .control-btn.voice.active {
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            border-color: transparent;
+        }
+        
+        .control-btn.primary {
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            color: white;
+        }
+        
+        .control-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .session-hint {
             text-align: center;
-            overflow-y: auto;
+            font-size: 13px;
+            font-style: italic;
+            margin-top: 10px;
+            transition: color 1s;
         }
-        .completion-screen.active { display: flex; }
+        .mode-day .session-hint { color: rgba(0,0,0,0.5); }
+        .mode-night .session-hint { color: rgba(255,255,255,0.5); }
         
-        .bilan-header {
+        /* Phase de respiration */
+        .breathing-phase {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+        }
+        
+        .breathing-phase.active {
+            display: flex;
+        }
+        
+        .breathing-orb {
+            width: 150px; height: 150px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(100, 200, 255, 0.8) 0%, 
+                rgba(50, 150, 220, 0.6) 40%,
+                rgba(30, 100, 180, 0.4) 70%);
+            box-shadow: 0 0 60px rgba(100, 180, 255, 0.4);
+            margin-bottom: 40px;
+            transition: transform 5s ease-in-out;
+        }
+        
+        .breathing-orb.inhale {
+            transform: scale(1.4);
+        }
+        
+        .breathing-orb.exhale {
+            transform: scale(1);
+        }
+        
+        .breathing-text {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            transition: color 1s;
+        }
+        .mode-day .breathing-text { color: #333; }
+        .mode-night .breathing-text { color: white; }
+        
+        .breathing-count {
+            font-size: 14px;
+            transition: color 1s;
+        }
+        .mode-day .breathing-count { color: rgba(0,0,0,0.5); }
+        .mode-night .breathing-count { color: rgba(255,255,255,0.5); }
+        
+        /* Phase visualisation guidée */
+        .visualize-phase {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .visualize-phase.active {
+            display: flex;
+        }
+        
+        .visualize-orb {
+            width: 120px; height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(255, 215, 0, 0.9) 0%, 
+                rgba(255, 180, 0, 0.7) 40%,
+                rgba(255, 140, 0, 0.5) 70%);
+            box-shadow: 0 0 80px rgba(255, 200, 0, 0.5);
+            margin-bottom: 30px;
+            animation: pulse-glow 4s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 60px rgba(255, 200, 0, 0.4); }
+            50% { transform: scale(1.1); box-shadow: 0 0 100px rgba(255, 200, 0, 0.6); }
+        }
+        
+        .visualize-text {
+            font-size: 18px;
+            font-weight: 500;
+            line-height: 1.7;
+            max-width: 300px;
+            transition: color 1s;
+        }
+        .mode-day .visualize-text { color: #333; }
+        .mode-night .visualize-text { color: rgba(255,255,255,0.9); }
+        
+        /* Phase de fin */
+        .complete-phase {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+        }
+        
+        .complete-phase.active {
+            display: flex;
+        }
+        
+        .complete-emoji {
+            font-size: 70px;
             margin-bottom: 25px;
         }
         
-        .completion-emoji { font-size: 50px; margin-bottom: 10px; }
-        .completion-title {
-            font-size: 22px; font-weight: 600;
-            color: #333;
+        .complete-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            transition: color 1s;
         }
+        .mode-day .complete-title { color: #333; }
+        .mode-night .complete-title { color: white; }
         
-        .bilan-section {
-            width: 100%; margin-bottom: 25px;
+        .complete-subtitle {
+            font-size: 14px;
+            margin-bottom: 30px;
+            transition: color 1s;
         }
+        .mode-day .complete-subtitle { color: rgba(0,0,0,0.5); }
+        .mode-night .complete-subtitle { color: rgba(255,255,255,0.5); }
         
-        .bilan-label {
-            font-size: 14px; color: #333;
-            margin-bottom: 12px; font-weight: 500;
-        }
-        
-        .bilan-label .optional {
-            font-size: 11px; color: rgba(0,0,0,0.4);
-            font-weight: 400;
-        }
-        
-        .rating-scale {
-            display: flex; justify-content: center; gap: 8px;
-            margin-bottom: 8px;
-        }
-        
-        .rating-btn {
-            width: 50px; height: 50px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.5);
-            border: 2px solid rgba(255,255,255,0.7);
-            font-size: 24px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex; align-items: center; justify-content: center;
-        }
-        
-        .rating-btn:hover {
-            background: rgba(255,255,255,0.7);
-            transform: scale(1.1);
-        }
-        
-        .rating-btn.selected {
-            background: rgba(107, 78, 155, 0.3);
-            border-color: #6B4E9B;
-            transform: scale(1.15);
-            box-shadow: 0 0 20px rgba(107, 78, 155, 0.4);
-        }
-        
-        .rating-labels {
-            display: flex; justify-content: space-between;
-            font-size: 11px; color: rgba(0,0,0,0.4);
-            padding: 0 10px;
-        }
-        
-        .bilan-textarea {
-            width: 100%; height: 80px;
-            background: rgba(255,255,255,0.6);
-            border: 2px solid rgba(255,255,255,0.8);
-            border-radius: 16px;
-            padding: 12px 15px;
-            font-family: 'Comfortaa', sans-serif;
-            font-size: 13px;
-            color: #333;
-            resize: none;
-            outline: none;
-            transition: all 0.3s;
-        }
-        
-        .bilan-textarea::placeholder {
-            color: rgba(0,0,0,0.4);
-        }
-        
-        .bilan-textarea:focus {
-            border-color: #6B4E9B;
-            background: rgba(255,255,255,0.8);
-        }
-        
-        .completion-btn {
-            padding: 14px 40px;
-            background: rgba(255,255,255,0.6);
-            border: 2px solid rgba(255,255,255,0.8);
+        .complete-btn {
+            padding: 16px 40px;
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            border: none;
             border-radius: 25px;
+            color: white;
             font-family: 'Comfortaa', sans-serif;
-            font-size: 14px; font-weight: 600;
-            color: #333; cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 10px;
-        }
-        .completion-btn:hover {
-            background: rgba(255,255,255,0.8);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
         }
         
-        /* Daily Tracker */
-        .tracker-container {
-            position: absolute; top: 115px; left: 20px; right: 20px;
-            z-index: 75;
-        }
-        
-        .tracker-card {
-            background: rgba(255,255,255,0.5);
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255,255,255,0.6);
-            border-radius: 16px;
-            padding: 12px 15px;
-        }
-        
-        .tracker-header {
-            display: flex; justify-content: space-between;
-            align-items: center; margin-bottom: 10px;
-        }
-        
-        .streak-display {
-            display: flex; align-items: center; gap: 8px;
-        }
-        
-        .streak-flame { font-size: 18px; }
-        
-        .streak-count {
-            font-size: 14px; font-weight: 600;
-            color: #6B4E9B;
-        }
-        
-        .streak-label {
-            font-size: 11px; color: rgba(0,0,0,0.5);
-        }
-        
-        .tracker-week {
-            display: flex; justify-content: space-between; gap: 6px;
-        }
-        
-        .tracker-day {
-            flex: 1; display: flex; flex-direction: column;
-            align-items: center; gap: 4px;
-        }
-        
-        .tracker-day-label {
-            font-size: 9px; color: rgba(0,0,0,0.5);
-            text-transform: uppercase;
-        }
-        
-        .tracker-day-circle {
-            width: 28px; height: 28px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.5);
-            border: 2px solid rgba(255,255,255,0.7);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 12px;
-            transition: all 0.3s;
-        }
-        
-        .tracker-day-circle.completed {
-            background: rgba(76, 175, 80, 0.4);
-            border-color: #4CAF50;
-        }
-        
-        .tracker-day-circle.today {
-            border-color: #6B4E9B;
-            box-shadow: 0 0 10px rgba(107, 78, 155, 0.3);
-        }
-        
-        .tracker-day-circle.today.completed {
-            background: rgba(107, 78, 155, 0.4);
-            border-color: #6B4E9B;
-        }
-        
-        /* Adjust content position when tracker is visible */
-        .content.with-tracker {
-            top: 195px;
-        }
-        
-        /* Hide tracker during session */
-        .tracker-container.hidden {
+        /* Soir mode spécial - pas de bouton final */
+        .soir-end {
             display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            padding: 30px;
         }
         
-        /* Transition overlay */
-        .transition-overlay {
-            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: none; flex-direction: column;
-            align-items: center; justify-content: center;
-            z-index: 150; text-align: center;
-            animation: fade-in 0.5s ease;
+        .soir-end.active {
+            display: flex;
         }
-        .transition-overlay.active { display: flex; }
-        .transition-emoji { font-size: 50px; margin-bottom: 15px; }
-        .transition-text {
-            font-size: 18px; color: white;
-            font-weight: 500;
+        
+        .soir-end-text {
+            font-size: 20px;
+            color: rgba(255,255,255,0.8);
+            line-height: 1.8;
+            font-style: italic;
         }
-        @keyframes fade-in {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        
+        .soir-moon {
+            font-size: 60px;
+            margin-bottom: 30px;
+            animation: float-moon 6s ease-in-out infinite;
+        }
+        
+        @keyframes float-moon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
     </style>
 </head>
-<body>
-    <div class="phone-frame">
-        <!-- Pétales flottants -->
+<body class="mode-day">
+    <div class="phone-frame mode-day">
+        <!-- Pétales (jour) -->
         <div class="petal"></div><div class="petal"></div><div class="petal"></div>
         <div class="petal"></div><div class="petal"></div><div class="petal"></div>
-        <!-- Nuages -->
-        <div class="cloud">☁️</div><div class="cloud">☁️</div>
+        
+        <!-- Étoiles (nuit) -->
+        <div class="stars" id="stars"></div>
         
         <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
         
         <div class="header">
             <button class="back-btn" onclick="goBack()">←</button>
-            <div class="header-title">✨ Visualisation Guidée</div>
-            <button class="progress-btn" onclick="goToProgress()">📊</button>
+            <div class="header-title" id="headerTitle">✨ Session</div>
         </div>
         
-        <!-- Progress -->
-        <div class="progress-container" id="progressContainer" style="display: none;">
-            <div class="progress-phases">
-                <div class="phase-dot" id="dot0"></div>
-                <div class="phase-dot" id="dot1"></div>
-                <div class="phase-dot" id="dot2"></div>
-                <div class="phase-dot" id="dot3"></div>
-            </div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill"></div>
-            </div>
-        </div>
-        
-        <!-- Daily Tracker -->
-        <div class="tracker-container" id="trackerContainer">
-            <div class="tracker-card">
-                <div class="tracker-header">
-                    <div class="streak-display">
-                        <span class="streak-flame">🔥</span>
-                        <span class="streak-count" id="streakCount">0</span>
-                        <span class="streak-label">jours</span>
+        <div class="content">
+            <!-- Écran choix du mode -->
+            <div class="mode-select" id="modeSelect">
+                <div class="mode-intro">
+                    <div class="mode-intro-emoji">✨</div>
+                    <div class="mode-intro-title">Quelle session ?</div>
+                    <div class="mode-intro-subtitle">Choisis selon ton moment</div>
+                </div>
+                
+                <div class="mode-cards" id="modeCards">
+                    <div class="mode-card" onclick="startSession('matin')">
+                        <div class="mode-card-emoji">🌅</div>
+                        <div class="mode-card-content">
+                            <div class="mode-card-title">Réveil</div>
+                            <div class="mode-card-desc">Lecture + ressenti + respirations</div>
+                        </div>
+                        <div class="mode-card-duration">~3 min</div>
                     </div>
-                    <div class="streak-label" id="monthLabel">Mars 2026</div>
+                    
+                    <div class="mode-card" onclick="startSession('soir')">
+                        <div class="mode-card-emoji">🌙</div>
+                        <div class="mode-card-content">
+                            <div class="mode-card-title">Coucher</div>
+                            <div class="mode-card-desc">Lecture douce, s'endormir dedans</div>
+                        </div>
+                        <div class="mode-card-duration">~3 min</div>
+                    </div>
+                    
+                    <div class="mode-card" onclick="startSession('profonde')">
+                        <div class="mode-card-emoji">🔥</div>
+                        <div class="mode-card-content">
+                            <div class="mode-card-title">Session profonde</div>
+                            <div class="mode-card-desc">Cohérence cardiaque + visualisation complète</div>
+                        </div>
+                        <div class="mode-card-duration">~12 min</div>
+                    </div>
                 </div>
-                <div class="tracker-week" id="trackerWeek">
-                    <!-- Filled by JS -->
-                </div>
-            </div>
-        </div>
-        
-        <!-- Main content -->
-        <div class="content with-tracker" id="mainContent">
-            <div class="orb-container">
-                <div class="ring"></div>
-                <div class="ring"></div>
-                <div class="ring"></div>
-                <div class="orb coherence" id="orb"></div>
-            </div>
-            
-            <div class="phase-info">
-                <div class="phase-emoji" id="phaseEmoji">🧘</div>
-                <div class="phase-title" id="phaseTitle">Prêt à commencer ?</div>
-                <div class="phase-subtitle" id="phaseSubtitle">
-                    Un voyage intérieur de 12 minutes pour te connecter à ton futur.
-                </div>
-                <div class="breathing-guide" id="breathingGuide"></div>
-            </div>
-            
-            <div class="timer" id="timer">12:00</div>
-        </div>
-        
-        <!-- Controls -->
-        <div class="controls" id="controls">
-            <div class="duration-selection">
-                <button class="duration-btn active" onclick="selectDuration(12)">12 min</button>
-                <button class="duration-btn" onclick="selectDuration(15)">15 min</button>
-                <button class="duration-btn voice-btn active" id="voiceBtn" onclick="toggleVoice()">🔊</button>
-            </div>
-            <button class="start-btn" id="startBtn" onclick="toggleSession()">
-                ▶ Commencer
-            </button>
-        </div>
-        
-        <!-- Intro screen -->
-        <div class="intro-screen" id="introScreen">
-            <div class="intro-emoji">🌟</div>
-            <div class="intro-title">Visualisation Guidée</div>
-            <div class="intro-text">
-                Connecte ton cœur à ton futur.<br>
-                Ressens comme si tu y étais déjà.
-            </div>
-            
-            <div class="intro-phases">
-                <div class="intro-phase">
-                    <span class="intro-phase-icon">🫁</span>
-                    <span><strong>Cohérence</strong> — Synchronise cœur & cerveau</span>
-                </div>
-                <div class="intro-phase">
-                    <span class="intro-phase-icon">💗</span>
-                    <span><strong>Ouverture</strong> — Active ton cœur avec gratitude</span>
-                </div>
-                <div class="intro-phase">
-                    <span class="intro-phase-icon">✨</span>
-                    <span><strong>Vision</strong> — Vois et ressens ton futur</span>
-                </div>
-                <div class="intro-phase">
-                    <span class="intro-phase-icon">🙏</span>
-                    <span><strong>Ancrage</strong> — Remercie comme si c'était fait</span>
+                
+                <div class="no-vision-msg" id="noVisionMsg" style="display: none;">
+                    <p>Tu n'as pas encore écrit ta vision.<br>Commence par là !</p>
+                    <button class="no-vision-btn" onclick="goToVision()">🔮 Écrire ma vision</button>
                 </div>
             </div>
             
-            <button class="start-btn" onclick="closeIntro()">
-                ✨ Je suis prêt
-            </button>
-        </div>
-        
-        <!-- Transition overlay -->
-        <div class="transition-overlay" id="transitionOverlay">
-            <div class="transition-emoji" id="transitionEmoji">💗</div>
-            <div class="transition-text" id="transitionText">Ouverture du cœur...</div>
-        </div>
-        
-        <!-- Bilan / Evaluation screen -->
-        <div class="completion-screen" id="completionScreen">
-            <div class="bilan-header">
-                <div class="completion-emoji">✨</div>
-                <div class="completion-title">Bilan de séance</div>
-            </div>
-            
-            <div class="bilan-section">
-                <div class="bilan-label">Intensité émotionnelle ressentie</div>
-                <div class="rating-scale" id="emotionRating">
-                    <button class="rating-btn" data-value="1" onclick="setRating('emotion', 1)">😶</button>
-                    <button class="rating-btn" data-value="2" onclick="setRating('emotion', 2)">🙂</button>
-                    <button class="rating-btn" data-value="3" onclick="setRating('emotion', 3)">😊</button>
-                    <button class="rating-btn" data-value="4" onclick="setRating('emotion', 4)">🥹</button>
-                    <button class="rating-btn" data-value="5" onclick="setRating('emotion', 5)">🤩</button>
+            <!-- Session Matin/Soir : Lecture -->
+            <div class="session-simple" id="sessionReading">
+                <div class="session-phase-label" id="phaseLabel">Lis et ressens</div>
+                
+                <div class="vision-display">
+                    <div class="vision-text" id="visionTextDisplay"></div>
                 </div>
-                <div class="rating-labels">
-                    <span>Faible</span>
-                    <span>Intense</span>
+                
+                <div class="session-hint" id="sessionHint">Ressens chaque mot comme si c'était déjà ta réalité</div>
+                
+                <div class="session-controls">
+                    <button class="control-btn voice" id="voiceBtn" onclick="toggleVoice()">🔊</button>
+                    <button class="control-btn primary" id="nextPhaseBtn" onclick="nextPhase()">→</button>
                 </div>
             </div>
             
-            <div class="bilan-section">
-                <div class="bilan-label">Clarté de la vision</div>
-                <div class="rating-scale" id="clarityRating">
-                    <button class="rating-btn" data-value="1" onclick="setRating('clarity', 1)">🌫️</button>
-                    <button class="rating-btn" data-value="2" onclick="setRating('clarity', 2)">🌥️</button>
-                    <button class="rating-btn" data-value="3" onclick="setRating('clarity', 3)">⛅</button>
-                    <button class="rating-btn" data-value="4" onclick="setRating('clarity', 4)">🌤️</button>
-                    <button class="rating-btn" data-value="5" onclick="setRating('clarity', 5)">☀️</button>
-                </div>
-                <div class="rating-labels">
-                    <span>Floue</span>
-                    <span>Cristalline</span>
-                </div>
+            <!-- Phase respirations -->
+            <div class="breathing-phase" id="breathingPhase">
+                <div class="breathing-orb" id="breathingOrb"></div>
+                <div class="breathing-text" id="breathingText">Inspire...</div>
+                <div class="breathing-count" id="breathingCount">1 / 3</div>
             </div>
             
-            <div class="bilan-section">
-                <div class="bilan-label">Ce que j'ai ressenti <span class="optional">(optionnel)</span></div>
-                <textarea class="bilan-textarea" id="bilanNotes" placeholder="Quelques mots sur ton ressenti, ta vision..."></textarea>
+            <!-- Phase visualisation -->
+            <div class="visualize-phase" id="visualizePhase">
+                <div class="visualize-orb"></div>
+                <div class="visualize-text" id="visualizeText">Ferme les yeux...<br><br>Visualise ta vie idéale...<br><br>Ressens comme si c'était maintenant.</div>
             </div>
             
-            <button class="completion-btn" onclick="saveBilanAndClose()">🌿 Terminer</button>
+            <!-- Phase complète (matin) -->
+            <div class="complete-phase" id="completePhase">
+                <div class="complete-emoji">✨</div>
+                <div class="complete-title">C'est ancré.</div>
+                <div class="complete-subtitle">Ta journée commence dans cette énergie.</div>
+                <button class="complete-btn" onclick="finishSession()">Terminer</button>
+            </div>
+            
+            <!-- Fin soir (pas de bouton) -->
+            <div class="soir-end" id="soirEnd">
+                <div class="soir-moon">🌙</div>
+                <div class="soir-end-text">
+                    Endors-toi dans cette réalité...<br><br>
+                    C'est déjà fait.
+                </div>
+            </div>
         </div>
     </div>
     
     <script>
-        // ========== PHASES CONFIGURATION ==========
-        const PHASES = [
-            {
-                id: 'coherence',
-                name: 'Cohérence',
-                emoji: '🫁',
-                title: 'Cohérence cardiaque',
-                subtitle: 'Respire lentement. Synchronise ton cœur et ton cerveau.',
-                duration: 5 * 60, // 5 min
-                orbClass: 'coherence',
-                type: 'breathing'
-            },
-            {
-                id: 'heart',
-                name: 'Ouverture',
-                emoji: '💗',
-                title: 'Ouverture du cœur',
-                subtitle: 'Place tes mains sur ton cœur. Ressens la gratitude, l\'amour, la joie.',
-                duration: 2.5 * 60, // 2.5 min
-                orbClass: 'heart',
-                type: 'heart',
-                prompts: [
-                    'Sens la douce chaleur dans ta poitrine',
-                    'Pense à tout ce pour quoi tu es reconnaissant',
-                    'Laisse cet amour rayonner doucement en toi',
-                    'Ressens cette joie, cette expansion qui grandit'
-                ]
-            },
-            {
-                id: 'vision',
-                name: 'Vision',
-                emoji: '✨',
-                title: 'Visualisation',
-                subtitle: 'Vois ton futur. Ressens comme si tu y étais MAINTENANT.',
-                duration: 3.5 * 60, // 3.5 min
-                orbClass: 'vision',
-                type: 'vision',
-                prompts: [
-                    'Où es-tu en ce moment. Que vois-tu autour de toi',
-                    'Ressens cette liberté, cette légèreté dans tout ton corps',
-                    'Tu y es déjà. C\'est réel. C\'est maintenant',
-                    'Tous tes sens sont éveillés. Tu ressens chaque détail',
-                    'Cette émotion, ancre-la profondément dans ton corps'
-                ]
-            },
-            {
-                id: 'gratitude',
-                name: 'Ancrage',
-                emoji: '🙏',
-                title: 'Ancrage & Gratitude',
-                subtitle: 'Remercie comme si c\'était déjà fait. Tu es déjà là.',
-                duration: 1 * 60, // 1 min
-                orbClass: 'gratitude',
-                type: 'gratitude',
-                prompts: [
-                    'Merci, pour cette vie que je vis maintenant',
-                    'Je suis reconnaissant d\'être devenu cette personne',
-                    'C\'est fait. C\'est réel. Merci'
-                ]
-            }
-        ];
-        
         // ========== STATE ==========
-        let selectedDuration = 12; // minutes
-        let isRunning = false;
-        let currentPhaseIndex = 0;
-        let phaseTimeRemaining = 0;
-        let totalTimeRemaining = 0;
-        let intervalId = null;
-        let promptIndex = 0;
-        let breathingState = 'inhale';
-        let breathingCount = 5;
-        let audioContext = null;
-        
-        // ========== AUDIO ==========
-        function initAudio() {
-            if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            }
-        }
-        
-        function playBell(frequencies = [396, 528, 639]) {
-            initAudio();
-            const now = audioContext.currentTime;
-            
-            frequencies.forEach((freq, i) => {
-                const osc = audioContext.createOscillator();
-                const gain = audioContext.createGain();
-                
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(freq, now);
-                
-                gain.gain.setValueAtTime(0, now);
-                gain.gain.linearRampToValueAtTime(0.15, now + 0.1);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 4);
-                
-                osc.connect(gain);
-                gain.connect(audioContext.destination);
-                
-                osc.start(now + i * 0.15);
-                osc.stop(now + 4);
-            });
-        }
-        
-        function playTransitionChime() {
-            initAudio();
-            const now = audioContext.currentTime;
-            
-            [528, 639].forEach((freq, i) => {
-                const osc = audioContext.createOscillator();
-                const gain = audioContext.createGain();
-                
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(freq, now);
-                
-                gain.gain.setValueAtTime(0, now);
-                gain.gain.linearRampToValueAtTime(0.1, now + 0.05);
-                gain.gain.exponentialRampToValueAtTime(0.001, now + 2);
-                
-                osc.connect(gain);
-                gain.connect(audioContext.destination);
-                
-                osc.start(now + i * 0.2);
-                osc.stop(now + 2);
-            });
-        }
-        
-        function playBreathingSound(isInhale) {
-            initAudio();
-            const now = audioContext.currentTime;
-            const duration = 5;
-            
-            // Create pink noise
-            const bufferSize = audioContext.sampleRate * duration;
-            const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
-            const data = buffer.getChannelData(0);
-            
-            let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-            for (let i = 0; i < bufferSize; i++) {
-                const white = Math.random() * 2 - 1;
-                b0 = 0.99886 * b0 + white * 0.0555179;
-                b1 = 0.99332 * b1 + white * 0.0750759;
-                b2 = 0.96900 * b2 + white * 0.1538520;
-                b3 = 0.86650 * b3 + white * 0.3104856;
-                b4 = 0.55000 * b4 + white * 0.5329522;
-                b5 = -0.7616 * b5 - white * 0.0168980;
-                data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.05;
-                b6 = white * 0.115926;
-            }
-            
-            const source = audioContext.createBufferSource();
-            source.buffer = buffer;
-            
-            const filter = audioContext.createBiquadFilter();
-            filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(isInhale ? 400 : 250, now);
-            
-            const gain = audioContext.createGain();
-            gain.gain.setValueAtTime(0, now);
-            
-            if (isInhale) {
-                gain.gain.linearRampToValueAtTime(0.15, now + duration * 0.3);
-                gain.gain.linearRampToValueAtTime(0.08, now + duration);
-            } else {
-                gain.gain.linearRampToValueAtTime(0.12, now + duration * 0.2);
-                gain.gain.linearRampToValueAtTime(0, now + duration);
-            }
-            
-            source.connect(filter);
-            filter.connect(gain);
-            gain.connect(audioContext.destination);
-            
-            source.start(now);
-            source.stop(now + duration);
-        }
-        
-        // ========== VOICE GUIDANCE ==========
-        let voiceEnabled = true;
-        let selectedVoice = null;
-        const speechAvailable = typeof speechSynthesis !== 'undefined';
-        
-        function initVoice() {
-            if (!speechAvailable) return;
-            
-            const voices = speechSynthesis.getVoices();
-            
-            // Priority: French feminine voices
-            // Common feminine voice names across platforms
-            const feminineKeywords = ['female', 'femme', 'amélie', 'aurelie', 'marie', 'julie', 'sophie', 'léa', 'emma', 'chloe', 'alice', 'hortense', 'virginie'];
-            
-            // First try to find a French feminine voice
-            selectedVoice = voices.find(v => {
-                const name = v.name.toLowerCase();
-                const isFrench = v.lang.startsWith('fr');
-                const isFeminine = feminineKeywords.some(kw => name.includes(kw));
-                return isFrench && isFeminine;
-            });
-            
-            // Fallback: any French voice
-            if (!selectedVoice) {
-                selectedVoice = voices.find(v => v.lang.startsWith('fr'));
-            }
-            
-            // Last resort: first available voice
-            if (!selectedVoice && voices.length > 0) {
-                selectedVoice = voices[0];
-            }
-            
-            console.log('Selected voice:', selectedVoice?.name);
-        }
-        
-        // Initialize voices when they load
-        if (speechAvailable && speechSynthesis.onvoiceschanged !== undefined) {
-            speechSynthesis.onvoiceschanged = initVoice;
-        }
-        // Also try immediately (some browsers have voices ready)
-        setTimeout(initVoice, 100);
-        
-        function speak(text, rate = 0.75) {
-            if (!voiceEnabled || !speechAvailable) return;
-            
-            // Cancel any ongoing speech
-            speechSynthesis.cancel();
-            
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'fr-FR';
-            utterance.rate = rate;      // Slower = more calming
-            utterance.pitch = 1.15;     // Slightly higher = more feminine
-            utterance.volume = 0.85;    // Slightly softer
-            
-            if (selectedVoice) {
-                utterance.voice = selectedVoice;
-            }
-            
-            speechSynthesis.speak(utterance);
-        }
-        
-        function speakPhaseIntro(phase) {
-            const intros = {
-                'coherence': 'Cohérence cardiaque. Respire lentement. Laisse ton cœur et ton cerveau se synchroniser.',
-                'heart': 'Ouverture du cœur. Place doucement tes mains sur ton cœur. Ressens la gratitude. L\'amour. La paix.',
-                'vision': 'Visualisation. Ferme les yeux. Vois ton futur. Ressens-le comme si tu y étais, maintenant.',
-                'gratitude': 'Ancrage et gratitude. Remercie, comme si tout était déjà accompli. Tu es déjà là.'
-            };
-            speak(intros[phase.id] || phase.title, 0.7);
-        }
-        
-        function speakBreathing(isInhale) {
-            speak(isInhale ? 'Inspire' : 'Expire', 0.8);
-        }
-        
-        function speakPrompt(text) {
-            // Clean text for speech - make it flow better
-            const cleanText = text
-                .replace(/\.\.\./g, ',')
-                .replace(/\?/g, '')
-                .replace(/!/g, '');
-            speak(cleanText, 0.7);
-        }
-        
-        function toggleVoice() {
-            voiceEnabled = !voiceEnabled;
-            const btn = document.getElementById('voiceBtn');
-            if (voiceEnabled) {
-                btn.textContent = '🔊';
-                btn.classList.remove('muted');
-                btn.classList.add('active');
-            } else {
-                btn.textContent = '🔇';
-                btn.classList.add('muted');
-                btn.classList.remove('active');
-                if (speechAvailable) speechSynthesis.cancel();
-            }
-        }
-        
-        // ========== UI UPDATES ==========
-        function updateTimer() {
-            const mins = Math.floor(totalTimeRemaining / 60);
-            const secs = totalTimeRemaining % 60;
-            document.getElementById('timer').textContent = 
-                `${mins}:${secs.toString().padStart(2, '0')}`;
-        }
-        
-        function updateProgress() {
-            const totalDuration = getTotalDuration();
-            const elapsed = totalDuration - totalTimeRemaining;
-            const percent = (elapsed / totalDuration) * 100;
-            document.getElementById('progressFill').style.width = percent + '%';
-        }
-        
-        function updatePhaseDots() {
-            for (let i = 0; i < 4; i++) {
-                const dot = document.getElementById('dot' + i);
-                dot.classList.remove('active', 'completed');
-                if (i < currentPhaseIndex) {
-                    dot.classList.add('completed');
-                } else if (i === currentPhaseIndex) {
-                    dot.classList.add('active');
-                }
-            }
-        }
-        
-        function updatePhaseUI(phase) {
-            const orb = document.getElementById('orb');
-            orb.className = 'orb ' + phase.orbClass;
-            
-            document.getElementById('phaseEmoji').textContent = phase.emoji;
-            document.getElementById('phaseTitle').textContent = phase.title;
-            document.getElementById('phaseSubtitle').textContent = phase.subtitle;
-            
-            updatePhaseDots();
-        }
-        
-        function showBreathingGuide(text) {
-            const guide = document.getElementById('breathingGuide');
-            guide.textContent = text;
-            guide.classList.add('visible');
-        }
-        
-        function hideBreathingGuide() {
-            document.getElementById('breathingGuide').classList.remove('visible');
-        }
-        
-        // ========== DURATION CALCULATION ==========
-        function getTotalDuration() {
-            return selectedDuration * 60;
-        }
-        
-        function calculatePhaseDurations() {
-            // Proportionally adjust phase durations based on selected total
-            const baseDuration = 12 * 60; // 12 min base
-            const totalDuration = getTotalDuration();
-            const ratio = totalDuration / baseDuration;
-            
-            PHASES.forEach(phase => {
-                if (phase.id === 'coherence') {
-                    phase.adjustedDuration = Math.round(5 * 60 * ratio);
-                } else if (phase.id === 'heart') {
-                    phase.adjustedDuration = Math.round(2.5 * 60 * ratio);
-                } else if (phase.id === 'vision') {
-                    phase.adjustedDuration = Math.round(3.5 * 60 * ratio);
-                } else {
-                    phase.adjustedDuration = Math.round(1 * 60 * ratio);
-                }
-            });
-        }
-        
-        // ========== SESSION CONTROL ==========
-        function closeIntro() {
-            document.getElementById('introScreen').classList.add('hidden');
-        }
-        
-        function selectDuration(mins) {
-            selectedDuration = mins;
-            totalTimeRemaining = mins * 60;
-            updateTimer();
-            
-            document.querySelectorAll('.duration-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-        }
-        
-        function toggleSession() {
-            if (isRunning) {
-                stopSession();
-            } else {
-                startSession();
-            }
-        }
-        
-        function startSession() {
-            isRunning = true;
-            currentPhaseIndex = 0;
-            promptIndex = 0;
-            
-            calculatePhaseDurations();
-            totalTimeRemaining = getTotalDuration();
-            phaseTimeRemaining = PHASES[0].adjustedDuration;
-            
-            // UI updates
-            document.getElementById('startBtn').textContent = '⏹ Arrêter';
-            document.getElementById('startBtn').classList.add('stop');
-            document.getElementById('progressContainer').style.display = 'block';
-            
-            // Hide tracker during session
-            hideTrackerDuringSession();
-            
-            // Play starting bell
-            playBell();
-            
-            // Announce first phase after bell
-            setTimeout(() => {
-                speakPhaseIntro(PHASES[0]);
-            }, 1500);
-            
-            // Start first phase
-            startPhase(PHASES[0]);
-            
-            // Main interval
-            intervalId = setInterval(tick, 1000);
-        }
-        
-        function tick() {
-            totalTimeRemaining--;
-            phaseTimeRemaining--;
-            
-            updateTimer();
-            updateProgress();
-            
-            // Phase-specific logic
-            const phase = PHASES[currentPhaseIndex];
-            
-            if (phase.type === 'breathing') {
-                handleBreathing();
-            } else if (phase.prompts) {
-                handlePrompts(phase);
-            }
-            
-            // Check phase completion
-            if (phaseTimeRemaining <= 0) {
-                nextPhase();
-            }
-            
-            // Check session completion
-            if (totalTimeRemaining <= 0) {
-                completeSession();
-            }
-        }
-        
-        function handleBreathing() {
-            breathingCount--;
-            
-            if (breathingCount <= 0) {
-                const orb = document.getElementById('orb');
-                
-                if (breathingState === 'inhale') {
-                    breathingState = 'exhale';
-                    showBreathingGuide('Expire...');
-                    orb.classList.remove('breathing-in');
-                    orb.classList.add('breathing-out');
-                    playBreathingSound(false);
-                    speakBreathing(false);
-                } else {
-                    breathingState = 'inhale';
-                    showBreathingGuide('Inspire...');
-                    orb.classList.remove('breathing-out');
-                    orb.classList.add('breathing-in');
-                    playBreathingSound(true);
-                    speakBreathing(true);
-                }
-                
-                breathingCount = 5;
-            }
-            
-            // Show countdown
-            const guide = document.getElementById('breathingGuide');
-            if (guide.classList.contains('visible')) {
-                const currentText = breathingState === 'inhale' ? 'Inspire' : 'Expire';
-                guide.textContent = `${currentText}... ${breathingCount}`;
-            }
-        }
-        
-        function handlePrompts(phase) {
-            // Show prompts at intervals
-            const promptInterval = Math.floor(phase.adjustedDuration / (phase.prompts.length + 1));
-            const elapsed = phase.adjustedDuration - phaseTimeRemaining;
-            const expectedPrompts = Math.floor(elapsed / promptInterval);
-            
-            if (expectedPrompts > promptIndex && promptIndex < phase.prompts.length) {
-                const prompt = phase.prompts[promptIndex];
-                showBreathingGuide(prompt);
-                speakPrompt(prompt);
-                promptIndex++;
-            }
-        }
-        
-        function startPhase(phase) {
-            promptIndex = 0;
-            breathingState = 'inhale';
-            breathingCount = 5;
-            
-            updatePhaseUI(phase);
-            
-            const orb = document.getElementById('orb');
-            orb.classList.remove('breathing-in', 'breathing-out', 'heartbeat', 'expanding');
-            
-            if (phase.type === 'breathing') {
-                showBreathingGuide('Inspire... 5');
-                orb.classList.add('breathing-in');
-                playBreathingSound(true);
-            } else if (phase.type === 'heart') {
-                orb.classList.add('heartbeat');
-                showBreathingGuide('Place tes mains sur ton cœur...');
-            } else if (phase.type === 'vision') {
-                orb.classList.add('expanding');
-                showBreathingGuide('Ferme les yeux... Vois ton futur...');
-            } else if (phase.type === 'gratitude') {
-                showBreathingGuide('Merci...');
-            }
-        }
-        
-        function nextPhase() {
-            currentPhaseIndex++;
-            
-            if (currentPhaseIndex >= PHASES.length) {
-                return; // Will be handled by completeSession
-            }
-            
-            const nextPhaseData = PHASES[currentPhaseIndex];
-            phaseTimeRemaining = nextPhaseData.adjustedDuration;
-            
-            // Show transition
-            showTransition(nextPhaseData);
-        }
-        
-        function showTransition(phase) {
-            const overlay = document.getElementById('transitionOverlay');
-            document.getElementById('transitionEmoji').textContent = phase.emoji;
-            document.getElementById('transitionText').textContent = phase.name + '...';
-            overlay.classList.add('active');
-            
-            playTransitionChime();
-            
-            // Announce phase with voice
-            setTimeout(() => {
-                speakPhaseIntro(phase);
-            }, 500);
-            
-            setTimeout(() => {
-                overlay.classList.remove('active');
-                startPhase(phase);
-            }, 3500); // Extended to let voice finish
-        }
-        
-        function stopSession() {
-            isRunning = false;
-            clearInterval(intervalId);
-            if (speechAvailable) speechSynthesis.cancel(); // Stop any ongoing speech
-            
-            document.getElementById('startBtn').textContent = '▶ Commencer';
-            document.getElementById('startBtn').classList.remove('stop');
-            document.getElementById('progressContainer').style.display = 'none';
-            
-            const orb = document.getElementById('orb');
-            orb.className = 'orb coherence';
-            
-            hideBreathingGuide();
-            
-            document.getElementById('phaseEmoji').textContent = '🧘';
-            document.getElementById('phaseTitle').textContent = 'Prêt à commencer ?';
-            document.getElementById('phaseSubtitle').textContent = 
-                'Un voyage intérieur de ' + selectedDuration + ' minutes pour te connecter à ton futur.';
-            
-            totalTimeRemaining = selectedDuration * 60;
-            updateTimer();
-            
-            // Show tracker again
-            showTracker();
-        }
-        
-        function completeSession() {
-            stopSession();
-            playBell([528, 639, 741]); // Completion bell
-            
-            // Speak completion
-            setTimeout(() => {
-                speak('Bravo. Prends un moment pour évaluer ta séance.', 0.65);
-            }, 1500);
-            
-            // Reset bilan state
-            currentBilan = {
-                emotion: 0,
-                clarity: 0,
-                notes: ''
-            };
-            
-            // Reset UI
-            document.querySelectorAll('.rating-btn').forEach(btn => btn.classList.remove('selected'));
-            document.getElementById('bilanNotes').value = '';
-            
-            // Show bilan screen
-            document.getElementById('completionScreen').classList.add('active');
-        }
-        
-        // ========== BILAN FUNCTIONS ==========
-        let currentBilan = {
-            emotion: 0,
-            clarity: 0,
-            notes: ''
-        };
-        
-        function setRating(type, value) {
-            currentBilan[type] = value;
-            
-            // Update UI
-            const containerId = type === 'emotion' ? 'emotionRating' : 'clarityRating';
-            const container = document.getElementById(containerId);
-            container.querySelectorAll('.rating-btn').forEach(btn => {
-                btn.classList.remove('selected');
-                if (parseInt(btn.dataset.value) === value) {
-                    btn.classList.add('selected');
-                }
-            });
-        }
-        
-        function saveBilanAndClose() {
-            // Get notes
-            currentBilan.notes = document.getElementById('bilanNotes').value.trim();
-            
-            // Get today's date key
-            const today = new Date().toISOString().split('T')[0];
-            
-            // Save session with bilan
-            const sessions = JSON.parse(localStorage.getItem('wutree_visualization_sessions') || '[]');
-            sessions.push({
-                date: new Date().toISOString(),
-                duration: selectedDuration,
-                bilan: {
-                    emotion: currentBilan.emotion,
-                    clarity: currentBilan.clarity,
-                    notes: currentBilan.notes
-                }
-            });
-            localStorage.setItem('wutree_visualization_sessions', JSON.stringify(sessions));
-            
-            // Mark today as completed
-            const completedDays = JSON.parse(localStorage.getItem('wutree_visualization_tracker') || '[]');
-            if (!completedDays.includes(today)) {
-                completedDays.push(today);
-                localStorage.setItem('wutree_visualization_tracker', JSON.stringify(completedDays));
-            }
-            
-            // Update tracker display
-            updateTracker();
-            
-            // Close screen
-            document.getElementById('completionScreen').classList.remove('active');
-        }
-        
-        // ========== TRACKER FUNCTIONS ==========
-        function updateTracker() {
-            const completedDays = JSON.parse(localStorage.getItem('wutree_visualization_tracker') || '[]');
-            const today = new Date();
-            const todayStr = today.toISOString().split('T')[0];
-            
-            // Calculate streak
-            let streak = 0;
-            let checkDate = new Date(today);
-            
-            // If today is completed, start counting from today
-            // Otherwise, start from yesterday
-            if (!completedDays.includes(todayStr)) {
-                checkDate.setDate(checkDate.getDate() - 1);
-            }
-            
-            while (true) {
-                const dateStr = checkDate.toISOString().split('T')[0];
-                if (completedDays.includes(dateStr)) {
-                    streak++;
-                    checkDate.setDate(checkDate.getDate() - 1);
-                } else {
-                    break;
-                }
-            }
-            
-            // Update streak display
-            document.getElementById('streakCount').textContent = streak;
-            
-            // Update month label
-            const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 
-                           'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
-            document.getElementById('monthLabel').textContent = 
-                months[today.getMonth()] + ' ' + today.getFullYear();
-            
-            // Generate week view (last 7 days)
-            const weekContainer = document.getElementById('trackerWeek');
-            const dayNames = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
-            let weekHTML = '';
-            
-            for (let i = 6; i >= 0; i--) {
-                const date = new Date(today);
-                date.setDate(date.getDate() - i);
-                const dateStr = date.toISOString().split('T')[0];
-                const dayName = dayNames[date.getDay()];
-                const isCompleted = completedDays.includes(dateStr);
-                const isToday = dateStr === todayStr;
-                
-                let classes = 'tracker-day-circle';
-                if (isCompleted) classes += ' completed';
-                if (isToday) classes += ' today';
-                
-                weekHTML += `
-                    <div class="tracker-day">
-                        <span class="tracker-day-label">${dayName}</span>
-                        <div class="${classes}">
-                            ${isCompleted ? '✓' : ''}
-                        </div>
-                    </div>
-                `;
-            }
-            
-            weekContainer.innerHTML = weekHTML;
-        }
-        
-        function hideTrackerDuringSession() {
-            document.getElementById('trackerContainer').classList.add('hidden');
-            document.getElementById('mainContent').classList.remove('with-tracker');
-        }
-        
-        function showTracker() {
-            document.getElementById('trackerContainer').classList.remove('hidden');
-            document.getElementById('mainContent').classList.add('with-tracker');
-        }
-        
-        function closeCompletion() {
-            document.getElementById('completionScreen').classList.remove('active');
-        }
-        
-        function goBack() {
-            if (isRunning) {
-                if (confirm('Arrêter la session ?')) {
-                    stopSession();
-                    window.location.href = 'wu-tree-v2-visualization.html';
-                }
-            } else {
-                window.location.href = 'wu-tree-v2-visualization.html';
-            }
-        }
-        
-        function goToProgress() {
-            window.location.href = 'wu-tree-v2-progress.html';
-        }
+        let visionData = JSON.parse(localStorage.getItem('wutree_vision') || 'null');
+        let currentMode = null; // 'matin', 'soir', 'profonde'
+        let currentPhase = 0;
+        let isVoiceActive = false;
+        let speechSynth = window.speechSynthesis;
+        let breathCount = 0;
+        let breathInterval = null;
         
         // ========== INIT ==========
-        updateTimer();
-        updateTracker();
-        
-        // Hide voice button if speech synthesis not available
-        if (!speechAvailable) {
-            const voiceBtn = document.getElementById('voiceBtn');
-            if (voiceBtn) voiceBtn.style.display = 'none';
+        function init() {
+            generateStars();
+            
+            if (!visionData || !visionData.text) {
+                document.getElementById('modeCards').style.display = 'none';
+                document.getElementById('noVisionMsg').style.display = 'block';
+            }
         }
+        
+        function generateStars() {
+            const container = document.getElementById('stars');
+            for (let i = 0; i < 50; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                star.style.width = (Math.random() * 2 + 1) + 'px';
+                star.style.height = star.style.width;
+                container.appendChild(star);
+            }
+        }
+        
+        // ========== MODE SWITCH ==========
+        function setDayMode() {
+            document.body.className = 'mode-day';
+            document.querySelector('.phone-frame').className = 'phone-frame mode-day';
+        }
+        
+        function setNightMode() {
+            document.body.className = 'mode-night';
+            document.querySelector('.phone-frame').className = 'phone-frame mode-night';
+        }
+        
+        // ========== START SESSION ==========
+        function startSession(mode) {
+            currentMode = mode;
+            currentPhase = 0;
+            
+            if (mode === 'soir') {
+                setNightMode();
+                document.getElementById('headerTitle').textContent = '🌙 Session Soir';
+            } else if (mode === 'matin') {
+                setDayMode();
+                document.getElementById('headerTitle').textContent = '🌅 Session Réveil';
+            } else {
+                setDayMode();
+                document.getElementById('headerTitle').textContent = '🔥 Session Profonde';
+                // Pour la session profonde, on pourrait rediriger vers l'ancienne page
+                // ou l'intégrer ici. Pour l'instant, on fait comme matin avec plus de phases
+            }
+            
+            // Afficher la vision
+            document.getElementById('visionTextDisplay').textContent = visionData.text;
+            
+            // Cacher sélection, afficher session
+            document.getElementById('modeSelect').classList.add('hidden');
+            document.getElementById('sessionReading').classList.add('active');
+            
+            // Adapter les hints selon le mode
+            if (mode === 'soir') {
+                document.getElementById('phaseLabel').textContent = 'Lis doucement...';
+                document.getElementById('sessionHint').textContent = 'Laisse ces mots t\'accompagner vers le sommeil';
+            } else {
+                document.getElementById('phaseLabel').textContent = 'Lis et ressens';
+                document.getElementById('sessionHint').textContent = 'Ressens chaque mot comme si c\'était déjà ta réalité';
+            }
+        }
+        
+        // ========== VOICE ==========
+        function toggleVoice() {
+            const btn = document.getElementById('voiceBtn');
+            
+            if (isVoiceActive) {
+                speechSynth.cancel();
+                isVoiceActive = false;
+                btn.classList.remove('active');
+                btn.textContent = '🔊';
+            } else {
+                readVision();
+                isVoiceActive = true;
+                btn.classList.add('active');
+                btn.textContent = '🔇';
+            }
+        }
+        
+        function readVision() {
+            if (!visionData || !visionData.text) return;
+            
+            const utterance = new SpeechSynthesisUtterance(visionData.text);
+            utterance.lang = 'fr-FR';
+            utterance.rate = currentMode === 'soir' ? 0.7 : 0.8;
+            utterance.pitch = 1.1;
+            
+            // Chercher une voix féminine française
+            const voices = speechSynth.getVoices();
+            const frenchVoice = voices.find(v => v.lang.includes('fr') && v.name.toLowerCase().includes('female')) 
+                || voices.find(v => v.lang.includes('fr'));
+            if (frenchVoice) utterance.voice = frenchVoice;
+            
+            utterance.onend = () => {
+                isVoiceActive = false;
+                document.getElementById('voiceBtn').classList.remove('active');
+                document.getElementById('voiceBtn').textContent = '🔊';
+            };
+            
+            speechSynth.speak(utterance);
+        }
+        
+        // ========== PHASES ==========
+        function nextPhase() {
+            currentPhase++;
+            
+            if (currentMode === 'matin' || currentMode === 'profonde') {
+                if (currentPhase === 1) {
+                    // Phase respirations
+                    document.getElementById('sessionReading').classList.remove('active');
+                    document.getElementById('breathingPhase').classList.add('active');
+                    startBreathing();
+                } else if (currentPhase === 2) {
+                    // Phase visualisation
+                    document.getElementById('breathingPhase').classList.remove('active');
+                    document.getElementById('visualizePhase').classList.add('active');
+                    
+                    // Timer puis fin
+                    setTimeout(() => {
+                        nextPhase();
+                    }, currentMode === 'profonde' ? 60000 : 20000); // 1 min ou 20s
+                } else {
+                    // Fin
+                    document.getElementById('visualizePhase').classList.remove('active');
+                    document.getElementById('completePhase').classList.add('active');
+                    saveSession();
+                }
+            } else if (currentMode === 'soir') {
+                if (currentPhase === 1) {
+                    // Respirations douces
+                    document.getElementById('sessionReading').classList.remove('active');
+                    document.getElementById('breathingPhase').classList.add('active');
+                    startBreathing();
+                } else {
+                    // Fin soir - pas de bouton
+                    document.getElementById('breathingPhase').classList.remove('active');
+                    document.getElementById('soirEnd').classList.add('active');
+                    saveSession();
+                }
+            }
+        }
+        
+        function startBreathing() {
+            breathCount = 0;
+            const totalBreaths = currentMode === 'profonde' ? 5 : 3;
+            
+            document.getElementById('breathingCount').textContent = `1 / ${totalBreaths}`;
+            
+            breathCycle(totalBreaths);
+        }
+        
+        function breathCycle(total) {
+            const orb = document.getElementById('breathingOrb');
+            const text = document.getElementById('breathingText');
+            const count = document.getElementById('breathingCount');
+            
+            // Inspire
+            orb.classList.remove('exhale');
+            orb.classList.add('inhale');
+            text.textContent = 'Inspire...';
+            
+            setTimeout(() => {
+                // Expire
+                orb.classList.remove('inhale');
+                orb.classList.add('exhale');
+                text.textContent = 'Expire...';
+                
+                setTimeout(() => {
+                    breathCount++;
+                    count.textContent = `${breathCount + 1} / ${total}`;
+                    
+                    if (breathCount < total) {
+                        breathCycle(total);
+                    } else {
+                        // Fin respirations
+                        setTimeout(() => {
+                            nextPhase();
+                        }, 1000);
+                    }
+                }, 5000);
+            }, 5000);
+        }
+        
+        // ========== SAVE ==========
+        function saveSession() {
+            const sessions = JSON.parse(localStorage.getItem('wutree_visualization_sessions') || '[]');
+            const today = new Date().toISOString().split('T')[0];
+            
+            sessions.push({
+                date: today,
+                mode: currentMode,
+                timestamp: new Date().toISOString()
+            });
+            
+            localStorage.setItem('wutree_visualization_sessions', JSON.stringify(sessions));
+            
+            // Tracker
+            const tracker = JSON.parse(localStorage.getItem('wutree_visualization_tracker') || '[]');
+            if (!tracker.includes(today)) {
+                tracker.push(today);
+                localStorage.setItem('wutree_visualization_tracker', JSON.stringify(tracker));
+            }
+        }
+        
+        function finishSession() {
+            goBack();
+        }
+        
+        // ========== NAVIGATION ==========
+        function goBack() {
+            speechSynth.cancel();
+            window.location.href = 'wu-tree-v2-visualization.html';
+        }
+        
+        function goToVision() {
+            window.location.href = 'wu-tree-v2-vision.html';
+        }
+        
+        // ========== LOAD VOICES ==========
+        speechSynth.onvoiceschanged = () => {
+            // Voices loaded
+        };
+        
+        // ========== START ==========
+        init();
     </script>
 </body>
 </html>
