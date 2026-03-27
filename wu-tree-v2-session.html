@@ -13,20 +13,18 @@
             min-height: 100vh;
             display: flex; justify-content: center; align-items: center;
             padding: 20px;
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
             transition: background 1s;
         }
         
-        body.mode-day {
-            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
-        }
-        
-        body.mode-night {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        body.night-mode {
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
         }
         
         .phone-frame {
             width: 100%; max-width: 390px;
             height: 844px; max-height: 95vh;
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
             border-radius: 45px;
             position: relative;
             overflow: hidden;
@@ -34,12 +32,8 @@
             transition: background 1s;
         }
         
-        .phone-frame.mode-day {
-            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
-        }
-        
-        .phone-frame.mode-night {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        body.night-mode .phone-frame {
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
         }
         
         /* Pétales (jour) */
@@ -51,9 +45,8 @@
             animation: fall linear infinite;
             pointer-events: none;
             z-index: 10;
-            transition: opacity 1s;
         }
-        .mode-night .petal { opacity: 0; }
+        body.night-mode .petal { display: none; }
         .petal:nth-child(1) { left: 10%; animation-duration: 12s; }
         .petal:nth-child(2) { left: 25%; animation-duration: 14s; animation-delay: 2s; }
         .petal:nth-child(3) { left: 40%; animation-duration: 16s; animation-delay: 4s; }
@@ -71,11 +64,10 @@
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
             pointer-events: none;
-            z-index: 5;
-            opacity: 0;
-            transition: opacity 1s;
+            z-index: 1;
+            display: none;
         }
-        .mode-night .stars { opacity: 1; }
+        body.night-mode .stars { display: block; }
         
         .star {
             position: absolute;
@@ -97,12 +89,11 @@
             justify-content: space-between;
             font-size: 14px;
             font-weight: 600;
+            color: rgba(0,0,0,0.6);
             position: relative;
             z-index: 100;
-            transition: color 1s;
         }
-        .mode-day .status-bar { color: rgba(0,0,0,0.6); }
-        .mode-night .status-bar { color: rgba(255,255,255,0.6); }
+        body.night-mode .status-bar { color: rgba(255,255,255,0.7); }
         
         .header {
             padding: 10px 20px 15px;
@@ -115,33 +106,46 @@
         
         .back-btn {
             width: 44px; height: 44px;
+            background: rgba(255,255,255,0.5);
             backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.6);
             border-radius: 50%;
+            color: #333;
             font-size: 20px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s;
         }
-        .mode-day .back-btn {
-            background: rgba(255,255,255,0.5);
-            border: 2px solid rgba(255,255,255,0.6);
-            color: #333;
-        }
-        .mode-night .back-btn {
+        body.night-mode .back-btn {
             background: rgba(255,255,255,0.1);
-            border: 2px solid rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.2);
             color: white;
         }
         
         .header-title {
+            flex: 1;
             font-size: 18px;
             font-weight: 600;
-            transition: color 1s;
+            color: #333;
         }
-        .mode-day .header-title { color: #333; }
-        .mode-night .header-title { color: white; }
+        body.night-mode .header-title { color: white; }
+        
+        .voice-btn {
+            width: 44px; height: 44px;
+            background: rgba(255,255,255,0.5);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: none;
+        }
+        body.night-mode .voice-btn {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.2);
+        }
+        .voice-btn.visible { display: flex; align-items: center; justify-content: center; }
+        .voice-btn.muted { opacity: 0.5; }
         
         .content {
             position: relative;
@@ -167,22 +171,9 @@
             margin-bottom: 25px;
         }
         
-        .mode-intro-emoji {
-            font-size: 50px;
-            margin-bottom: 12px;
-        }
-        
-        .mode-intro-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 6px;
-        }
-        
-        .mode-intro-subtitle {
-            font-size: 11px;
-            color: rgba(0,0,0,0.5);
-        }
+        .mode-intro-emoji { font-size: 50px; margin-bottom: 12px; }
+        .mode-intro-title { font-size: 18px; font-weight: 600; color: #333; margin-bottom: 6px; }
+        .mode-intro-subtitle { font-size: 11px; color: rgba(0,0,0,0.5); }
         
         .mode-cards {
             display: flex;
@@ -203,47 +194,17 @@
             gap: 16px;
         }
         
-        .mode-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-        }
+        .mode-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+        .mode-card:active { transform: scale(0.98); }
         
-        .mode-card:active {
-            transform: scale(0.98);
-        }
-        
-        .mode-card-emoji {
-            font-size: 36px;
-            width: 50px;
-            text-align: center;
-        }
-        
-        .mode-card-content {
-            flex: 1;
-        }
-        
-        .mode-card-title {
-            font-size: 15px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 4px;
-        }
-        
-        .mode-card-desc {
-            font-size: 11px;
-            color: rgba(0,0,0,0.5);
-            line-height: 1.4;
-        }
-        
-        .mode-card-duration {
-            font-size: 11px;
-            color: #6B4E9B;
-            font-weight: 600;
-        }
+        .mode-card-emoji { font-size: 36px; width: 50px; text-align: center; }
+        .mode-card-content { flex: 1; }
+        .mode-card-title { font-size: 15px; font-weight: 600; color: #333; margin-bottom: 4px; }
+        .mode-card-desc { font-size: 11px; color: rgba(0,0,0,0.5); line-height: 1.4; }
+        .mode-card-duration { font-size: 11px; color: #6B4E9B; font-weight: 600; }
         
         .mode-card-check {
-            width: 28px;
-            height: 28px;
+            width: 28px; height: 28px;
             border-radius: 50%;
             background: #4CAF50;
             color: white;
@@ -251,17 +212,9 @@
             display: none;
             align-items: center;
             justify-content: center;
-            flex-shrink: 0;
         }
-        
-        .mode-card.completed .mode-card-check {
-            display: flex;
-        }
-        
-        .mode-card.completed {
-            border-color: rgba(76, 175, 80, 0.5);
-            background: rgba(76, 175, 80, 0.1);
-        }
+        .mode-card.completed .mode-card-check { display: flex; }
+        .mode-card.completed { border-color: rgba(76, 175, 80, 0.5); background: rgba(76, 175, 80, 0.1); }
         
         .daily-summary {
             display: flex;
@@ -271,29 +224,25 @@
             padding: 15px;
             background: rgba(255,255,255,0.4);
             border-radius: 16px;
+            flex-wrap: wrap;
         }
         
-        .daily-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-        }
+        .daily-item { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .daily-icon { font-size: 20px; opacity: 0.4; }
+        .daily-icon.done { opacity: 1; }
+        .daily-label { font-size: 9px; color: rgba(0,0,0,0.5); text-transform: uppercase; }
         
-        .daily-icon {
-            font-size: 20px;
-            opacity: 0.4;
+        .day-complete-msg {
+            display: none;
+            width: 100%;
+            text-align: center;
+            margin-top: 5px;
+            font-size: 11px;
+            color: #4CAF50;
+            font-weight: 600;
         }
-        
-        .daily-icon.done {
-            opacity: 1;
-        }
-        
-        .daily-label {
-            font-size: 9px;
-            color: rgba(0,0,0,0.5);
-            text-transform: uppercase;
-        }
+        .daily-summary.day-complete { background: rgba(76, 175, 80, 0.2); border: 2px solid rgba(76, 175, 80, 0.4); }
+        .daily-summary.day-complete .day-complete-msg { display: block; }
         
         .streak-display {
             text-align: center;
@@ -301,11 +250,7 @@
             font-size: 12px;
             color: rgba(0,0,0,0.5);
         }
-        
-        .streak-display span {
-            color: #6B4E9B;
-            font-weight: 600;
-        }
+        .streak-display span { color: #6B4E9B; font-weight: 600; }
         
         .no-vision-msg {
             text-align: center;
@@ -314,13 +259,7 @@
             border-radius: 20px;
             margin-top: 20px;
         }
-        
-        .no-vision-msg p {
-            font-size: 13px;
-            color: #333;
-            margin-bottom: 15px;
-        }
-        
+        .no-vision-msg p { font-size: 13px; color: #333; margin-bottom: 15px; }
         .no-vision-btn {
             padding: 12px 25px;
             background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
@@ -333,28 +272,186 @@
             cursor: pointer;
         }
         
-        /* ========== SESSION MATIN/SOIR ========== */
-        .session-simple {
+        /* ========== SESSION PROFONDE - 4 PHASES ========== */
+        .deep-session {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+        }
+        .deep-session.active { display: flex; }
+        
+        /* Progress dots */
+        .phase-progress {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .phase-dot {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            border: 2px solid rgba(255,255,255,0.6);
+            transition: all 0.5s;
+        }
+        body.night-mode .phase-dot {
+            background: rgba(255,255,255,0.2);
+            border-color: rgba(255,255,255,0.3);
+        }
+        .phase-dot.active {
+            background: #6B4E9B;
+            border-color: #6B4E9B;
+            box-shadow: 0 0 15px rgba(107, 78, 155, 0.6);
+        }
+        .phase-dot.completed {
+            background: #4CAF50;
+            border-color: #4CAF50;
+        }
+        
+        /* Orbe central */
+        .orb-container {
+            position: relative;
+            width: 200px; height: 200px;
+            margin-bottom: 30px;
+        }
+        
+        .orb {
+            width: 150px; height: 150px;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 1s ease;
+        }
+        
+        .orb.coherence {
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(100, 200, 255, 0.9) 0%, 
+                rgba(50, 150, 220, 0.7) 40%,
+                rgba(30, 100, 180, 0.5) 70%);
+            box-shadow: 0 0 60px rgba(100, 180, 255, 0.5),
+                        0 0 120px rgba(50, 120, 200, 0.3);
+        }
+        
+        .orb.heart {
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(255, 100, 150, 0.9) 0%, 
+                rgba(220, 50, 100, 0.7) 40%,
+                rgba(180, 30, 80, 0.5) 70%);
+            box-shadow: 0 0 60px rgba(255, 100, 150, 0.5),
+                        0 0 120px rgba(220, 50, 100, 0.3);
+        }
+        
+        .orb.vision {
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(255, 215, 0, 0.9) 0%, 
+                rgba(255, 180, 0, 0.7) 40%,
+                rgba(255, 140, 0, 0.5) 70%);
+            box-shadow: 0 0 80px rgba(255, 200, 0, 0.5),
+                        0 0 150px rgba(255, 140, 0, 0.3);
+        }
+        
+        .orb.gratitude {
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(150, 255, 150, 0.9) 0%, 
+                rgba(100, 220, 100, 0.7) 40%,
+                rgba(50, 180, 80, 0.5) 70%);
+            box-shadow: 0 0 80px rgba(100, 255, 100, 0.5),
+                        0 0 150px rgba(50, 200, 80, 0.3);
+        }
+        
+        /* Breathing animation */
+        .orb.breathing { animation: breathe 10s ease-in-out infinite; }
+        @keyframes breathe {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.25); }
+        }
+        
+        /* Heartbeat animation */
+        .orb.heartbeat { animation: heartbeat 1.5s ease-in-out infinite; }
+        @keyframes heartbeat {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            15% { transform: translate(-50%, -50%) scale(1.15); }
+            30% { transform: translate(-50%, -50%) scale(1); }
+            45% { transform: translate(-50%, -50%) scale(1.1); }
+        }
+        
+        /* Glow pulse */
+        .orb.glow-pulse { animation: glow-pulse 4s ease-in-out infinite; }
+        @keyframes glow-pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.9; }
+        }
+        
+        /* Rings */
+        .ring {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 2px solid rgba(107, 78, 155, 0.3);
+            animation: ring-expand 4s ease-out infinite;
+        }
+        .ring:nth-child(2) { animation-delay: 1s; }
+        .ring:nth-child(3) { animation-delay: 2s; }
+        
+        @keyframes ring-expand {
+            0% { width: 150px; height: 150px; opacity: 0.5; }
+            100% { width: 250px; height: 250px; opacity: 0; }
+        }
+        
+        .phase-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #6B4E9B;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+        
+        .phase-instruction {
+            font-size: 20px;
+            font-weight: 500;
+            color: #333;
+            line-height: 1.6;
+            max-width: 300px;
+            margin-bottom: 15px;
+        }
+        
+        .phase-timer {
+            font-size: 28px;
+            font-weight: 700;
+            color: #6B4E9B;
+        }
+        
+        .breathing-hint {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-top: 10px;
+        }
+        
+        /* ========== SESSION SIMPLE (matin/soir) ========== */
+        .simple-session {
             display: none;
             flex-direction: column;
             height: 100%;
         }
+        .simple-session.active { display: flex; }
         
-        .session-simple.active {
-            display: flex;
-        }
-        
-        .session-phase-label {
+        .simple-phase-label {
             text-align: center;
             font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-bottom: 15px;
-            transition: color 1s;
+            color: #6B4E9B;
         }
-        .mode-day .session-phase-label { color: #6B4E9B; }
-        .mode-night .session-phase-label { color: rgba(255,255,255,0.6); }
+        body.night-mode .simple-phase-label { color: rgba(255,255,255,0.6); }
         
         .vision-display {
             flex: 1;
@@ -364,10 +461,8 @@
             border-radius: 24px;
             padding: 25px;
             overflow-y: auto;
-            transition: all 1s;
         }
-        
-        .mode-night .vision-display {
+        body.night-mode .vision-display {
             background: rgba(255,255,255,0.08);
             border-color: rgba(255,255,255,0.15);
         }
@@ -376,26 +471,24 @@
             font-size: 15px;
             line-height: 1.9;
             white-space: pre-wrap;
-            transition: color 1s;
+            color: #333;
         }
-        .mode-day .vision-text { color: #333; }
-        .mode-night .vision-text { color: rgba(255,255,255,0.9); }
+        body.night-mode .vision-text { color: rgba(255,255,255,0.9); }
         
-        /* Highlight pendant lecture */
-        .vision-text.reading {
-            opacity: 0.6;
+        .simple-hint {
+            text-align: center;
+            font-size: 13px;
+            font-style: italic;
+            margin-top: 15px;
+            color: rgba(0,0,0,0.5);
         }
+        body.night-mode .simple-hint { color: rgba(255,255,255,0.5); }
         
-        .vision-text .current-sentence {
-            opacity: 1;
-            font-weight: 600;
-        }
-        
-        .session-controls {
+        .simple-controls {
             display: flex;
-            gap: 10px;
-            padding: 20px 0;
+            gap: 15px;
             justify-content: center;
+            padding: 20px 0;
         }
         
         .control-btn {
@@ -410,198 +503,118 @@
             transition: all 0.3s;
         }
         
-        .control-btn.voice {
+        .control-btn.voice-toggle {
             background: rgba(255,255,255,0.5);
             border: 2px solid rgba(255,255,255,0.6);
         }
-        .mode-night .control-btn.voice {
-            background: rgba(255,255,255,0.1);
-            border-color: rgba(255,255,255,0.2);
-        }
-        
-        .control-btn.voice.active {
+        .control-btn.voice-toggle.active {
             background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
             border-color: transparent;
+            color: white;
         }
         
-        .control-btn.primary {
+        .control-btn.next {
             background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
             color: white;
         }
         
-        .control-btn:active {
-            transform: scale(0.95);
-        }
+        .control-btn:active { transform: scale(0.95); }
         
-        .session-hint {
-            text-align: center;
-            font-size: 13px;
-            font-style: italic;
-            margin-top: 10px;
-            transition: color 1s;
-        }
-        .mode-day .session-hint { color: rgba(0,0,0,0.5); }
-        .mode-night .session-hint { color: rgba(255,255,255,0.5); }
-        
-        /* Phase de respiration */
-        .breathing-phase {
+        /* ========== BILAN ========== */
+        .bilan-screen {
             display: none;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            height: 100%;
-            text-align: center;
+            padding: 20px 0;
         }
+        .bilan-screen.active { display: flex; }
         
-        .breathing-phase.active {
-            display: flex;
-        }
-        
-        .breathing-orb {
-            width: 150px; height: 150px;
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, 
-                rgba(100, 200, 255, 0.8) 0%, 
-                rgba(50, 150, 220, 0.6) 40%,
-                rgba(30, 100, 180, 0.4) 70%);
-            box-shadow: 0 0 60px rgba(100, 180, 255, 0.4);
-            margin-bottom: 40px;
-            transition: transform 5s ease-in-out;
-        }
-        
-        .breathing-orb.inhale {
-            transform: scale(1.4);
-        }
-        
-        .breathing-orb.exhale {
-            transform: scale(1);
-        }
-        
-        .breathing-text {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 10px;
-            transition: color 1s;
-        }
-        .mode-day .breathing-text { color: #333; }
-        .mode-night .breathing-text { color: white; }
-        
-        .breathing-count {
-            font-size: 14px;
-            transition: color 1s;
-        }
-        .mode-day .breathing-count { color: rgba(0,0,0,0.5); }
-        .mode-night .breathing-count { color: rgba(255,255,255,0.5); }
-        
-        /* Phase visualisation guidée */
-        .visualize-phase {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            text-align: center;
-            padding: 20px;
-        }
-        
-        .visualize-phase.active {
-            display: flex;
-        }
-        
-        .visualize-orb {
-            width: 120px; height: 120px;
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, 
-                rgba(255, 215, 0, 0.9) 0%, 
-                rgba(255, 180, 0, 0.7) 40%,
-                rgba(255, 140, 0, 0.5) 70%);
-            box-shadow: 0 0 80px rgba(255, 200, 0, 0.5);
+        .bilan-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #333;
             margin-bottom: 30px;
-            animation: pulse-glow 4s ease-in-out infinite;
         }
         
-        @keyframes pulse-glow {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 60px rgba(255, 200, 0, 0.4); }
-            50% { transform: scale(1.1); box-shadow: 0 0 100px rgba(255, 200, 0, 0.6); }
-        }
-        
-        .heart-orb {
-            font-size: 80px;
-            margin-bottom: 30px;
-            animation: heartbeat 1.5s ease-in-out infinite;
-        }
-        
-        @keyframes heartbeat {
-            0%, 100% { transform: scale(1); }
-            15% { transform: scale(1.15); }
-            30% { transform: scale(1); }
-            45% { transform: scale(1.1); }
-        }
-        
-        .gratitude-orb {
-            font-size: 70px;
-            margin-bottom: 30px;
-            animation: gentle-pulse 3s ease-in-out infinite;
-        }
-        
-        @keyframes gentle-pulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.9; }
-        }
-        
-        .coherence-orb {
-            background: radial-gradient(circle at 30% 30%, 
-                rgba(100, 200, 255, 0.8) 0%, 
-                rgba(50, 150, 220, 0.6) 40%,
-                rgba(30, 100, 180, 0.4) 70%);
-            box-shadow: 0 0 60px rgba(100, 180, 255, 0.4);
-        }
-        
-        .visualize-text {
-            font-size: 18px;
-            font-weight: 500;
-            line-height: 1.7;
-            max-width: 300px;
-            transition: color 1s;
-        }
-        .mode-day .visualize-text { color: #333; }
-        .mode-night .visualize-text { color: rgba(255,255,255,0.9); }
-        
-        /* Phase de fin */
-        .complete-phase {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            text-align: center;
-        }
-        
-        .complete-phase.active {
-            display: flex;
-        }
-        
-        .complete-emoji {
-            font-size: 70px;
+        .bilan-section {
+            width: 100%;
             margin-bottom: 25px;
         }
         
-        .complete-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            transition: color 1s;
+        .bilan-label {
+            font-size: 13px;
+            color: rgba(0,0,0,0.6);
+            margin-bottom: 12px;
+            text-align: center;
         }
-        .mode-day .complete-title { color: #333; }
-        .mode-night .complete-title { color: white; }
         
-        .complete-subtitle {
-            font-size: 14px;
-            margin-bottom: 30px;
-            transition: color 1s;
+        .bilan-options {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
         }
-        .mode-day .complete-subtitle { color: rgba(0,0,0,0.5); }
-        .mode-night .complete-subtitle { color: rgba(255,255,255,0.5); }
+        
+        .bilan-option {
+            width: 50px; height: 50px;
+            background: rgba(255,255,255,0.5);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .bilan-option.selected {
+            background: rgba(255,255,255,0.8);
+            border-color: #6B4E9B;
+            transform: scale(1.1);
+        }
+        
+        .bilan-notes {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255,255,255,0.5);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 16px;
+            color: #333;
+            font-family: 'Comfortaa', sans-serif;
+            font-size: 14px;
+            resize: none;
+            height: 80px;
+        }
+        .bilan-notes::placeholder { color: rgba(0,0,0,0.4); }
+        .bilan-notes:focus { border-color: #6B4E9B; outline: none; }
+        
+        .bilan-submit {
+            margin-top: 20px;
+            padding: 16px 50px;
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            border: none;
+            border-radius: 30px;
+            color: white;
+            font-family: 'Comfortaa', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        
+        /* ========== COMPLETE ========== */
+        .complete-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+        }
+        .complete-screen.active { display: flex; }
+        
+        .complete-emoji { font-size: 80px; margin-bottom: 25px; }
+        .complete-title { font-size: 24px; font-weight: 700; color: #333; margin-bottom: 10px; }
+        .complete-subtitle { font-size: 14px; color: rgba(0,0,0,0.5); margin-bottom: 30px; }
         
         .complete-btn {
             padding: 16px 40px;
@@ -615,7 +628,7 @@
             cursor: pointer;
         }
         
-        /* Soir mode spécial - pas de bouton final */
+        /* Soir end */
         .soir-end {
             display: none;
             flex-direction: column;
@@ -623,34 +636,20 @@
             justify-content: center;
             height: 100%;
             text-align: center;
-            padding: 30px;
         }
+        .soir-end.active { display: flex; }
         
-        .soir-end.active {
-            display: flex;
-        }
-        
-        .soir-end-text {
-            font-size: 20px;
-            color: rgba(255,255,255,0.8);
-            line-height: 1.8;
-            font-style: italic;
-        }
-        
-        .soir-moon {
-            font-size: 60px;
-            margin-bottom: 30px;
-            animation: float-moon 6s ease-in-out infinite;
-        }
-        
-        @keyframes float-moon {
+        .soir-moon { font-size: 70px; margin-bottom: 30px; animation: float 4s ease-in-out infinite; }
+        @keyframes float {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-15px); }
         }
+        
+        .soir-text { font-size: 18px; color: rgba(255,255,255,0.8); line-height: 1.8; font-style: italic; }
     </style>
 </head>
-<body class="mode-day">
-    <div class="phone-frame mode-day">
+<body>
+    <div class="phone-frame">
         <!-- Pétales (jour) -->
         <div class="petal"></div><div class="petal"></div><div class="petal"></div>
         <div class="petal"></div><div class="petal"></div><div class="petal"></div>
@@ -663,10 +662,11 @@
         <div class="header">
             <button class="back-btn" onclick="goBack()">←</button>
             <div class="header-title" id="headerTitle">✨ Session</div>
+            <button class="voice-btn" id="voiceBtn" onclick="toggleVoice()">🔊</button>
         </div>
         
         <div class="content">
-            <!-- Écran choix du mode -->
+            <!-- ===== ÉCRAN CHOIX MODE ===== -->
             <div class="mode-select" id="modeSelect">
                 <div class="mode-intro">
                     <div class="mode-intro-emoji">✨</div>
@@ -699,7 +699,7 @@
                         <div class="mode-card-emoji">🔥</div>
                         <div class="mode-card-content">
                             <div class="mode-card-title">Session profonde</div>
-                            <div class="mode-card-desc">Cohérence cardiaque + visualisation complète</div>
+                            <div class="mode-card-desc">Cohérence + cœur + visualisation</div>
                         </div>
                         <div class="mode-card-duration">~12 min</div>
                         <div class="mode-card-check">✓</div>
@@ -719,6 +719,7 @@
                         <div class="daily-icon" id="iconProfonde">🔥</div>
                         <div class="daily-label">Profonde</div>
                     </div>
+                    <div class="day-complete-msg" id="dayCompleteMsg">✓ Journée complète</div>
                 </div>
                 
                 <div class="streak-display" id="streakDisplay"></div>
@@ -729,73 +730,87 @@
                 </div>
             </div>
             
-            <!-- Session Matin/Soir : Lecture -->
-            <div class="session-simple" id="sessionReading">
-                <div class="session-phase-label" id="phaseLabel">Lis et ressens</div>
+            <!-- ===== SESSION PROFONDE - 4 PHASES ===== -->
+            <div class="deep-session" id="deepSession">
+                <div class="phase-progress">
+                    <div class="phase-dot" id="dot1"></div>
+                    <div class="phase-dot" id="dot2"></div>
+                    <div class="phase-dot" id="dot3"></div>
+                    <div class="phase-dot" id="dot4"></div>
+                </div>
                 
+                <div class="orb-container">
+                    <div class="orb coherence breathing" id="orb"></div>
+                    <div class="ring"></div>
+                    <div class="ring"></div>
+                    <div class="ring"></div>
+                </div>
+                
+                <div class="phase-title" id="phaseTitle">Phase 1</div>
+                <div class="phase-instruction" id="phaseInstruction">Prépare-toi...</div>
+                <div class="phase-timer" id="phaseTimer">5:00</div>
+                <div class="breathing-hint" id="breathingHint"></div>
+            </div>
+            
+            <!-- ===== SESSION SIMPLE (matin/soir) ===== -->
+            <div class="simple-session" id="simpleSession">
+                <div class="simple-phase-label" id="simplePhaseLabel">Lis et ressens</div>
                 <div class="vision-display">
-                    <div class="vision-text" id="visionTextDisplay"></div>
+                    <div class="vision-text" id="visionText"></div>
+                </div>
+                <div class="simple-hint" id="simpleHint">Ressens chaque mot comme si c'était déjà ta réalité</div>
+                <div class="simple-controls">
+                    <button class="control-btn voice-toggle" id="simpleVoiceBtn" onclick="toggleSimpleVoice()">🔊</button>
+                    <button class="control-btn next" onclick="nextSimplePhase()">→</button>
+                </div>
+            </div>
+            
+            <!-- ===== BILAN ===== -->
+            <div class="bilan-screen" id="bilanScreen">
+                <div class="bilan-title">✨ Bilan</div>
+                
+                <div class="bilan-section">
+                    <div class="bilan-label">Intensité émotionnelle ressentie</div>
+                    <div class="bilan-options" id="emotionOptions">
+                        <div class="bilan-option" data-value="1">😶</div>
+                        <div class="bilan-option" data-value="2">🙂</div>
+                        <div class="bilan-option" data-value="3">😊</div>
+                        <div class="bilan-option" data-value="4">🥹</div>
+                        <div class="bilan-option" data-value="5">🤩</div>
+                    </div>
                 </div>
                 
-                <div class="session-hint" id="sessionHint">Ressens chaque mot comme si c'était déjà ta réalité</div>
+                <div class="bilan-section">
+                    <div class="bilan-label">Clarté de ta vision</div>
+                    <div class="bilan-options" id="clarityOptions">
+                        <div class="bilan-option" data-value="1">🌫️</div>
+                        <div class="bilan-option" data-value="2">🌥️</div>
+                        <div class="bilan-option" data-value="3">⛅</div>
+                        <div class="bilan-option" data-value="4">🌤️</div>
+                        <div class="bilan-option" data-value="5">☀️</div>
+                    </div>
+                </div>
                 
-                <div class="session-controls">
-                    <button class="control-btn voice" id="voiceBtn" onclick="toggleVoice()">🔊</button>
-                    <button class="control-btn primary" id="nextPhaseBtn" onclick="nextPhase()">→</button>
+                <div class="bilan-section">
+                    <div class="bilan-label">Notes (optionnel)</div>
+                    <textarea class="bilan-notes" id="bilanNotes" placeholder="Ce que tu as ressenti..."></textarea>
                 </div>
+                
+                <button class="bilan-submit" onclick="submitBilan()">Terminer ✨</button>
             </div>
             
-            <!-- Phase respirations (matin/soir) -->
-            <div class="breathing-phase" id="breathingPhase">
-                <div class="breathing-orb" id="breathingOrb"></div>
-                <div class="breathing-text" id="breathingText">Inspire...</div>
-                <div class="breathing-count" id="breathingCount">1 / 3</div>
-            </div>
-            
-            <!-- Phase cohérence cardiaque (profonde) -->
-            <div class="breathing-phase" id="coherencePhase">
-                <div class="breathing-orb coherence-orb" id="coherenceOrb"></div>
-                <div class="breathing-text" id="coherenceText">Inspire...</div>
-                <div class="breathing-count" id="coherenceTime">5:00</div>
-            </div>
-            
-            <!-- Phase ouverture cœur (profonde) -->
-            <div class="visualize-phase" id="heartPhase">
-                <div class="heart-orb">💗</div>
-                <div class="visualize-text">
-                    Ressens l'amour et la gratitude<br>dans ton cœur...
-                </div>
-            </div>
-            
-            <!-- Phase visualisation -->
-            <div class="visualize-phase" id="visualizePhase">
-                <div class="visualize-orb"></div>
-                <div class="visualize-text" id="visualizeText">Ferme les yeux...<br><br>Visualise ta vie idéale...<br><br>Ressens comme si c'était maintenant.</div>
-            </div>
-            
-            <!-- Phase gratitude (profonde) -->
-            <div class="visualize-phase" id="gratitudePhase">
-                <div class="gratitude-orb">🙏</div>
-                <div class="visualize-text">
-                    Merci...<br><br>C'est fait.
-                </div>
-            </div>
-            
-            <!-- Phase complète (matin) -->
-            <div class="complete-phase" id="completePhase">
+            <!-- ===== COMPLETE ===== -->
+            <div class="complete-screen" id="completeScreen">
                 <div class="complete-emoji">✨</div>
                 <div class="complete-title">C'est ancré.</div>
                 <div class="complete-subtitle">Ta journée commence dans cette énergie.</div>
                 <button class="complete-btn" onclick="finishSession()">Terminer</button>
             </div>
             
-            <!-- Fin soir (pas de bouton) -->
+            <!-- ===== SOIR END ===== -->
             <div class="soir-end" id="soirEnd">
                 <div class="soir-moon">🌙</div>
-                <div class="soir-end-text">
-                    Endors-toi dans cette réalité...<br><br>
-                    C'est déjà fait.
-                </div>
+                <div class="soir-text">Endors-toi dans cette réalité...<br><br>C'est déjà fait.</div>
             </div>
         </div>
     </div>
@@ -803,24 +818,67 @@
     <script>
         // ========== STATE ==========
         let visionData = JSON.parse(localStorage.getItem('wutree_vision') || 'null');
-        let currentMode = null; // 'matin', 'soir', 'profonde'
+        let currentMode = null;
         let currentPhase = 0;
-        let isVoiceActive = false;
+        let phaseTimer = null;
+        let breathingInterval = null;
+        let isVoiceMuted = false;
         let speechSynth = window.speechSynthesis;
-        let breathCount = 0;
-        let coherenceInterval = null;
-        let coherenceCycles = 0;
+        let bilanData = { emotion: 0, clarity: 0, notes: '' };
         
-        // Phases pour chaque mode
-        const PHASES = {
-            matin: ['reading', 'breathing', 'visualize', 'complete'],
-            soir: ['reading', 'breathing', 'soirEnd'],
-            profonde: ['reading', 'coherence', 'heart', 'visualize', 'gratitude', 'complete']
-        };
+        // ========== DEEP SESSION PHASES ==========
+        const DEEP_PHASES = [
+            {
+                name: 'Cohérence cardiaque',
+                duration: 300, // 5 min
+                orbClass: 'coherence',
+                animation: 'breathing',
+                instructions: [
+                    { time: 0, text: 'Pose tes mains sur ton cœur...', speak: true },
+                    { time: 10, text: 'Respire lentement...', speak: true },
+                    { time: 20, text: 'Inspire... 5 secondes', speak: false },
+                ]
+            },
+            {
+                name: 'Ouverture du cœur',
+                duration: 150, // 2.5 min
+                orbClass: 'heart',
+                animation: 'heartbeat',
+                instructions: [
+                    { time: 0, text: 'Ressens la gratitude dans ton cœur...', speak: true },
+                    { time: 15, text: 'Pense à quelqu\'un que tu aimes...', speak: true },
+                    { time: 45, text: 'Laisse l\'amour rayonner...', speak: true },
+                ]
+            },
+            {
+                name: 'Visualisation',
+                duration: 210, // 3.5 min
+                orbClass: 'vision',
+                animation: 'glow-pulse',
+                instructions: [
+                    { time: 0, text: 'Ferme les yeux...', speak: true },
+                    { time: 10, text: 'Tu es dans ta vie idéale...', speak: true },
+                    { time: 25, text: 'Vois les détails, les couleurs...', speak: true },
+                    { time: 45, text: 'Ressens comme si c\'était maintenant...', speak: true },
+                ]
+            },
+            {
+                name: 'Ancrage gratitude',
+                duration: 60, // 1 min
+                orbClass: 'gratitude',
+                animation: 'glow-pulse',
+                instructions: [
+                    { time: 0, text: 'Merci...', speak: true },
+                    { time: 10, text: 'Merci pour cette vie...', speak: true },
+                    { time: 25, text: 'C\'est fait.', speak: true },
+                ]
+            }
+        ];
         
         // ========== INIT ==========
         function init() {
             generateStars();
+            setupBilanOptions();
             
             if (!visionData || !visionData.text) {
                 document.getElementById('modeCards').style.display = 'none';
@@ -832,15 +890,43 @@
             }
         }
         
+        function generateStars() {
+            const container = document.getElementById('stars');
+            for (let i = 0; i < 60; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                star.style.width = (Math.random() * 2 + 1) + 'px';
+                star.style.height = star.style.width;
+                container.appendChild(star);
+            }
+        }
+        
+        function setupBilanOptions() {
+            document.querySelectorAll('#emotionOptions .bilan-option').forEach(opt => {
+                opt.onclick = () => selectBilanOption('emotion', opt);
+            });
+            document.querySelectorAll('#clarityOptions .bilan-option').forEach(opt => {
+                opt.onclick = () => selectBilanOption('clarity', opt);
+            });
+        }
+        
+        function selectBilanOption(type, element) {
+            const container = document.getElementById(type + 'Options');
+            container.querySelectorAll('.bilan-option').forEach(o => o.classList.remove('selected'));
+            element.classList.add('selected');
+            bilanData[type] = parseInt(element.dataset.value);
+        }
+        
+        // ========== COMPLETED SESSIONS ==========
         function updateCompletedSessions() {
             const sessions = JSON.parse(localStorage.getItem('wutree_visualization_sessions') || '[]');
             const today = new Date().toISOString().split('T')[0];
-            
-            // Trouver les sessions faites aujourd'hui
             const todaySessions = sessions.filter(s => s.date === today);
             const completedModes = todaySessions.map(s => s.mode);
             
-            // Mettre à jour les cartes
             if (completedModes.includes('matin')) {
                 document.getElementById('cardMatin').classList.add('completed');
                 document.getElementById('iconMatin').classList.add('done');
@@ -853,217 +939,239 @@
                 document.getElementById('cardProfonde').classList.add('completed');
                 document.getElementById('iconProfonde').classList.add('done');
             }
+            
+            if (completedModes.includes('matin') && completedModes.includes('soir') && completedModes.includes('profonde')) {
+                document.getElementById('dailySummary').classList.add('day-complete');
+            }
+        }
+        
+        function isDayComplete(dateStr) {
+            const sessions = JSON.parse(localStorage.getItem('wutree_visualization_sessions') || '[]');
+            const daySessions = sessions.filter(s => s.date === dateStr);
+            const modes = daySessions.map(s => s.mode);
+            return modes.includes('matin') && modes.includes('soir') && modes.includes('profonde');
         }
         
         function updateStreak() {
-            const tracker = JSON.parse(localStorage.getItem('wutree_visualization_tracker') || '[]');
-            if (tracker.length === 0) {
-                document.getElementById('streakDisplay').innerHTML = '';
-                return;
-            }
-            
-            // Calculer le streak
-            let streak = 0;
             const today = new Date();
+            const todayStr = today.toISOString().split('T')[0];
+            let streak = 0;
+            let startFromYesterday = !isDayComplete(todayStr);
             
-            for (let i = 0; i < 365; i++) {
+            for (let i = startFromYesterday ? 1 : 0; i < 365; i++) {
                 const checkDate = new Date(today);
                 checkDate.setDate(checkDate.getDate() - i);
                 const dateStr = checkDate.toISOString().split('T')[0];
                 
-                if (tracker.includes(dateStr)) {
+                if (isDayComplete(dateStr)) {
                     streak++;
-                } else if (i > 0) {
+                } else {
                     break;
                 }
             }
             
+            const el = document.getElementById('streakDisplay');
             if (streak > 0) {
-                document.getElementById('streakDisplay').innerHTML = `🔥 <span>${streak}</span> jour${streak > 1 ? 's' : ''} consécutif${streak > 1 ? 's' : ''}`;
+                el.innerHTML = `🔥 <span>${streak}</span> jour${streak > 1 ? 's' : ''} complet${streak > 1 ? 's' : ''}`;
+            } else {
+                const sessions = JSON.parse(localStorage.getItem('wutree_visualization_sessions') || '[]');
+                const todaySessions = sessions.filter(s => s.date === todayStr);
+                const count = new Set(todaySessions.map(s => s.mode)).size;
+                if (count > 0) {
+                    el.innerHTML = `Aujourd'hui : <span>${count}/3</span>`;
+                }
             }
-        }
-        
-        function generateStars() {
-            const container = document.getElementById('stars');
-            for (let i = 0; i < 50; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                star.style.animationDelay = Math.random() * 3 + 's';
-                star.style.width = (Math.random() * 2 + 1) + 'px';
-                star.style.height = star.style.width;
-                container.appendChild(star);
-            }
-        }
-        
-        // ========== MODE SWITCH ==========
-        function setDayMode() {
-            document.body.className = 'mode-day';
-            document.querySelector('.phone-frame').className = 'phone-frame mode-day';
-        }
-        
-        function setNightMode() {
-            document.body.className = 'mode-night';
-            document.querySelector('.phone-frame').className = 'phone-frame mode-night';
         }
         
         // ========== START SESSION ==========
         function startSession(mode) {
             currentMode = mode;
             currentPhase = 0;
-            
-            if (mode === 'soir') {
-                setNightMode();
-                document.getElementById('headerTitle').textContent = '🌙 Session Soir';
-            } else if (mode === 'matin') {
-                setDayMode();
-                document.getElementById('headerTitle').textContent = '🌅 Session Réveil';
-            } else {
-                setDayMode();
-                document.getElementById('headerTitle').textContent = '🔥 Session Profonde';
-            }
-            
-            // Afficher la vision
-            document.getElementById('visionTextDisplay').textContent = visionData.text;
-            
-            // Cacher sélection
             document.getElementById('modeSelect').classList.add('hidden');
             
-            // Lancer la première phase (toujours reading)
-            showPhase('reading');
-            
-            // Adapter les hints selon le mode
-            if (mode === 'soir') {
-                document.getElementById('phaseLabel').textContent = 'Lis doucement...';
-                document.getElementById('sessionHint').textContent = 'Laisse ces mots t\'accompagner vers le sommeil';
-            } else if (mode === 'profonde') {
-                document.getElementById('phaseLabel').textContent = '📖 Étape 1/5 — Relecture';
-                document.getElementById('sessionHint').textContent = 'Charge l\'image avant d\'entrer en cohérence';
+            if (mode === 'profonde') {
+                document.getElementById('headerTitle').textContent = '🔥 Session Profonde';
+                document.getElementById('voiceBtn').classList.add('visible');
+                startDeepSession();
+            } else if (mode === 'soir') {
+                document.body.classList.add('night-mode');
+                document.getElementById('headerTitle').textContent = '🌙 Session Soir';
+                startSimpleSession();
             } else {
-                document.getElementById('phaseLabel').textContent = 'Lis et ressens';
-                document.getElementById('sessionHint').textContent = 'Ressens chaque mot comme si c\'était déjà ta réalité';
+                document.getElementById('headerTitle').textContent = '🌅 Session Réveil';
+                startSimpleSession();
             }
         }
         
-        // ========== PHASES ==========
-        function hideAllPhases() {
-            document.getElementById('sessionReading').classList.remove('active');
-            document.getElementById('breathingPhase').classList.remove('active');
-            document.getElementById('coherencePhase').classList.remove('active');
-            document.getElementById('heartPhase').classList.remove('active');
-            document.getElementById('visualizePhase').classList.remove('active');
-            document.getElementById('gratitudePhase').classList.remove('active');
-            document.getElementById('completePhase').classList.remove('active');
-            document.getElementById('soirEnd').classList.remove('active');
+        // ========== DEEP SESSION ==========
+        function startDeepSession() {
+            document.getElementById('deepSession').classList.add('active');
+            runDeepPhase(0);
         }
         
-        function showPhase(phase) {
-            hideAllPhases();
+        function runDeepPhase(phaseIndex) {
+            if (phaseIndex >= DEEP_PHASES.length) {
+                endDeepSession();
+                return;
+            }
             
-            switch(phase) {
-                case 'reading':
-                    document.getElementById('sessionReading').classList.add('active');
-                    break;
-                case 'breathing':
-                    document.getElementById('breathingPhase').classList.add('active');
-                    startBreathing(3);
-                    break;
-                case 'coherence':
-                    document.getElementById('coherencePhase').classList.add('active');
-                    startCoherence();
-                    break;
-                case 'heart':
-                    document.getElementById('heartPhase').classList.add('active');
-                    startHeartPhase();
-                    break;
-                case 'visualize':
-                    document.getElementById('visualizePhase').classList.add('active');
-                    startVisualizePhase();
-                    break;
-                case 'gratitude':
-                    document.getElementById('gratitudePhase').classList.add('active');
-                    startGratitudePhase();
-                    break;
-                case 'complete':
-                    document.getElementById('completePhase').classList.add('active');
-                    saveSession();
-                    break;
-                case 'soirEnd':
+            currentPhase = phaseIndex;
+            const phase = DEEP_PHASES[phaseIndex];
+            
+            // Update dots
+            for (let i = 0; i < 4; i++) {
+                const dot = document.getElementById('dot' + (i + 1));
+                dot.classList.remove('active', 'completed');
+                if (i < phaseIndex) dot.classList.add('completed');
+                if (i === phaseIndex) dot.classList.add('active');
+            }
+            
+            // Update orb
+            const orb = document.getElementById('orb');
+            orb.className = 'orb ' + phase.orbClass + ' ' + phase.animation;
+            
+            // Update text
+            document.getElementById('phaseTitle').textContent = phase.name;
+            document.getElementById('phaseInstruction').textContent = phase.instructions[0].text;
+            
+            // Speak first instruction
+            if (phase.instructions[0].speak && !isVoiceMuted) {
+                speak(phase.instructions[0].text);
+            }
+            
+            // Start timer
+            let remaining = phase.duration;
+            let instructionIndex = 1;
+            
+            updateTimerDisplay(remaining);
+            
+            // Breathing hint for coherence phase
+            if (phaseIndex === 0) {
+                startBreathingHints();
+            } else {
+                stopBreathingHints();
+            }
+            
+            phaseTimer = setInterval(() => {
+                remaining--;
+                updateTimerDisplay(remaining);
+                
+                // Check for next instruction
+                if (instructionIndex < phase.instructions.length) {
+                    const nextInstr = phase.instructions[instructionIndex];
+                    if (phase.duration - remaining >= nextInstr.time) {
+                        document.getElementById('phaseInstruction').textContent = nextInstr.text;
+                        if (nextInstr.speak && !isVoiceMuted) {
+                            speak(nextInstr.text);
+                        }
+                        instructionIndex++;
+                    }
+                }
+                
+                if (remaining <= 0) {
+                    clearInterval(phaseTimer);
+                    runDeepPhase(phaseIndex + 1);
+                }
+            }, 1000);
+        }
+        
+        function updateTimerDisplay(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            document.getElementById('phaseTimer').textContent = 
+                mins + ':' + secs.toString().padStart(2, '0');
+        }
+        
+        function startBreathingHints() {
+            const hint = document.getElementById('breathingHint');
+            let isInhale = true;
+            
+            hint.textContent = 'Inspire...';
+            
+            breathingInterval = setInterval(() => {
+                isInhale = !isInhale;
+                hint.textContent = isInhale ? 'Inspire...' : 'Expire...';
+            }, 5000);
+        }
+        
+        function stopBreathingHints() {
+            if (breathingInterval) {
+                clearInterval(breathingInterval);
+                breathingInterval = null;
+            }
+            document.getElementById('breathingHint').textContent = '';
+        }
+        
+        function endDeepSession() {
+            stopBreathingHints();
+            document.getElementById('deepSession').classList.remove('active');
+            document.getElementById('bilanScreen').classList.add('active');
+        }
+        
+        // ========== SIMPLE SESSION (matin/soir) ==========
+        function startSimpleSession() {
+            document.getElementById('simpleSession').classList.add('active');
+            document.getElementById('visionText').textContent = visionData.text;
+            
+            if (currentMode === 'soir') {
+                document.getElementById('simplePhaseLabel').textContent = 'Lis doucement...';
+                document.getElementById('simpleHint').textContent = 'Laisse ces mots t\'accompagner vers le sommeil';
+            } else {
+                document.getElementById('simplePhaseLabel').textContent = 'Lis et ressens';
+                document.getElementById('simpleHint').textContent = 'Ressens chaque mot comme si c\'était déjà ta réalité';
+            }
+        }
+        
+        let simplePhase = 0;
+        
+        function nextSimplePhase() {
+            simplePhase++;
+            speechSynth.cancel();
+            
+            if (currentMode === 'soir') {
+                if (simplePhase === 1) {
+                    // Soir end
+                    document.getElementById('simpleSession').classList.remove('active');
                     document.getElementById('soirEnd').classList.add('active');
                     saveSession();
-                    break;
-            }
-        }
-        
-        function nextPhase() {
-            speechSynth.cancel();
-            currentPhase++;
-            
-            const phases = PHASES[currentMode];
-            if (currentPhase < phases.length) {
-                showPhase(phases[currentPhase]);
-                updatePhaseLabel();
-            }
-        }
-        
-        function updatePhaseLabel() {
-            if (currentMode !== 'profonde') return;
-            
-            const labels = {
-                1: '💙 Étape 2/5 — Cohérence cardiaque',
-                2: '💗 Étape 3/5 — Ouverture du cœur',
-                3: '✨ Étape 4/5 — Visualisation',
-                4: '🙏 Étape 5/5 — Gratitude'
-            };
-            
-            const label = document.getElementById('phaseLabel');
-            if (labels[currentPhase]) {
-                label.textContent = labels[currentPhase];
+                }
+            } else {
+                if (simplePhase === 1) {
+                    // Matin complete
+                    document.getElementById('simpleSession').classList.remove('active');
+                    document.getElementById('completeScreen').classList.add('active');
+                    saveSession();
+                }
             }
         }
         
         // ========== VOICE ==========
         function toggleVoice() {
+            isVoiceMuted = !isVoiceMuted;
             const btn = document.getElementById('voiceBtn');
+            btn.textContent = isVoiceMuted ? '🔇' : '🔊';
+            btn.classList.toggle('muted', isVoiceMuted);
             
-            if (isVoiceActive) {
+            if (isVoiceMuted) {
                 speechSynth.cancel();
-                isVoiceActive = false;
-                btn.classList.remove('active');
-                btn.textContent = '🔊';
-            } else {
-                readVision();
-                isVoiceActive = true;
-                btn.classList.add('active');
-                btn.textContent = '🔇';
             }
         }
         
-        function readVision() {
-            if (!visionData || !visionData.text) return;
+        function toggleSimpleVoice() {
+            const btn = document.getElementById('simpleVoiceBtn');
             
-            const utterance = new SpeechSynthesisUtterance(visionData.text);
-            utterance.lang = 'fr-FR';
-            utterance.rate = currentMode === 'soir' ? 0.7 : 0.8;
-            utterance.pitch = 1.1;
-            
-            // Chercher une voix féminine française
-            const voices = speechSynth.getVoices();
-            const frenchVoice = voices.find(v => v.lang.includes('fr') && v.name.toLowerCase().includes('female')) 
-                || voices.find(v => v.lang.includes('fr'));
-            if (frenchVoice) utterance.voice = frenchVoice;
-            
-            utterance.onend = () => {
-                isVoiceActive = false;
-                document.getElementById('voiceBtn').classList.remove('active');
-                document.getElementById('voiceBtn').textContent = '🔊';
-            };
-            
-            speechSynth.speak(utterance);
+            if (btn.classList.contains('active')) {
+                speechSynth.cancel();
+                btn.classList.remove('active');
+            } else {
+                readVision();
+                btn.classList.add('active');
+            }
         }
         
-        function speak(text, callback) {
+        function speak(text) {
+            if (isVoiceMuted) return;
+            
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'fr-FR';
             utterance.rate = 0.75;
@@ -1073,119 +1181,33 @@
             const frenchVoice = voices.find(v => v.lang.includes('fr'));
             if (frenchVoice) utterance.voice = frenchVoice;
             
-            if (callback) utterance.onend = callback;
+            speechSynth.speak(utterance);
+        }
+        
+        function readVision() {
+            const utterance = new SpeechSynthesisUtterance(visionData.text);
+            utterance.lang = 'fr-FR';
+            utterance.rate = currentMode === 'soir' ? 0.65 : 0.75;
+            utterance.pitch = 1.1;
+            
+            const voices = speechSynth.getVoices();
+            const frenchVoice = voices.find(v => v.lang.includes('fr'));
+            if (frenchVoice) utterance.voice = frenchVoice;
+            
+            utterance.onend = () => {
+                document.getElementById('simpleVoiceBtn').classList.remove('active');
+            };
             
             speechSynth.speak(utterance);
         }
         
-        // ========== BREATHING (simple) ==========
-        function startBreathing(total) {
-            breathCount = 0;
-            document.getElementById('breathingCount').textContent = `1 / ${total}`;
-            breathCycle(total);
-        }
-        
-        function breathCycle(total) {
-            const orb = document.getElementById('breathingOrb');
-            const text = document.getElementById('breathingText');
-            const count = document.getElementById('breathingCount');
+        // ========== BILAN ==========
+        function submitBilan() {
+            bilanData.notes = document.getElementById('bilanNotes').value;
+            saveSession();
             
-            // Inspire
-            orb.classList.remove('exhale');
-            orb.classList.add('inhale');
-            text.textContent = 'Inspire...';
-            
-            setTimeout(() => {
-                // Expire
-                orb.classList.remove('inhale');
-                orb.classList.add('exhale');
-                text.textContent = 'Expire...';
-                
-                setTimeout(() => {
-                    breathCount++;
-                    count.textContent = `${Math.min(breathCount + 1, total)} / ${total}`;
-                    
-                    if (breathCount < total) {
-                        breathCycle(total);
-                    } else {
-                        setTimeout(() => nextPhase(), 1000);
-                    }
-                }, 5000);
-            }, 5000);
-        }
-        
-        // ========== COHERENCE CARDIAQUE (5 min) ==========
-        function startCoherence() {
-            coherenceCycles = 0;
-            const totalCycles = 30; // 30 cycles x 10s = 5 min
-            
-            document.getElementById('coherenceTime').textContent = '5:00';
-            speak('Pose tes mains sur ton cœur. Respire lentement.', () => {
-                coherenceCycle(totalCycles);
-            });
-        }
-        
-        function coherenceCycle(total) {
-            const orb = document.getElementById('coherenceOrb');
-            const text = document.getElementById('coherenceText');
-            const time = document.getElementById('coherenceTime');
-            
-            // Inspire 5s
-            orb.classList.remove('exhale');
-            orb.classList.add('inhale');
-            text.textContent = 'Inspire...';
-            
-            setTimeout(() => {
-                // Expire 5s
-                orb.classList.remove('inhale');
-                orb.classList.add('exhale');
-                text.textContent = 'Expire...';
-                
-                setTimeout(() => {
-                    coherenceCycles++;
-                    const remaining = Math.max(0, (total - coherenceCycles) * 10);
-                    const mins = Math.floor(remaining / 60);
-                    const secs = remaining % 60;
-                    time.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
-                    
-                    if (coherenceCycles < total) {
-                        coherenceCycle(total);
-                    } else {
-                        speak('Parfait. Ton cœur et ton cerveau sont alignés.', () => {
-                            setTimeout(() => nextPhase(), 1000);
-                        });
-                    }
-                }, 5000);
-            }, 5000);
-        }
-        
-        // ========== HEART PHASE (2 min) ==========
-        function startHeartPhase() {
-            speak('Ressens de la gratitude dans ton cœur. Pense à quelque chose ou quelqu\'un que tu aimes.', () => {
-                setTimeout(() => {
-                    speak('Laisse cette énergie d\'amour rayonner...', () => {
-                        setTimeout(() => nextPhase(), 60000); // 1 min supplémentaire
-                    });
-                }, 60000); // 1 min
-            });
-        }
-        
-        // ========== VISUALIZE PHASE (3 min) ==========
-        function startVisualizePhase() {
-            speak('Ferme les yeux. Tu es dans ta vie idéale. Visualise ce que tu as lu. Ressens-le maintenant.', () => {
-                setTimeout(() => {
-                    speak('Vois les détails. Les couleurs. Les sensations.', () => {
-                        setTimeout(() => nextPhase(), 120000); // 2 min de silence
-                    });
-                }, 60000);
-            });
-        }
-        
-        // ========== GRATITUDE PHASE ==========
-        function startGratitudePhase() {
-            speak('Merci. Merci pour cette vie. C\'est fait. C\'est déjà ta réalité.', () => {
-                setTimeout(() => nextPhase(), 10000);
-            });
+            document.getElementById('bilanScreen').classList.remove('active');
+            document.getElementById('completeScreen').classList.add('active');
         }
         
         // ========== SAVE ==========
@@ -1193,20 +1215,18 @@
             const sessions = JSON.parse(localStorage.getItem('wutree_visualization_sessions') || '[]');
             const today = new Date().toISOString().split('T')[0];
             
-            sessions.push({
+            const sessionData = {
                 date: today,
                 mode: currentMode,
                 timestamp: new Date().toISOString()
-            });
+            };
             
-            localStorage.setItem('wutree_visualization_sessions', JSON.stringify(sessions));
-            
-            // Tracker
-            const tracker = JSON.parse(localStorage.getItem('wutree_visualization_tracker') || '[]');
-            if (!tracker.includes(today)) {
-                tracker.push(today);
-                localStorage.setItem('wutree_visualization_tracker', JSON.stringify(tracker));
+            if (currentMode === 'profonde' && bilanData.emotion > 0) {
+                sessionData.bilan = { ...bilanData };
             }
+            
+            sessions.push(sessionData);
+            localStorage.setItem('wutree_visualization_sessions', JSON.stringify(sessions));
         }
         
         function finishSession() {
@@ -1216,6 +1236,8 @@
         // ========== NAVIGATION ==========
         function goBack() {
             speechSynth.cancel();
+            if (phaseTimer) clearInterval(phaseTimer);
+            stopBreathingHints();
             window.location.href = 'wu-tree-v2-visualization.html';
         }
         
@@ -1224,9 +1246,7 @@
         }
         
         // ========== LOAD VOICES ==========
-        speechSynth.onvoiceschanged = () => {
-            // Voices loaded
-        };
+        speechSynth.onvoiceschanged = () => {};
         
         // ========== START ==========
         init();
