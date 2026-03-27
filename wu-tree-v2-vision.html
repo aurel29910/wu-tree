@@ -3,30 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Wu Tree - Ma Vision</title>
+    <title>Wu Tree - Session</title>
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body {
             font-family: 'Comfortaa', sans-serif;
-            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
             min-height: 100vh;
             display: flex; justify-content: center; align-items: center;
             padding: 20px;
+            transition: background 1s;
+        }
+        
+        body.mode-day {
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+        }
+        
+        body.mode-night {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
         }
         
         .phone-frame {
             width: 100%; max-width: 390px;
             height: 844px; max-height: 95vh;
-            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
             border-radius: 45px;
             position: relative;
             overflow: hidden;
             box-shadow: 0 25px 80px rgba(0,0,0,0.15);
+            transition: background 1s;
         }
         
-        /* Pétales flottants */
+        .phone-frame.mode-day {
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+        }
+        
+        .phone-frame.mode-night {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        }
+        
+        /* Pétales (jour) */
         .petal {
             position: absolute;
             width: 10px; height: 10px;
@@ -35,8 +51,10 @@
             animation: fall linear infinite;
             pointer-events: none;
             z-index: 10;
+            transition: opacity 1s;
         }
-        .petal:nth-child(1) { left: 10%; animation-duration: 12s; width: 8px; }
+        .mode-night .petal { opacity: 0; }
+        .petal:nth-child(1) { left: 10%; animation-duration: 12s; }
         .petal:nth-child(2) { left: 25%; animation-duration: 14s; animation-delay: 2s; }
         .petal:nth-child(3) { left: 40%; animation-duration: 16s; animation-delay: 4s; }
         .petal:nth-child(4) { left: 55%; animation-duration: 13s; animation-delay: 1s; }
@@ -48,22 +66,28 @@
             100% { transform: translateY(900px) rotate(360deg); opacity: 0; }
         }
         
-        /* Nuages */
-        .cloud {
+        /* Étoiles (nuit) */
+        .stars {
             position: absolute;
-            color: white;
-            font-size: 50px;
-            opacity: 0.5;
-            animation: float-cloud linear infinite;
+            top: 0; left: 0; right: 0; bottom: 0;
             pointer-events: none;
             z-index: 5;
+            opacity: 0;
+            transition: opacity 1s;
         }
-        .cloud:nth-child(7) { top: 100px; animation-duration: 180s; }
-        .cloud:nth-child(8) { top: 200px; animation-duration: 220s; animation-delay: -60s; font-size: 40px; }
+        .mode-night .stars { opacity: 1; }
         
-        @keyframes float-cloud {
-            0% { transform: translateX(-80px); }
-            100% { transform: translateX(470px); }
+        .star {
+            position: absolute;
+            width: 2px; height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
         }
         
         .status-bar {
@@ -73,10 +97,12 @@
             justify-content: space-between;
             font-size: 14px;
             font-weight: 600;
-            color: rgba(0,0,0,0.6);
             position: relative;
             z-index: 100;
+            transition: color 1s;
         }
+        .mode-day .status-bar { color: rgba(0,0,0,0.6); }
+        .mode-night .status-bar { color: rgba(255,255,255,0.6); }
         
         .header {
             padding: 10px 20px 15px;
@@ -89,23 +115,33 @@
         
         .back-btn {
             width: 44px; height: 44px;
-            background: rgba(255,255,255,0.5);
             backdrop-filter: blur(10px);
-            border: 2px solid rgba(255,255,255,0.6);
             border-radius: 50%;
-            color: #333;
             font-size: 20px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.3s;
+        }
+        .mode-day .back-btn {
+            background: rgba(255,255,255,0.5);
+            border: 2px solid rgba(255,255,255,0.6);
+            color: #333;
+        }
+        .mode-night .back-btn {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.2);
+            color: white;
         }
         
         .header-title {
-            font-size: 20px;
-            font-weight: 700;
-            color: #333;
+            font-size: 18px;
+            font-weight: 600;
+            transition: color 1s;
         }
+        .mode-day .header-title { color: #333; }
+        .mode-night .header-title { color: white; }
         
         .content {
             position: relative;
@@ -117,224 +153,562 @@
             flex-direction: column;
         }
         
-        /* ========== ÉCRAN ÉCRITURE ========== */
-        .write-screen {
-            display: none;
-            flex-direction: column;
-            height: 100%;
-        }
-        
-        .write-screen.active {
+        /* ========== ÉCRAN CHOIX MODE ========== */
+        .mode-select {
             display: flex;
+            flex-direction: column;
+            padding-top: 20px;
         }
         
-        .write-intro {
+        .mode-select.hidden { display: none; }
+        
+        .mode-intro {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
         
-        .write-emoji {
-            font-size: 45px;
-            margin-bottom: 10px;
+        .mode-intro-emoji {
+            font-size: 50px;
+            margin-bottom: 12px;
         }
         
-        .write-title {
-            font-size: 16px;
+        .mode-intro-title {
+            font-size: 18px;
             font-weight: 600;
             color: #333;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         
-        .write-hint {
+        .mode-intro-subtitle {
             font-size: 11px;
             color: rgba(0,0,0,0.5);
-            line-height: 1.5;
         }
         
-        .vision-textarea {
-            flex: 1;
-            min-height: 280px;
-            background: rgba(255,255,255,0.6);
-            border: 2px solid rgba(255,255,255,0.8);
-            border-radius: 20px;
-            padding: 20px;
-            font-family: 'Comfortaa', sans-serif;
-            font-size: 14px;
-            color: #333;
-            line-height: 1.7;
-            resize: none;
-            outline: none;
-        }
-        
-        .vision-textarea::placeholder {
-            color: rgba(0,0,0,0.35);
-        }
-        
-        .vision-textarea:focus {
-            border-color: #6B4E9B;
-        }
-        
-        .write-actions {
+        .mode-cards {
             display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            padding-bottom: 15px;
-        }
-        
-        .action-btn {
-            flex: 1;
-            padding: 15px;
-            border-radius: 20px;
-            font-family: 'Comfortaa', sans-serif;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: none;
-        }
-        
-        .action-btn.secondary {
-            background: rgba(255,255,255,0.5);
-            color: #333;
-        }
-        
-        .action-btn.primary {
-            background: linear-gradient(135deg, #6B4E9B 0%, #9B6B9B 100%);
-            color: white;
-        }
-        
-        .action-btn:active {
-            transform: scale(0.97);
-        }
-        
-        /* ========== ÉCRAN VISION EXISTANTE ========== */
-        .view-screen {
-            display: none;
             flex-direction: column;
-            height: 100%;
+            gap: 12px;
         }
         
-        .view-screen.active {
-            display: flex;
-        }
-        
-        .vision-card {
+        .mode-card {
+            padding: 20px;
             background: rgba(255,255,255,0.5);
             backdrop-filter: blur(15px);
             border: 2px solid rgba(255,255,255,0.6);
             border-radius: 24px;
-            padding: 20px;
-            margin-bottom: 15px;
-            flex: 1;
-            overflow-y: auto;
-        }
-        
-        .vision-card-header {
+            cursor: pointer;
+            transition: all 0.3s;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            gap: 16px;
         }
         
-        .vision-card-title {
-            font-size: 14px;
+        .mode-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .mode-card:active {
+            transform: scale(0.98);
+        }
+        
+        .mode-card-emoji {
+            font-size: 36px;
+            width: 50px;
+            text-align: center;
+        }
+        
+        .mode-card-content {
+            flex: 1;
+        }
+        
+        .mode-card-title {
+            font-size: 15px;
             font-weight: 600;
             color: #333;
+            margin-bottom: 4px;
         }
         
-        .vision-card-date {
-            font-size: 10px;
-            color: rgba(0,0,0,0.4);
+        .mode-card-desc {
+            font-size: 11px;
+            color: rgba(0,0,0,0.5);
+            line-height: 1.4;
         }
         
-        .vision-card-text {
-            font-size: 14px;
+        .mode-card-duration {
+            font-size: 11px;
+            color: #6B4E9B;
+            font-weight: 600;
+        }
+        
+        .no-vision-msg {
+            text-align: center;
+            padding: 30px 20px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 20px;
+            margin-top: 20px;
+        }
+        
+        .no-vision-msg p {
+            font-size: 13px;
             color: #333;
-            line-height: 1.8;
-            white-space: pre-wrap;
+            margin-bottom: 15px;
         }
         
-        .view-actions {
-            display: flex;
+        .no-vision-btn {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            border: none;
+            border-radius: 20px;
+            color: white;
+            font-family: 'Comfortaa', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        /* ========== SESSION MATIN/SOIR ========== */
+        .session-simple {
+            display: none;
             flex-direction: column;
-            gap: 10px;
-            padding: 15px 0;
+            height: 100%;
         }
         
-        .view-actions .action-btn {
+        .session-simple.active {
+            display: flex;
+        }
+        
+        .session-phase-label {
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            transition: color 1s;
+        }
+        .mode-day .session-phase-label { color: #6B4E9B; }
+        .mode-night .session-phase-label { color: rgba(255,255,255,0.6); }
+        
+        .vision-display {
+            flex: 1;
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 24px;
+            padding: 25px;
+            overflow-y: auto;
+            transition: all 1s;
+        }
+        
+        .mode-night .vision-display {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.15);
+        }
+        
+        .vision-text {
+            font-size: 15px;
+            line-height: 1.9;
+            white-space: pre-wrap;
+            transition: color 1s;
+        }
+        .mode-day .vision-text { color: #333; }
+        .mode-night .vision-text { color: rgba(255,255,255,0.9); }
+        
+        /* Highlight pendant lecture */
+        .vision-text.reading {
+            opacity: 0.6;
+        }
+        
+        .vision-text .current-sentence {
+            opacity: 1;
+            font-weight: 600;
+        }
+        
+        .session-controls {
+            display: flex;
+            gap: 10px;
+            padding: 20px 0;
+            justify-content: center;
+        }
+        
+        .control-btn {
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            transition: all 0.3s;
         }
         
-        /* Quote */
-        .quote-hint {
+        .control-btn.voice {
+            background: rgba(255,255,255,0.5);
+            border: 2px solid rgba(255,255,255,0.6);
+        }
+        .mode-night .control-btn.voice {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.2);
+        }
+        
+        .control-btn.voice.active {
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            border-color: transparent;
+        }
+        
+        .control-btn.primary {
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            color: white;
+        }
+        
+        .control-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .session-hint {
             text-align: center;
-            font-size: 11px;
-            color: rgba(0,0,0,0.4);
+            font-size: 13px;
             font-style: italic;
             margin-top: 10px;
-            line-height: 1.5;
+            transition: color 1s;
+        }
+        .mode-day .session-hint { color: rgba(0,0,0,0.5); }
+        .mode-night .session-hint { color: rgba(255,255,255,0.5); }
+        
+        /* Phase de respiration */
+        .breathing-phase {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+        }
+        
+        .breathing-phase.active {
+            display: flex;
+        }
+        
+        .breathing-orb {
+            width: 150px; height: 150px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(100, 200, 255, 0.8) 0%, 
+                rgba(50, 150, 220, 0.6) 40%,
+                rgba(30, 100, 180, 0.4) 70%);
+            box-shadow: 0 0 60px rgba(100, 180, 255, 0.4);
+            margin-bottom: 40px;
+            transition: transform 5s ease-in-out;
+        }
+        
+        .breathing-orb.inhale {
+            transform: scale(1.4);
+        }
+        
+        .breathing-orb.exhale {
+            transform: scale(1);
+        }
+        
+        .breathing-text {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            transition: color 1s;
+        }
+        .mode-day .breathing-text { color: #333; }
+        .mode-night .breathing-text { color: white; }
+        
+        .breathing-count {
+            font-size: 14px;
+            transition: color 1s;
+        }
+        .mode-day .breathing-count { color: rgba(0,0,0,0.5); }
+        .mode-night .breathing-count { color: rgba(255,255,255,0.5); }
+        
+        /* Phase visualisation guidée */
+        .visualize-phase {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .visualize-phase.active {
+            display: flex;
+        }
+        
+        .visualize-orb {
+            width: 120px; height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(255, 215, 0, 0.9) 0%, 
+                rgba(255, 180, 0, 0.7) 40%,
+                rgba(255, 140, 0, 0.5) 70%);
+            box-shadow: 0 0 80px rgba(255, 200, 0, 0.5);
+            margin-bottom: 30px;
+            animation: pulse-glow 4s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 60px rgba(255, 200, 0, 0.4); }
+            50% { transform: scale(1.1); box-shadow: 0 0 100px rgba(255, 200, 0, 0.6); }
+        }
+        
+        .heart-orb {
+            font-size: 80px;
+            margin-bottom: 30px;
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            15% { transform: scale(1.15); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.1); }
+        }
+        
+        .gratitude-orb {
+            font-size: 70px;
+            margin-bottom: 30px;
+            animation: gentle-pulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes gentle-pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+        }
+        
+        .coherence-orb {
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(100, 200, 255, 0.8) 0%, 
+                rgba(50, 150, 220, 0.6) 40%,
+                rgba(30, 100, 180, 0.4) 70%);
+            box-shadow: 0 0 60px rgba(100, 180, 255, 0.4);
+        }
+        
+        .visualize-text {
+            font-size: 18px;
+            font-weight: 500;
+            line-height: 1.7;
+            max-width: 300px;
+            transition: color 1s;
+        }
+        .mode-day .visualize-text { color: #333; }
+        .mode-night .visualize-text { color: rgba(255,255,255,0.9); }
+        
+        /* Phase de fin */
+        .complete-phase {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+        }
+        
+        .complete-phase.active {
+            display: flex;
+        }
+        
+        .complete-emoji {
+            font-size: 70px;
+            margin-bottom: 25px;
+        }
+        
+        .complete-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            transition: color 1s;
+        }
+        .mode-day .complete-title { color: #333; }
+        .mode-night .complete-title { color: white; }
+        
+        .complete-subtitle {
+            font-size: 14px;
+            margin-bottom: 30px;
+            transition: color 1s;
+        }
+        .mode-day .complete-subtitle { color: rgba(0,0,0,0.5); }
+        .mode-night .complete-subtitle { color: rgba(255,255,255,0.5); }
+        
+        .complete-btn {
+            padding: 16px 40px;
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-family: 'Comfortaa', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        /* Soir mode spécial - pas de bouton final */
+        .soir-end {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            padding: 30px;
+        }
+        
+        .soir-end.active {
+            display: flex;
+        }
+        
+        .soir-end-text {
+            font-size: 20px;
+            color: rgba(255,255,255,0.8);
+            line-height: 1.8;
+            font-style: italic;
+        }
+        
+        .soir-moon {
+            font-size: 60px;
+            margin-bottom: 30px;
+            animation: float-moon 6s ease-in-out infinite;
+        }
+        
+        @keyframes float-moon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
     </style>
 </head>
-<body>
-    <div class="phone-frame">
-        <!-- Pétales -->
+<body class="mode-day">
+    <div class="phone-frame mode-day">
+        <!-- Pétales (jour) -->
         <div class="petal"></div><div class="petal"></div><div class="petal"></div>
         <div class="petal"></div><div class="petal"></div><div class="petal"></div>
-        <!-- Nuages -->
-        <div class="cloud">☁️</div><div class="cloud">☁️</div>
+        
+        <!-- Étoiles (nuit) -->
+        <div class="stars" id="stars"></div>
         
         <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
         
         <div class="header">
             <button class="back-btn" onclick="goBack()">←</button>
-            <div class="header-title">🔮 Ma Vision</div>
+            <div class="header-title" id="headerTitle">✨ Session</div>
         </div>
         
         <div class="content">
-            <!-- Écran écriture -->
-            <div class="write-screen" id="writeScreen">
-                <div class="write-intro">
-                    <div class="write-emoji">🔮</div>
-                    <div class="write-title">Décris ta vie idéale</div>
-                    <div class="write-hint">
-                        Écris au présent, comme si tu y étais déjà.<br>
-                        Ce que tu ressens, ce que tu fais, où tu es.
+            <!-- Écran choix du mode -->
+            <div class="mode-select" id="modeSelect">
+                <div class="mode-intro">
+                    <div class="mode-intro-emoji">✨</div>
+                    <div class="mode-intro-title">Quelle session ?</div>
+                    <div class="mode-intro-subtitle">Choisis selon ton moment</div>
+                </div>
+                
+                <div class="mode-cards" id="modeCards">
+                    <div class="mode-card" onclick="startSession('matin')">
+                        <div class="mode-card-emoji">🌅</div>
+                        <div class="mode-card-content">
+                            <div class="mode-card-title">Réveil</div>
+                            <div class="mode-card-desc">Lecture + ressenti + respirations</div>
+                        </div>
+                        <div class="mode-card-duration">~3 min</div>
+                    </div>
+                    
+                    <div class="mode-card" onclick="startSession('soir')">
+                        <div class="mode-card-emoji">🌙</div>
+                        <div class="mode-card-content">
+                            <div class="mode-card-title">Coucher</div>
+                            <div class="mode-card-desc">Lecture douce, s'endormir dedans</div>
+                        </div>
+                        <div class="mode-card-duration">~3 min</div>
+                    </div>
+                    
+                    <div class="mode-card" onclick="startSession('profonde')">
+                        <div class="mode-card-emoji">🔥</div>
+                        <div class="mode-card-content">
+                            <div class="mode-card-title">Session profonde</div>
+                            <div class="mode-card-desc">Cohérence cardiaque + visualisation complète</div>
+                        </div>
+                        <div class="mode-card-duration">~12 min</div>
                     </div>
                 </div>
                 
-                <textarea class="vision-textarea" id="visionTextarea" placeholder="Je me réveille dans mon appartement à Chiang Mai. La lumière du matin passe à travers les rideaux. Je me sens calme, libre, vivant.
-
-Après mon café, j'ouvre mes charts et je prends mes positions du jour. Aucun stress, juste de la clarté.
-
-Puis direction le gym pour ma session de Muay Thai..."></textarea>
-                
-                <div class="quote-hint">
-                    « Vis depuis la fin, comme si c'était déjà fait. »
-                </div>
-                
-                <div class="write-actions">
-                    <button class="action-btn secondary" onclick="cancelWriting()">Annuler</button>
-                    <button class="action-btn primary" onclick="saveVision()">Enregistrer</button>
+                <div class="no-vision-msg" id="noVisionMsg" style="display: none;">
+                    <p>Tu n'as pas encore écrit ta vision.<br>Commence par là !</p>
+                    <button class="no-vision-btn" onclick="goToVision()">🔮 Écrire ma vision</button>
                 </div>
             </div>
             
-            <!-- Écran vision existante -->
-            <div class="view-screen" id="viewScreen">
-                <div class="vision-card">
-                    <div class="vision-card-header">
-                        <div class="vision-card-title">✨ Ma vision</div>
-                        <div class="vision-card-date" id="visionDate"></div>
-                    </div>
-                    <div class="vision-card-text" id="visionText"></div>
+            <!-- Session Matin/Soir : Lecture -->
+            <div class="session-simple" id="sessionReading">
+                <div class="session-phase-label" id="phaseLabel">Lis et ressens</div>
+                
+                <div class="vision-display">
+                    <div class="vision-text" id="visionTextDisplay"></div>
                 </div>
                 
-                <div class="view-actions">
-                    <button class="action-btn secondary" onclick="editVision()">✏️ Modifier</button>
-                    <button class="action-btn primary" onclick="goToSession()">✨ Commencer une session</button>
+                <div class="session-hint" id="sessionHint">Ressens chaque mot comme si c'était déjà ta réalité</div>
+                
+                <div class="session-controls">
+                    <button class="control-btn voice" id="voiceBtn" onclick="toggleVoice()">🔊</button>
+                    <button class="control-btn primary" id="nextPhaseBtn" onclick="nextPhase()">→</button>
+                </div>
+            </div>
+            
+            <!-- Phase respirations (matin/soir) -->
+            <div class="breathing-phase" id="breathingPhase">
+                <div class="breathing-orb" id="breathingOrb"></div>
+                <div class="breathing-text" id="breathingText">Inspire...</div>
+                <div class="breathing-count" id="breathingCount">1 / 3</div>
+            </div>
+            
+            <!-- Phase cohérence cardiaque (profonde) -->
+            <div class="breathing-phase" id="coherencePhase">
+                <div class="breathing-orb coherence-orb" id="coherenceOrb"></div>
+                <div class="breathing-text" id="coherenceText">Inspire...</div>
+                <div class="breathing-count" id="coherenceTime">5:00</div>
+            </div>
+            
+            <!-- Phase ouverture cœur (profonde) -->
+            <div class="visualize-phase" id="heartPhase">
+                <div class="heart-orb">💗</div>
+                <div class="visualize-text">
+                    Ressens l'amour et la gratitude<br>dans ton cœur...
+                </div>
+            </div>
+            
+            <!-- Phase visualisation -->
+            <div class="visualize-phase" id="visualizePhase">
+                <div class="visualize-orb"></div>
+                <div class="visualize-text" id="visualizeText">Ferme les yeux...<br><br>Visualise ta vie idéale...<br><br>Ressens comme si c'était maintenant.</div>
+            </div>
+            
+            <!-- Phase gratitude (profonde) -->
+            <div class="visualize-phase" id="gratitudePhase">
+                <div class="gratitude-orb">🙏</div>
+                <div class="visualize-text">
+                    Merci...<br><br>C'est fait.
+                </div>
+            </div>
+            
+            <!-- Phase complète (matin) -->
+            <div class="complete-phase" id="completePhase">
+                <div class="complete-emoji">✨</div>
+                <div class="complete-title">C'est ancré.</div>
+                <div class="complete-subtitle">Ta journée commence dans cette énergie.</div>
+                <button class="complete-btn" onclick="finishSession()">Terminer</button>
+            </div>
+            
+            <!-- Fin soir (pas de bouton) -->
+            <div class="soir-end" id="soirEnd">
+                <div class="soir-moon">🌙</div>
+                <div class="soir-end-text">
+                    Endors-toi dans cette réalité...<br><br>
+                    C'est déjà fait.
                 </div>
             </div>
         </div>
@@ -343,76 +717,375 @@ Puis direction le gym pour ma session de Muay Thai..."></textarea>
     <script>
         // ========== STATE ==========
         let visionData = JSON.parse(localStorage.getItem('wutree_vision') || 'null');
+        let currentMode = null; // 'matin', 'soir', 'profonde'
+        let currentPhase = 0;
+        let isVoiceActive = false;
+        let speechSynth = window.speechSynthesis;
+        let breathCount = 0;
+        let coherenceInterval = null;
+        let coherenceCycles = 0;
+        
+        // Phases pour chaque mode
+        const PHASES = {
+            matin: ['reading', 'breathing', 'visualize', 'complete'],
+            soir: ['reading', 'breathing', 'soirEnd'],
+            profonde: ['reading', 'coherence', 'heart', 'visualize', 'gratitude', 'complete']
+        };
         
         // ========== INIT ==========
         function init() {
-            if (visionData && visionData.text) {
-                showViewScreen();
-            } else {
-                showWriteScreen();
+            generateStars();
+            
+            if (!visionData || !visionData.text) {
+                document.getElementById('modeCards').style.display = 'none';
+                document.getElementById('noVisionMsg').style.display = 'block';
             }
         }
         
-        // ========== SCREENS ==========
-        function showWriteScreen() {
-            document.getElementById('writeScreen').classList.add('active');
-            document.getElementById('viewScreen').classList.remove('active');
-            document.getElementById('visionTextarea').value = visionData?.text || '';
-        }
-        
-        function showViewScreen() {
-            document.getElementById('writeScreen').classList.remove('active');
-            document.getElementById('viewScreen').classList.add('active');
-            renderVision();
-        }
-        
-        // ========== ACTIONS ==========
-        function cancelWriting() {
-            if (visionData && visionData.text) {
-                showViewScreen();
-            } else {
-                goBack();
+        function generateStars() {
+            const container = document.getElementById('stars');
+            for (let i = 0; i < 50; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                star.style.width = (Math.random() * 2 + 1) + 'px';
+                star.style.height = star.style.width;
+                container.appendChild(star);
             }
         }
         
-        function saveVision() {
-            const text = document.getElementById('visionTextarea').value.trim();
-            if (!text) {
-                alert('Écris ta vision avant d\'enregistrer');
-                return;
+        // ========== MODE SWITCH ==========
+        function setDayMode() {
+            document.body.className = 'mode-day';
+            document.querySelector('.phone-frame').className = 'phone-frame mode-day';
+        }
+        
+        function setNightMode() {
+            document.body.className = 'mode-night';
+            document.querySelector('.phone-frame').className = 'phone-frame mode-night';
+        }
+        
+        // ========== START SESSION ==========
+        function startSession(mode) {
+            currentMode = mode;
+            currentPhase = 0;
+            
+            if (mode === 'soir') {
+                setNightMode();
+                document.getElementById('headerTitle').textContent = '🌙 Session Soir';
+            } else if (mode === 'matin') {
+                setDayMode();
+                document.getElementById('headerTitle').textContent = '🌅 Session Réveil';
+            } else {
+                setDayMode();
+                document.getElementById('headerTitle').textContent = '🔥 Session Profonde';
             }
             
-            visionData = {
-                text: text,
-                createdAt: visionData?.createdAt || new Date().toISOString(),
-                updatedAt: new Date().toISOString()
+            // Afficher la vision
+            document.getElementById('visionTextDisplay').textContent = visionData.text;
+            
+            // Cacher sélection
+            document.getElementById('modeSelect').classList.add('hidden');
+            
+            // Lancer la première phase (toujours reading)
+            showPhase('reading');
+            
+            // Adapter les hints selon le mode
+            if (mode === 'soir') {
+                document.getElementById('phaseLabel').textContent = 'Lis doucement...';
+                document.getElementById('sessionHint').textContent = 'Laisse ces mots t\'accompagner vers le sommeil';
+            } else if (mode === 'profonde') {
+                document.getElementById('phaseLabel').textContent = '📖 Étape 1/5 — Relecture';
+                document.getElementById('sessionHint').textContent = 'Charge l\'image avant d\'entrer en cohérence';
+            } else {
+                document.getElementById('phaseLabel').textContent = 'Lis et ressens';
+                document.getElementById('sessionHint').textContent = 'Ressens chaque mot comme si c\'était déjà ta réalité';
+            }
+        }
+        
+        // ========== PHASES ==========
+        function hideAllPhases() {
+            document.getElementById('sessionReading').classList.remove('active');
+            document.getElementById('breathingPhase').classList.remove('active');
+            document.getElementById('coherencePhase').classList.remove('active');
+            document.getElementById('heartPhase').classList.remove('active');
+            document.getElementById('visualizePhase').classList.remove('active');
+            document.getElementById('gratitudePhase').classList.remove('active');
+            document.getElementById('completePhase').classList.remove('active');
+            document.getElementById('soirEnd').classList.remove('active');
+        }
+        
+        function showPhase(phase) {
+            hideAllPhases();
+            
+            switch(phase) {
+                case 'reading':
+                    document.getElementById('sessionReading').classList.add('active');
+                    break;
+                case 'breathing':
+                    document.getElementById('breathingPhase').classList.add('active');
+                    startBreathing(3);
+                    break;
+                case 'coherence':
+                    document.getElementById('coherencePhase').classList.add('active');
+                    startCoherence();
+                    break;
+                case 'heart':
+                    document.getElementById('heartPhase').classList.add('active');
+                    startHeartPhase();
+                    break;
+                case 'visualize':
+                    document.getElementById('visualizePhase').classList.add('active');
+                    startVisualizePhase();
+                    break;
+                case 'gratitude':
+                    document.getElementById('gratitudePhase').classList.add('active');
+                    startGratitudePhase();
+                    break;
+                case 'complete':
+                    document.getElementById('completePhase').classList.add('active');
+                    saveSession();
+                    break;
+                case 'soirEnd':
+                    document.getElementById('soirEnd').classList.add('active');
+                    saveSession();
+                    break;
+            }
+        }
+        
+        function nextPhase() {
+            speechSynth.cancel();
+            currentPhase++;
+            
+            const phases = PHASES[currentMode];
+            if (currentPhase < phases.length) {
+                showPhase(phases[currentPhase]);
+                updatePhaseLabel();
+            }
+        }
+        
+        function updatePhaseLabel() {
+            if (currentMode !== 'profonde') return;
+            
+            const labels = {
+                1: '💙 Étape 2/5 — Cohérence cardiaque',
+                2: '💗 Étape 3/5 — Ouverture du cœur',
+                3: '✨ Étape 4/5 — Visualisation',
+                4: '🙏 Étape 5/5 — Gratitude'
             };
             
-            localStorage.setItem('wutree_vision', JSON.stringify(visionData));
-            showViewScreen();
+            const label = document.getElementById('phaseLabel');
+            if (labels[currentPhase]) {
+                label.textContent = labels[currentPhase];
+            }
         }
         
-        function editVision() {
-            showWriteScreen();
+        // ========== VOICE ==========
+        function toggleVoice() {
+            const btn = document.getElementById('voiceBtn');
+            
+            if (isVoiceActive) {
+                speechSynth.cancel();
+                isVoiceActive = false;
+                btn.classList.remove('active');
+                btn.textContent = '🔊';
+            } else {
+                readVision();
+                isVoiceActive = true;
+                btn.classList.add('active');
+                btn.textContent = '🔇';
+            }
         }
         
-        function renderVision() {
-            if (!visionData) return;
+        function readVision() {
+            if (!visionData || !visionData.text) return;
             
-            document.getElementById('visionText').textContent = visionData.text;
+            const utterance = new SpeechSynthesisUtterance(visionData.text);
+            utterance.lang = 'fr-FR';
+            utterance.rate = currentMode === 'soir' ? 0.7 : 0.8;
+            utterance.pitch = 1.1;
             
-            const date = new Date(visionData.updatedAt || visionData.createdAt);
-            document.getElementById('visionDate').textContent = date.toLocaleDateString('fr-FR');
+            // Chercher une voix féminine française
+            const voices = speechSynth.getVoices();
+            const frenchVoice = voices.find(v => v.lang.includes('fr') && v.name.toLowerCase().includes('female')) 
+                || voices.find(v => v.lang.includes('fr'));
+            if (frenchVoice) utterance.voice = frenchVoice;
+            
+            utterance.onend = () => {
+                isVoiceActive = false;
+                document.getElementById('voiceBtn').classList.remove('active');
+                document.getElementById('voiceBtn').textContent = '🔊';
+            };
+            
+            speechSynth.speak(utterance);
+        }
+        
+        function speak(text, callback) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'fr-FR';
+            utterance.rate = 0.75;
+            utterance.pitch = 1.1;
+            
+            const voices = speechSynth.getVoices();
+            const frenchVoice = voices.find(v => v.lang.includes('fr'));
+            if (frenchVoice) utterance.voice = frenchVoice;
+            
+            if (callback) utterance.onend = callback;
+            
+            speechSynth.speak(utterance);
+        }
+        
+        // ========== BREATHING (simple) ==========
+        function startBreathing(total) {
+            breathCount = 0;
+            document.getElementById('breathingCount').textContent = `1 / ${total}`;
+            breathCycle(total);
+        }
+        
+        function breathCycle(total) {
+            const orb = document.getElementById('breathingOrb');
+            const text = document.getElementById('breathingText');
+            const count = document.getElementById('breathingCount');
+            
+            // Inspire
+            orb.classList.remove('exhale');
+            orb.classList.add('inhale');
+            text.textContent = 'Inspire...';
+            
+            setTimeout(() => {
+                // Expire
+                orb.classList.remove('inhale');
+                orb.classList.add('exhale');
+                text.textContent = 'Expire...';
+                
+                setTimeout(() => {
+                    breathCount++;
+                    count.textContent = `${Math.min(breathCount + 1, total)} / ${total}`;
+                    
+                    if (breathCount < total) {
+                        breathCycle(total);
+                    } else {
+                        setTimeout(() => nextPhase(), 1000);
+                    }
+                }, 5000);
+            }, 5000);
+        }
+        
+        // ========== COHERENCE CARDIAQUE (5 min) ==========
+        function startCoherence() {
+            coherenceCycles = 0;
+            const totalCycles = 30; // 30 cycles x 10s = 5 min
+            
+            document.getElementById('coherenceTime').textContent = '5:00';
+            speak('Pose tes mains sur ton cœur. Respire lentement.', () => {
+                coherenceCycle(totalCycles);
+            });
+        }
+        
+        function coherenceCycle(total) {
+            const orb = document.getElementById('coherenceOrb');
+            const text = document.getElementById('coherenceText');
+            const time = document.getElementById('coherenceTime');
+            
+            // Inspire 5s
+            orb.classList.remove('exhale');
+            orb.classList.add('inhale');
+            text.textContent = 'Inspire...';
+            
+            setTimeout(() => {
+                // Expire 5s
+                orb.classList.remove('inhale');
+                orb.classList.add('exhale');
+                text.textContent = 'Expire...';
+                
+                setTimeout(() => {
+                    coherenceCycles++;
+                    const remaining = Math.max(0, (total - coherenceCycles) * 10);
+                    const mins = Math.floor(remaining / 60);
+                    const secs = remaining % 60;
+                    time.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+                    
+                    if (coherenceCycles < total) {
+                        coherenceCycle(total);
+                    } else {
+                        speak('Parfait. Ton cœur et ton cerveau sont alignés.', () => {
+                            setTimeout(() => nextPhase(), 1000);
+                        });
+                    }
+                }, 5000);
+            }, 5000);
+        }
+        
+        // ========== HEART PHASE (2 min) ==========
+        function startHeartPhase() {
+            speak('Ressens de la gratitude dans ton cœur. Pense à quelque chose ou quelqu\'un que tu aimes.', () => {
+                setTimeout(() => {
+                    speak('Laisse cette énergie d\'amour rayonner...', () => {
+                        setTimeout(() => nextPhase(), 60000); // 1 min supplémentaire
+                    });
+                }, 60000); // 1 min
+            });
+        }
+        
+        // ========== VISUALIZE PHASE (3 min) ==========
+        function startVisualizePhase() {
+            speak('Ferme les yeux. Tu es dans ta vie idéale. Visualise ce que tu as lu. Ressens-le maintenant.', () => {
+                setTimeout(() => {
+                    speak('Vois les détails. Les couleurs. Les sensations.', () => {
+                        setTimeout(() => nextPhase(), 120000); // 2 min de silence
+                    });
+                }, 60000);
+            });
+        }
+        
+        // ========== GRATITUDE PHASE ==========
+        function startGratitudePhase() {
+            speak('Merci. Merci pour cette vie. C\'est fait. C\'est déjà ta réalité.', () => {
+                setTimeout(() => nextPhase(), 10000);
+            });
+        }
+        
+        // ========== SAVE ==========
+        function saveSession() {
+            const sessions = JSON.parse(localStorage.getItem('wutree_visualization_sessions') || '[]');
+            const today = new Date().toISOString().split('T')[0];
+            
+            sessions.push({
+                date: today,
+                mode: currentMode,
+                timestamp: new Date().toISOString()
+            });
+            
+            localStorage.setItem('wutree_visualization_sessions', JSON.stringify(sessions));
+            
+            // Tracker
+            const tracker = JSON.parse(localStorage.getItem('wutree_visualization_tracker') || '[]');
+            if (!tracker.includes(today)) {
+                tracker.push(today);
+                localStorage.setItem('wutree_visualization_tracker', JSON.stringify(tracker));
+            }
+        }
+        
+        function finishSession() {
+            goBack();
         }
         
         // ========== NAVIGATION ==========
         function goBack() {
+            speechSynth.cancel();
             window.location.href = 'wu-tree-v2-visualization.html';
         }
         
-        function goToSession() {
-            window.location.href = 'wu-tree-v2-session.html';
+        function goToVision() {
+            window.location.href = 'wu-tree-v2-vision.html';
         }
+        
+        // ========== LOAD VOICES ==========
+        speechSynth.onvoiceschanged = () => {
+            // Voices loaded
+        };
         
         // ========== START ==========
         init();
