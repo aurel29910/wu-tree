@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -242,6 +241,72 @@
             font-weight: 600;
         }
         
+        .mode-card-check {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #4CAF50;
+            color: white;
+            font-size: 16px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .mode-card.completed .mode-card-check {
+            display: flex;
+        }
+        
+        .mode-card.completed {
+            border-color: rgba(76, 175, 80, 0.5);
+            background: rgba(76, 175, 80, 0.1);
+        }
+        
+        .daily-summary {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 16px;
+        }
+        
+        .daily-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .daily-icon {
+            font-size: 20px;
+            opacity: 0.4;
+        }
+        
+        .daily-icon.done {
+            opacity: 1;
+        }
+        
+        .daily-label {
+            font-size: 9px;
+            color: rgba(0,0,0,0.5);
+            text-transform: uppercase;
+        }
+        
+        .streak-display {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 12px;
+            color: rgba(0,0,0,0.5);
+        }
+        
+        .streak-display span {
+            color: #6B4E9B;
+            font-weight: 600;
+        }
+        
         .no-vision-msg {
             text-align: center;
             padding: 30px 20px;
@@ -460,6 +525,38 @@
             50% { transform: scale(1.1); box-shadow: 0 0 100px rgba(255, 200, 0, 0.6); }
         }
         
+        .heart-orb {
+            font-size: 80px;
+            margin-bottom: 30px;
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            15% { transform: scale(1.15); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.1); }
+        }
+        
+        .gratitude-orb {
+            font-size: 70px;
+            margin-bottom: 30px;
+            animation: gentle-pulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes gentle-pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+        }
+        
+        .coherence-orb {
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(100, 200, 255, 0.8) 0%, 
+                rgba(50, 150, 220, 0.6) 40%,
+                rgba(30, 100, 180, 0.4) 70%);
+            box-shadow: 0 0 60px rgba(100, 180, 255, 0.4);
+        }
+        
         .visualize-text {
             font-size: 18px;
             font-weight: 500;
@@ -578,33 +675,53 @@
                 </div>
                 
                 <div class="mode-cards" id="modeCards">
-                    <div class="mode-card" onclick="startSession('matin')">
+                    <div class="mode-card" id="cardMatin" onclick="startSession('matin')">
                         <div class="mode-card-emoji">🌅</div>
                         <div class="mode-card-content">
                             <div class="mode-card-title">Réveil</div>
                             <div class="mode-card-desc">Lecture + ressenti + respirations</div>
                         </div>
                         <div class="mode-card-duration">~3 min</div>
+                        <div class="mode-card-check">✓</div>
                     </div>
                     
-                    <div class="mode-card" onclick="startSession('soir')">
+                    <div class="mode-card" id="cardSoir" onclick="startSession('soir')">
                         <div class="mode-card-emoji">🌙</div>
                         <div class="mode-card-content">
                             <div class="mode-card-title">Coucher</div>
                             <div class="mode-card-desc">Lecture douce, s'endormir dedans</div>
                         </div>
                         <div class="mode-card-duration">~3 min</div>
+                        <div class="mode-card-check">✓</div>
                     </div>
                     
-                    <div class="mode-card" onclick="startSession('profonde')">
+                    <div class="mode-card" id="cardProfonde" onclick="startSession('profonde')">
                         <div class="mode-card-emoji">🔥</div>
                         <div class="mode-card-content">
                             <div class="mode-card-title">Session profonde</div>
                             <div class="mode-card-desc">Cohérence cardiaque + visualisation complète</div>
                         </div>
                         <div class="mode-card-duration">~12 min</div>
+                        <div class="mode-card-check">✓</div>
                     </div>
                 </div>
+                
+                <div class="daily-summary" id="dailySummary">
+                    <div class="daily-item">
+                        <div class="daily-icon" id="iconMatin">🌅</div>
+                        <div class="daily-label">Matin</div>
+                    </div>
+                    <div class="daily-item">
+                        <div class="daily-icon" id="iconSoir">🌙</div>
+                        <div class="daily-label">Soir</div>
+                    </div>
+                    <div class="daily-item">
+                        <div class="daily-icon" id="iconProfonde">🔥</div>
+                        <div class="daily-label">Profonde</div>
+                    </div>
+                </div>
+                
+                <div class="streak-display" id="streakDisplay"></div>
                 
                 <div class="no-vision-msg" id="noVisionMsg" style="display: none;">
                     <p>Tu n'as pas encore écrit ta vision.<br>Commence par là !</p>
@@ -628,17 +745,40 @@
                 </div>
             </div>
             
-            <!-- Phase respirations -->
+            <!-- Phase respirations (matin/soir) -->
             <div class="breathing-phase" id="breathingPhase">
                 <div class="breathing-orb" id="breathingOrb"></div>
                 <div class="breathing-text" id="breathingText">Inspire...</div>
                 <div class="breathing-count" id="breathingCount">1 / 3</div>
             </div>
             
+            <!-- Phase cohérence cardiaque (profonde) -->
+            <div class="breathing-phase" id="coherencePhase">
+                <div class="breathing-orb coherence-orb" id="coherenceOrb"></div>
+                <div class="breathing-text" id="coherenceText">Inspire...</div>
+                <div class="breathing-count" id="coherenceTime">5:00</div>
+            </div>
+            
+            <!-- Phase ouverture cœur (profonde) -->
+            <div class="visualize-phase" id="heartPhase">
+                <div class="heart-orb">💗</div>
+                <div class="visualize-text">
+                    Ressens l'amour et la gratitude<br>dans ton cœur...
+                </div>
+            </div>
+            
             <!-- Phase visualisation -->
             <div class="visualize-phase" id="visualizePhase">
                 <div class="visualize-orb"></div>
                 <div class="visualize-text" id="visualizeText">Ferme les yeux...<br><br>Visualise ta vie idéale...<br><br>Ressens comme si c'était maintenant.</div>
+            </div>
+            
+            <!-- Phase gratitude (profonde) -->
+            <div class="visualize-phase" id="gratitudePhase">
+                <div class="gratitude-orb">🙏</div>
+                <div class="visualize-text">
+                    Merci...<br><br>C'est fait.
+                </div>
             </div>
             
             <!-- Phase complète (matin) -->
@@ -668,7 +808,15 @@
         let isVoiceActive = false;
         let speechSynth = window.speechSynthesis;
         let breathCount = 0;
-        let breathInterval = null;
+        let coherenceInterval = null;
+        let coherenceCycles = 0;
+        
+        // Phases pour chaque mode
+        const PHASES = {
+            matin: ['reading', 'breathing', 'visualize', 'complete'],
+            soir: ['reading', 'breathing', 'soirEnd'],
+            profonde: ['reading', 'coherence', 'heart', 'visualize', 'gratitude', 'complete']
+        };
         
         // ========== INIT ==========
         function init() {
@@ -676,7 +824,62 @@
             
             if (!visionData || !visionData.text) {
                 document.getElementById('modeCards').style.display = 'none';
+                document.getElementById('dailySummary').style.display = 'none';
                 document.getElementById('noVisionMsg').style.display = 'block';
+            } else {
+                updateCompletedSessions();
+                updateStreak();
+            }
+        }
+        
+        function updateCompletedSessions() {
+            const sessions = JSON.parse(localStorage.getItem('wutree_visualization_sessions') || '[]');
+            const today = new Date().toISOString().split('T')[0];
+            
+            // Trouver les sessions faites aujourd'hui
+            const todaySessions = sessions.filter(s => s.date === today);
+            const completedModes = todaySessions.map(s => s.mode);
+            
+            // Mettre à jour les cartes
+            if (completedModes.includes('matin')) {
+                document.getElementById('cardMatin').classList.add('completed');
+                document.getElementById('iconMatin').classList.add('done');
+            }
+            if (completedModes.includes('soir')) {
+                document.getElementById('cardSoir').classList.add('completed');
+                document.getElementById('iconSoir').classList.add('done');
+            }
+            if (completedModes.includes('profonde')) {
+                document.getElementById('cardProfonde').classList.add('completed');
+                document.getElementById('iconProfonde').classList.add('done');
+            }
+        }
+        
+        function updateStreak() {
+            const tracker = JSON.parse(localStorage.getItem('wutree_visualization_tracker') || '[]');
+            if (tracker.length === 0) {
+                document.getElementById('streakDisplay').innerHTML = '';
+                return;
+            }
+            
+            // Calculer le streak
+            let streak = 0;
+            const today = new Date();
+            
+            for (let i = 0; i < 365; i++) {
+                const checkDate = new Date(today);
+                checkDate.setDate(checkDate.getDate() - i);
+                const dateStr = checkDate.toISOString().split('T')[0];
+                
+                if (tracker.includes(dateStr)) {
+                    streak++;
+                } else if (i > 0) {
+                    break;
+                }
+            }
+            
+            if (streak > 0) {
+                document.getElementById('streakDisplay').innerHTML = `🔥 <span>${streak}</span> jour${streak > 1 ? 's' : ''} consécutif${streak > 1 ? 's' : ''}`;
             }
         }
         
@@ -719,24 +922,104 @@
             } else {
                 setDayMode();
                 document.getElementById('headerTitle').textContent = '🔥 Session Profonde';
-                // Pour la session profonde, on pourrait rediriger vers l'ancienne page
-                // ou l'intégrer ici. Pour l'instant, on fait comme matin avec plus de phases
             }
             
             // Afficher la vision
             document.getElementById('visionTextDisplay').textContent = visionData.text;
             
-            // Cacher sélection, afficher session
+            // Cacher sélection
             document.getElementById('modeSelect').classList.add('hidden');
-            document.getElementById('sessionReading').classList.add('active');
+            
+            // Lancer la première phase (toujours reading)
+            showPhase('reading');
             
             // Adapter les hints selon le mode
             if (mode === 'soir') {
                 document.getElementById('phaseLabel').textContent = 'Lis doucement...';
                 document.getElementById('sessionHint').textContent = 'Laisse ces mots t\'accompagner vers le sommeil';
+            } else if (mode === 'profonde') {
+                document.getElementById('phaseLabel').textContent = '📖 Étape 1/5 — Relecture';
+                document.getElementById('sessionHint').textContent = 'Charge l\'image avant d\'entrer en cohérence';
             } else {
                 document.getElementById('phaseLabel').textContent = 'Lis et ressens';
                 document.getElementById('sessionHint').textContent = 'Ressens chaque mot comme si c\'était déjà ta réalité';
+            }
+        }
+        
+        // ========== PHASES ==========
+        function hideAllPhases() {
+            document.getElementById('sessionReading').classList.remove('active');
+            document.getElementById('breathingPhase').classList.remove('active');
+            document.getElementById('coherencePhase').classList.remove('active');
+            document.getElementById('heartPhase').classList.remove('active');
+            document.getElementById('visualizePhase').classList.remove('active');
+            document.getElementById('gratitudePhase').classList.remove('active');
+            document.getElementById('completePhase').classList.remove('active');
+            document.getElementById('soirEnd').classList.remove('active');
+        }
+        
+        function showPhase(phase) {
+            hideAllPhases();
+            
+            switch(phase) {
+                case 'reading':
+                    document.getElementById('sessionReading').classList.add('active');
+                    break;
+                case 'breathing':
+                    document.getElementById('breathingPhase').classList.add('active');
+                    startBreathing(3);
+                    break;
+                case 'coherence':
+                    document.getElementById('coherencePhase').classList.add('active');
+                    startCoherence();
+                    break;
+                case 'heart':
+                    document.getElementById('heartPhase').classList.add('active');
+                    startHeartPhase();
+                    break;
+                case 'visualize':
+                    document.getElementById('visualizePhase').classList.add('active');
+                    startVisualizePhase();
+                    break;
+                case 'gratitude':
+                    document.getElementById('gratitudePhase').classList.add('active');
+                    startGratitudePhase();
+                    break;
+                case 'complete':
+                    document.getElementById('completePhase').classList.add('active');
+                    saveSession();
+                    break;
+                case 'soirEnd':
+                    document.getElementById('soirEnd').classList.add('active');
+                    saveSession();
+                    break;
+            }
+        }
+        
+        function nextPhase() {
+            speechSynth.cancel();
+            currentPhase++;
+            
+            const phases = PHASES[currentMode];
+            if (currentPhase < phases.length) {
+                showPhase(phases[currentPhase]);
+                updatePhaseLabel();
+            }
+        }
+        
+        function updatePhaseLabel() {
+            if (currentMode !== 'profonde') return;
+            
+            const labels = {
+                1: '💙 Étape 2/5 — Cohérence cardiaque',
+                2: '💗 Étape 3/5 — Ouverture du cœur',
+                3: '✨ Étape 4/5 — Visualisation',
+                4: '🙏 Étape 5/5 — Gratitude'
+            };
+            
+            const label = document.getElementById('phaseLabel');
+            if (labels[currentPhase]) {
+                label.textContent = labels[currentPhase];
             }
         }
         
@@ -780,53 +1063,26 @@
             speechSynth.speak(utterance);
         }
         
-        // ========== PHASES ==========
-        function nextPhase() {
-            currentPhase++;
+        function speak(text, callback) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'fr-FR';
+            utterance.rate = 0.75;
+            utterance.pitch = 1.1;
             
-            if (currentMode === 'matin' || currentMode === 'profonde') {
-                if (currentPhase === 1) {
-                    // Phase respirations
-                    document.getElementById('sessionReading').classList.remove('active');
-                    document.getElementById('breathingPhase').classList.add('active');
-                    startBreathing();
-                } else if (currentPhase === 2) {
-                    // Phase visualisation
-                    document.getElementById('breathingPhase').classList.remove('active');
-                    document.getElementById('visualizePhase').classList.add('active');
-                    
-                    // Timer puis fin
-                    setTimeout(() => {
-                        nextPhase();
-                    }, currentMode === 'profonde' ? 60000 : 20000); // 1 min ou 20s
-                } else {
-                    // Fin
-                    document.getElementById('visualizePhase').classList.remove('active');
-                    document.getElementById('completePhase').classList.add('active');
-                    saveSession();
-                }
-            } else if (currentMode === 'soir') {
-                if (currentPhase === 1) {
-                    // Respirations douces
-                    document.getElementById('sessionReading').classList.remove('active');
-                    document.getElementById('breathingPhase').classList.add('active');
-                    startBreathing();
-                } else {
-                    // Fin soir - pas de bouton
-                    document.getElementById('breathingPhase').classList.remove('active');
-                    document.getElementById('soirEnd').classList.add('active');
-                    saveSession();
-                }
-            }
+            const voices = speechSynth.getVoices();
+            const frenchVoice = voices.find(v => v.lang.includes('fr'));
+            if (frenchVoice) utterance.voice = frenchVoice;
+            
+            if (callback) utterance.onend = callback;
+            
+            speechSynth.speak(utterance);
         }
         
-        function startBreathing() {
+        // ========== BREATHING (simple) ==========
+        function startBreathing(total) {
             breathCount = 0;
-            const totalBreaths = currentMode === 'profonde' ? 5 : 3;
-            
-            document.getElementById('breathingCount').textContent = `1 / ${totalBreaths}`;
-            
-            breathCycle(totalBreaths);
+            document.getElementById('breathingCount').textContent = `1 / ${total}`;
+            breathCycle(total);
         }
         
         function breathCycle(total) {
@@ -847,18 +1103,89 @@
                 
                 setTimeout(() => {
                     breathCount++;
-                    count.textContent = `${breathCount + 1} / ${total}`;
+                    count.textContent = `${Math.min(breathCount + 1, total)} / ${total}`;
                     
                     if (breathCount < total) {
                         breathCycle(total);
                     } else {
-                        // Fin respirations
-                        setTimeout(() => {
-                            nextPhase();
-                        }, 1000);
+                        setTimeout(() => nextPhase(), 1000);
                     }
                 }, 5000);
             }, 5000);
+        }
+        
+        // ========== COHERENCE CARDIAQUE (5 min) ==========
+        function startCoherence() {
+            coherenceCycles = 0;
+            const totalCycles = 30; // 30 cycles x 10s = 5 min
+            
+            document.getElementById('coherenceTime').textContent = '5:00';
+            speak('Pose tes mains sur ton cœur. Respire lentement.', () => {
+                coherenceCycle(totalCycles);
+            });
+        }
+        
+        function coherenceCycle(total) {
+            const orb = document.getElementById('coherenceOrb');
+            const text = document.getElementById('coherenceText');
+            const time = document.getElementById('coherenceTime');
+            
+            // Inspire 5s
+            orb.classList.remove('exhale');
+            orb.classList.add('inhale');
+            text.textContent = 'Inspire...';
+            
+            setTimeout(() => {
+                // Expire 5s
+                orb.classList.remove('inhale');
+                orb.classList.add('exhale');
+                text.textContent = 'Expire...';
+                
+                setTimeout(() => {
+                    coherenceCycles++;
+                    const remaining = Math.max(0, (total - coherenceCycles) * 10);
+                    const mins = Math.floor(remaining / 60);
+                    const secs = remaining % 60;
+                    time.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+                    
+                    if (coherenceCycles < total) {
+                        coherenceCycle(total);
+                    } else {
+                        speak('Parfait. Ton cœur et ton cerveau sont alignés.', () => {
+                            setTimeout(() => nextPhase(), 1000);
+                        });
+                    }
+                }, 5000);
+            }, 5000);
+        }
+        
+        // ========== HEART PHASE (2 min) ==========
+        function startHeartPhase() {
+            speak('Ressens de la gratitude dans ton cœur. Pense à quelque chose ou quelqu\'un que tu aimes.', () => {
+                setTimeout(() => {
+                    speak('Laisse cette énergie d\'amour rayonner...', () => {
+                        setTimeout(() => nextPhase(), 60000); // 1 min supplémentaire
+                    });
+                }, 60000); // 1 min
+            });
+        }
+        
+        // ========== VISUALIZE PHASE (3 min) ==========
+        function startVisualizePhase() {
+            speak('Ferme les yeux. Tu es dans ta vie idéale. Visualise ce que tu as lu. Ressens-le maintenant.', () => {
+                setTimeout(() => {
+                    speak('Vois les détails. Les couleurs. Les sensations.', () => {
+                        setTimeout(() => nextPhase(), 120000); // 2 min de silence
+                    });
+                }, 60000);
+            });
+        }
+        
+        // ========== GRATITUDE PHASE ==========
+        function startGratitudePhase() {
+            speak('Merci. Merci pour cette vie. C\'est fait. C\'est déjà ta réalité.', () => {
+                setTimeout(() => nextPhase(), 10000);
+            });
         }
         
         // ========== SAVE ==========
