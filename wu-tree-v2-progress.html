@@ -236,6 +236,11 @@
             color: #2E7D32;
         }
         
+        .calendar-day.partial {
+            background: rgba(255, 193, 7, 0.4);
+            color: #333;
+        }
+        
         .calendar-day.today {
             border: 2px solid #6B4E9B;
             color: #6B4E9B;
@@ -324,6 +329,78 @@
             text-align: right;
             margin-top: 4px;
         }
+        
+        /* Today Card */
+        .today-card {
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 20px;
+            padding: 18px;
+            margin-bottom: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        .today-card.complete {
+            background: rgba(76, 175, 80, 0.2);
+            border-color: rgba(76, 175, 80, 0.5);
+        }
+        
+        .today-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        
+        .today-sessions {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 10px;
+        }
+        
+        .today-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            opacity: 0.4;
+        }
+        
+        .today-item.done {
+            opacity: 1;
+        }
+        
+        .today-item.done .today-icon::after {
+            content: '✓';
+            position: absolute;
+            bottom: -2px;
+            right: -8px;
+            font-size: 10px;
+            color: #4CAF50;
+        }
+        
+        .today-icon {
+            font-size: 24px;
+            position: relative;
+        }
+        
+        .today-label {
+            font-size: 10px;
+            color: rgba(0,0,0,0.5);
+        }
+        
+        .today-status {
+            text-align: center;
+            font-size: 12px;
+            color: #6B4E9B;
+            font-weight: 600;
+        }
+        
+        .today-card.complete .today-status {
+            color: #4CAF50;
+        }
     </style>
 </head>
 <body>
@@ -336,6 +413,26 @@
         </div>
         
         <div class="content">
+            <!-- Today Progress -->
+            <div class="today-card" id="todayCard">
+                <div class="today-title">Aujourd'hui</div>
+                <div class="today-sessions">
+                    <div class="today-item" id="todayMatin">
+                        <span class="today-icon">🌅</span>
+                        <span class="today-label">Matin</span>
+                    </div>
+                    <div class="today-item" id="todaySoir">
+                        <span class="today-icon">🌙</span>
+                        <span class="today-label">Soir</span>
+                    </div>
+                    <div class="today-item" id="todayProfonde">
+                        <span class="today-icon">🔥</span>
+                        <span class="today-label">Profonde</span>
+                    </div>
+                </div>
+                <div class="today-status" id="todayStatus">0/3 sessions</div>
+            </div>
+            
             <!-- Stats Grid -->
             <div class="stats-grid">
                 <div class="stat-card">
@@ -353,7 +450,7 @@
                 <div class="stat-card">
                     <div class="stat-icon">✨</div>
                     <div class="stat-value" id="totalSessions">0</div>
-                    <div class="stat-label">Sessions totales</div>
+                    <div class="stat-label">Jours complets</div>
                 </div>
             </div>
             
@@ -431,15 +528,54 @@
         const clarityEmojis = ['🌫️', '🌥️', '⛅', '🌤️', '☀️'];
         
         // ========== STATS ==========
+        function isDayComplete(dateStr) {
+            const sessions = JSON.parse(localStorage.getItem('wutree_visualization_sessions') || '[]');
+            const daySessions = sessions.filter(s => s.date === dateStr);
+            const modes = daySessions.map(s => s.mode);
+            return modes.includes('matin') && modes.includes('soir') && modes.includes('profonde');
+        }
+        
+        function getCompletedDays() {
+            // Retourne uniquement les jours où les 3 sessions sont faites
+            const sessions = JSON.parse(localStorage.getItem('wutree_visualization_sessions') || '[]');
+            const allDates = [...new Set(sessions.map(s => s.date))];
+            return allDates.filter(date => isDayComplete(date));
+        }
+        
         function loadStats() {
             const sessions = JSON.parse(localStorage.getItem('wutree_visualization_sessions') || '[]');
-            const tracker = JSON.parse(localStorage.getItem('wutree_visualization_tracker') || '[]');
+            const completedDays = getCompletedDays();
+            const today = new Date().toISOString().split('T')[0];
             
-            // Total sessions
-            document.getElementById('totalSessions').textContent = sessions.length;
+            // Today's progress
+            const todaySessions = sessions.filter(s => s.date === today);
+            const todayModes = todaySessions.map(s => s.mode);
             
-            // Streak
-            const streak = calculateStreak(tracker);
+            if (todayModes.includes('matin')) {
+                document.getElementById('todayMatin').classList.add('done');
+            }
+            if (todayModes.includes('soir')) {
+                document.getElementById('todaySoir').classList.add('done');
+            }
+            if (todayModes.includes('profonde')) {
+                document.getElementById('todayProfonde').classList.add('done');
+            }
+            
+            const todayCount = new Set(todayModes).size;
+            const todayStatus = document.getElementById('todayStatus');
+            
+            if (todayCount === 3) {
+                document.getElementById('todayCard').classList.add('complete');
+                todayStatus.textContent = '✓ Journée complète !';
+            } else {
+                todayStatus.textContent = `${todayCount}/3 sessions`;
+            }
+            
+            // Total jours complets
+            document.getElementById('totalSessions').textContent = completedDays.length;
+            
+            // Streak (jours consécutifs complets)
+            const streak = calculateStreak(completedDays);
             document.getElementById('streakCount').textContent = streak;
             document.getElementById('streakFill').style.width = Math.min((streak / 21) * 100, 100) + '%';
             
@@ -452,19 +588,19 @@
             const todayStr = today.toISOString().split('T')[0];
             
             let streak = 0;
-            let checkDate = new Date(today);
             
-            // If today is not completed, start from yesterday
-            if (!completedDays.includes(todayStr)) {
-                checkDate.setDate(checkDate.getDate() - 1);
-            }
+            // Commencer par aujourd'hui ou hier selon si aujourd'hui est complet
+            let startFromYesterday = !completedDays.includes(todayStr);
             
-            while (true) {
+            for (let i = startFromYesterday ? 1 : 0; i < 365; i++) {
+                const checkDate = new Date(today);
+                checkDate.setDate(checkDate.getDate() - i);
                 const dateStr = checkDate.toISOString().split('T')[0];
+                
                 if (completedDays.includes(dateStr)) {
                     streak++;
-                    checkDate.setDate(checkDate.getDate() - 1);
                 } else {
+                    // Jour non complet = streak cassé
                     break;
                 }
             }
@@ -517,7 +653,7 @@
         
         // ========== CALENDAR ==========
         function renderCalendar() {
-            const tracker = JSON.parse(localStorage.getItem('wutree_visualization_tracker') || '[]');
+            const completedDays = getCompletedDays();
             const today = new Date();
             const todayStr = today.toISOString().split('T')[0];
             
@@ -553,8 +689,15 @@
                 
                 const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
                 
-                if (tracker.includes(dateStr)) {
+                if (completedDays.includes(dateStr)) {
                     day.classList.add('completed');
+                } else {
+                    // Vérifier si partiellement fait
+                    const sessions = JSON.parse(localStorage.getItem('wutree_visualization_sessions') || '[]');
+                    const daySessions = sessions.filter(s => s.date === dateStr);
+                    if (daySessions.length > 0 && daySessions.length < 3) {
+                        day.classList.add('partial');
+                    }
                 }
                 
                 if (dateStr === todayStr) {
