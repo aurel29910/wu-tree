@@ -311,7 +311,7 @@
             border-color: #4CAF50;
         }
         
-        /* Orbe central */
+        /* Orbe central - gardé pour phases 2 et 3 */
         .orb-container {
             position: relative;
             width: 200px; height: 200px;
@@ -363,27 +363,80 @@
                         0 0 150px rgba(50, 200, 80, 0.3);
         }
         
-        /* Breathing animation */
-        .orb.breathing { animation: breathe 10s ease-in-out infinite; }
-        @keyframes breathe {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.25); }
-        }
-        
-        /* Heartbeat animation */
-        .orb.heartbeat { animation: heartbeat 1.5s ease-in-out infinite; }
-        @keyframes heartbeat {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); }
-            15% { transform: translate(-50%, -50%) scale(1.15); }
-            30% { transform: translate(-50%, -50%) scale(1); }
-            45% { transform: translate(-50%, -50%) scale(1.1); }
-        }
-        
-        /* Glow pulse */
+        /* Glow pulse for non-breathing phases */
         .orb.glow-pulse { animation: glow-pulse 4s ease-in-out infinite; }
         @keyframes glow-pulse {
             0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
             50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.9; }
+        }
+        
+        /* ========== BREATHING BUBBLE ========== */
+        .breathing-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .breathing-container.active {
+            display: flex;
+        }
+        
+        .breathing-track {
+            width: 80px;
+            height: 280px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 40px;
+            position: relative;
+            border: 2px solid rgba(255,255,255,0.5);
+            overflow: hidden;
+        }
+        
+        .breathing-bubble {
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle at 30% 30%, 
+                rgba(100, 200, 255, 0.95) 0%, 
+                rgba(50, 150, 220, 0.8) 50%,
+                rgba(30, 100, 180, 0.6) 100%);
+            border-radius: 50%;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 10px;
+            box-shadow: 0 0 30px rgba(100, 180, 255, 0.6),
+                        inset 0 -5px 15px rgba(255,255,255,0.3);
+            transition: bottom 5s ease-in-out;
+        }
+        
+        .breathing-bubble.inhale {
+            bottom: 210px;
+        }
+        
+        .breathing-bubble.exhale {
+            bottom: 10px;
+        }
+        
+        /* Petites bulles décoratives */
+        .mini-bubble {
+            position: absolute;
+            background: rgba(255,255,255,0.6);
+            border-radius: 50%;
+            animation: float-up 3s ease-in infinite;
+        }
+        
+        @keyframes float-up {
+            0% { opacity: 0; transform: translateY(0) scale(0.5); }
+            50% { opacity: 0.8; }
+            100% { opacity: 0; transform: translateY(-100px) scale(1); }
+        }
+        
+        .breathing-label {
+            font-size: 20px;
+            font-weight: 600;
+            color: #6B4E9B;
+            margin-top: 20px;
+            height: 30px;
         }
         
         /* Rings */
@@ -782,8 +835,17 @@
                     <div class="phase-dot" id="dot3"></div>
                 </div>
                 
+                <!-- Breathing bubble for phase 1 -->
+                <div class="breathing-container" id="breathingContainer">
+                    <div class="breathing-track">
+                        <div class="breathing-bubble" id="breathingBubble"></div>
+                    </div>
+                    <div class="breathing-label" id="breathingLabel">Inspire...</div>
+                </div>
+                
+                <!-- Orb for phases 2 & 3 -->
                 <div class="orb-container" id="orbContainer">
-                    <div class="orb coherence breathing" id="orb"></div>
+                    <div class="orb vision glow-pulse" id="orb"></div>
                     <div class="ring"></div>
                     <div class="ring"></div>
                     <div class="ring"></div>
@@ -792,7 +854,6 @@
                 <div class="phase-title" id="phaseTitle">Phase 1</div>
                 <div class="phase-instruction" id="phaseInstruction">Prépare-toi...</div>
                 <div class="phase-timer" id="phaseTimer">1:00</div>
-                <div class="breathing-hint" id="breathingHint"></div>
                 
                 <!-- Vision display for relecture phase -->
                 <div class="deep-vision-display" id="deepVisionDisplay">
@@ -883,10 +944,9 @@
                 orbClass: 'coherence',
                 animation: 'breathing',
                 instructions: [
-                    { time: 0, text: 'Pose tes mains sur ton cœur...', speak: true },
-                    { time: 8, text: 'Respire lentement...', speak: true },
-                    { time: 20, text: 'Ressens la gratitude...', speak: true },
-                    { time: 35, text: 'Pense à quelqu\'un que tu aimes...', speak: true },
+                    { time: 0, text: 'Pose tes mains sur ton cœur...' },
+                    { time: 20, text: 'Ressens la gratitude...' },
+                    { time: 40, text: 'Laisse l\'amour rayonner...' },
                 ]
             },
             {
@@ -896,7 +956,7 @@
                 animation: 'glow-pulse',
                 showVision: true,
                 instructions: [
-                    { time: 0, text: 'Lis ta vision... Ressens chaque mot...', speak: true },
+                    { time: 0, text: 'Lis ta vision... Ressens chaque mot...' },
                 ]
             },
             {
@@ -905,8 +965,8 @@
                 orbClass: 'gratitude',
                 animation: 'glow-pulse',
                 instructions: [
-                    { time: 0, text: 'Merci...', speak: true },
-                    { time: 10, text: 'C\'est fait.', speak: true },
+                    { time: 0, text: 'Merci...' },
+                    { time: 15, text: 'C\'est fait.' },
                 ]
             }
         ];
@@ -1027,7 +1087,6 @@
             
             if (mode === 'profonde') {
                 document.getElementById('headerTitle').textContent = '🔥 Session Profonde';
-                document.getElementById('voiceBtn').classList.add('visible');
                 startDeepSession();
             } else if (mode === 'soir') {
                 document.body.classList.add('night-mode');
@@ -1057,6 +1116,11 @@
             deepVoiceBtn.classList.remove('playing');
             deepVoiceBtn.textContent = '🔊 Écouter';
             
+            // Stop breathing if switching away from phase 0
+            if (currentPhase === 0 && phaseIndex !== 0) {
+                stopBreathingBubble();
+            }
+            
             currentPhase = phaseIndex;
             const phase = DEEP_PHASES[phaseIndex];
             
@@ -1068,44 +1132,42 @@
                 if (i === phaseIndex) dot.classList.add('active');
             }
             
-            // Update orb
-            const orb = document.getElementById('orb');
-            orb.className = 'orb ' + phase.orbClass + ' ' + phase.animation;
-            
-            // Show/hide vision display
-            const visionDisplay = document.getElementById('deepVisionDisplay');
+            // Show/hide containers based on phase
+            const breathingContainer = document.getElementById('breathingContainer');
             const orbContainer = document.getElementById('orbContainer');
+            const visionDisplay = document.getElementById('deepVisionDisplay');
             
-            if (phase.showVision) {
-                visionDisplay.classList.add('visible');
+            if (phaseIndex === 0) {
+                // Coherence phase - show breathing bubble
+                breathingContainer.classList.add('active');
                 orbContainer.style.display = 'none';
+                visionDisplay.classList.remove('visible');
+                startBreathingBubble();
+            } else if (phase.showVision) {
+                // Relecture phase - show vision
+                breathingContainer.classList.remove('active');
+                orbContainer.style.display = 'none';
+                visionDisplay.classList.add('visible');
                 document.getElementById('deepVisionText').textContent = visionData.text;
             } else {
-                visionDisplay.classList.remove('visible');
+                // Ancrage phase - show orb
+                breathingContainer.classList.remove('active');
                 orbContainer.style.display = 'block';
+                visionDisplay.classList.remove('visible');
+                
+                const orb = document.getElementById('orb');
+                orb.className = 'orb ' + phase.orbClass + ' ' + phase.animation;
             }
             
             // Update text
             document.getElementById('phaseTitle').textContent = phase.name;
             document.getElementById('phaseInstruction').textContent = phase.instructions[0].text;
             
-            // Speak first instruction
-            if (phase.instructions[0].speak && !isVoiceMuted) {
-                speak(phase.instructions[0].text);
-            }
-            
             // Start timer
             let remaining = phase.duration;
             let instructionIndex = 1;
             
             updateTimerDisplay(remaining);
-            
-            // Breathing hint for coherence phase
-            if (phaseIndex === 0) {
-                startBreathingHints();
-            } else {
-                stopBreathingHints();
-            }
             
             phaseTimer = setInterval(() => {
                 remaining--;
@@ -1116,9 +1178,6 @@
                     const nextInstr = phase.instructions[instructionIndex];
                     if (phase.duration - remaining >= nextInstr.time) {
                         document.getElementById('phaseInstruction').textContent = nextInstr.text;
-                        if (nextInstr.speak && !isVoiceMuted) {
-                            speak(nextInstr.text);
-                        }
                         instructionIndex++;
                     }
                 }
@@ -1137,32 +1196,160 @@
                 mins + ':' + secs.toString().padStart(2, '0');
         }
         
-        function startBreathingHints() {
-            const hint = document.getElementById('breathingHint');
-            let isInhale = true;
+        // ========== AUDIO SYSTEM ==========
+        let audioContext = null;
+        let waterSource = null;
+        let waterGain = null;
+        
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        }
+        
+        function playDing() {
+            initAudio();
             
-            hint.textContent = 'Inspire...';
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
             
-            breathingInterval = setInterval(() => {
-                isInhale = !isInhale;
-                hint.textContent = isInhale ? 'Inspire...' : 'Expire...';
+            // Son de bol tibétain / cloche
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(528, audioContext.currentTime); // Fréquence "miracle" 528Hz
+            
+            gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 2);
+            
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+            
+            osc.start(audioContext.currentTime);
+            osc.stop(audioContext.currentTime + 2);
+            
+            // Harmonique pour plus de richesse
+            const osc2 = audioContext.createOscillator();
+            const gain2 = audioContext.createGain();
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(528 * 2, audioContext.currentTime);
+            gain2.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.5);
+            osc2.connect(gain2);
+            gain2.connect(audioContext.destination);
+            osc2.start(audioContext.currentTime);
+            osc2.stop(audioContext.currentTime + 1.5);
+        }
+        
+        function startWaterSound() {
+            initAudio();
+            
+            // Créer du bruit blanc filtré pour simuler l'eau
+            const bufferSize = 2 * audioContext.sampleRate;
+            const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+            const output = noiseBuffer.getChannelData(0);
+            
+            for (let i = 0; i < bufferSize; i++) {
+                output[i] = Math.random() * 2 - 1;
+            }
+            
+            waterSource = audioContext.createBufferSource();
+            waterSource.buffer = noiseBuffer;
+            waterSource.loop = true;
+            
+            // Filtre passe-bas pour son d'eau
+            const filter = audioContext.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(400, audioContext.currentTime);
+            filter.Q.setValueAtTime(1, audioContext.currentTime);
+            
+            // Filtre passe-haut pour enlever les basses
+            const highpass = audioContext.createBiquadFilter();
+            highpass.type = 'highpass';
+            highpass.frequency.setValueAtTime(100, audioContext.currentTime);
+            
+            waterGain = audioContext.createGain();
+            waterGain.gain.setValueAtTime(0.08, audioContext.currentTime);
+            
+            waterSource.connect(filter);
+            filter.connect(highpass);
+            highpass.connect(waterGain);
+            waterGain.connect(audioContext.destination);
+            
+            waterSource.start();
+        }
+        
+        function stopWaterSound() {
+            if (waterSource) {
+                waterSource.stop();
+                waterSource = null;
+            }
+        }
+        
+        // ========== BREATHING BUBBLE ==========
+        let breathingCycleInterval = null;
+        let isInhaling = true;
+        
+        function startBreathingBubble() {
+            const bubble = document.getElementById('breathingBubble');
+            const label = document.getElementById('breathingLabel');
+            
+            // Start water sound
+            startWaterSound();
+            
+            // Initial state
+            isInhaling = true;
+            bubble.classList.remove('exhale');
+            bubble.classList.add('inhale');
+            label.textContent = 'Inspire...';
+            playDing();
+            
+            // Toggle every 5 seconds
+            breathingCycleInterval = setInterval(() => {
+                isInhaling = !isInhaling;
+                playDing();
+                
+                if (isInhaling) {
+                    bubble.classList.remove('exhale');
+                    bubble.classList.add('inhale');
+                    label.textContent = 'Inspire...';
+                } else {
+                    bubble.classList.remove('inhale');
+                    bubble.classList.add('exhale');
+                    label.textContent = 'Expire...';
+                }
             }, 5000);
         }
         
-        function stopBreathingHints() {
-            if (breathingInterval) {
-                clearInterval(breathingInterval);
-                breathingInterval = null;
+        function stopBreathingBubble() {
+            if (breathingCycleInterval) {
+                clearInterval(breathingCycleInterval);
+                breathingCycleInterval = null;
             }
-            document.getElementById('breathingHint').textContent = '';
+            stopWaterSound();
+            
+            // Reset bubble
+            const bubble = document.getElementById('breathingBubble');
+            bubble.classList.remove('inhale', 'exhale');
+        }
+        
+        // Old functions kept for compatibility
+        function startBreathingHints() {
+            // Now handled by startBreathingBubble
+        }
+        
+        function stopBreathingHints() {
+            stopBreathingBubble();
         }
         
         function endDeepSession() {
-            stopBreathingHints();
+            stopBreathingBubble();
             speechSynth.cancel();
             document.getElementById('deepVoiceBtn').classList.remove('playing');
             document.getElementById('deepVoiceBtn').textContent = '🔊 Écouter';
             document.getElementById('deepVisionDisplay').classList.remove('visible');
+            document.getElementById('breathingContainer').classList.remove('active');
             document.getElementById('orbContainer').style.display = 'block';
             document.getElementById('deepSession').classList.remove('active');
             document.getElementById('bilanScreen').classList.add('active');
@@ -1325,7 +1512,7 @@
         function goBack() {
             speechSynth.cancel();
             if (phaseTimer) clearInterval(phaseTimer);
-            stopBreathingHints();
+            stopBreathingBubble();
             window.location.href = 'wu-tree-v2-visualization.html';
         }
         
