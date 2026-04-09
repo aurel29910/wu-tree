@@ -370,11 +370,12 @@
             50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.9; }
         }
         
-        /* ========== BREATHING BUBBLE ========== */
+        /* ========== BREATHING ORB (pulse + waves) ========== */
         .breathing-container {
             display: none;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             margin-bottom: 20px;
         }
         
@@ -382,60 +383,81 @@
             display: flex;
         }
         
-        .breathing-track {
-            width: 80px;
-            height: 280px;
-            background: rgba(255,255,255,0.3);
-            border-radius: 40px;
+        .breathing-orb-wrapper {
             position: relative;
-            border: 2px solid rgba(255,255,255,0.5);
-            overflow: hidden;
+            width: 220px;
+            height: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
-        .breathing-bubble {
-            width: 60px;
-            height: 60px;
+        .breathing-orb {
+            width: 120px;
+            height: 120px;
             background: radial-gradient(circle at 30% 30%, 
-                rgba(100, 200, 255, 0.95) 0%, 
-                rgba(50, 150, 220, 0.8) 50%,
-                rgba(30, 100, 180, 0.6) 100%);
+                rgba(255, 182, 193, 0.95) 0%, 
+                rgba(255, 130, 160, 0.85) 40%,
+                rgba(220, 100, 140, 0.7) 70%,
+                rgba(180, 80, 120, 0.5) 100%);
             border-radius: 50%;
+            box-shadow: 0 0 40px rgba(255, 150, 180, 0.5),
+                        0 0 80px rgba(255, 130, 160, 0.3),
+                        inset 0 -10px 30px rgba(255,255,255,0.2);
+            transition: transform 5s ease-in-out, box-shadow 5s ease-in-out;
+            z-index: 10;
+        }
+        
+        .breathing-orb.inhale {
+            transform: scale(1.5);
+            box-shadow: 0 0 60px rgba(255, 150, 180, 0.6),
+                        0 0 120px rgba(255, 130, 160, 0.4),
+                        inset 0 -10px 30px rgba(255,255,255,0.3);
+        }
+        
+        .breathing-orb.exhale {
+            transform: scale(1);
+            box-shadow: 0 0 40px rgba(255, 150, 180, 0.5),
+                        0 0 80px rgba(255, 130, 160, 0.3),
+                        inset 0 -10px 30px rgba(255,255,255,0.2);
+        }
+        
+        /* Ondes qui émanent */
+        .breathing-wave {
             position: absolute;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
-            bottom: 10px;
-            box-shadow: 0 0 30px rgba(100, 180, 255, 0.6),
-                        inset 0 -5px 15px rgba(255,255,255,0.3);
-            transition: bottom 5s ease-in-out;
-        }
-        
-        .breathing-bubble.inhale {
-            bottom: 210px;
-        }
-        
-        .breathing-bubble.exhale {
-            bottom: 10px;
-        }
-        
-        /* Petites bulles décoratives */
-        .mini-bubble {
-            position: absolute;
-            background: rgba(255,255,255,0.6);
+            transform: translate(-50%, -50%);
             border-radius: 50%;
-            animation: float-up 3s ease-in infinite;
+            border: 2px solid rgba(255, 150, 180, 0.4);
+            animation: wave-expand 5s ease-out infinite;
+            pointer-events: none;
         }
         
-        @keyframes float-up {
-            0% { opacity: 0; transform: translateY(0) scale(0.5); }
-            50% { opacity: 0.8; }
-            100% { opacity: 0; transform: translateY(-100px) scale(1); }
+        .breathing-wave:nth-child(2) { animation-delay: 1.25s; }
+        .breathing-wave:nth-child(3) { animation-delay: 2.5s; }
+        .breathing-wave:nth-child(4) { animation-delay: 3.75s; }
+        
+        @keyframes wave-expand {
+            0% { 
+                width: 120px; 
+                height: 120px; 
+                opacity: 0.6;
+                border-color: rgba(255, 150, 180, 0.5);
+            }
+            100% { 
+                width: 280px; 
+                height: 280px; 
+                opacity: 0;
+                border-color: rgba(255, 150, 180, 0);
+            }
         }
         
         .breathing-label {
             font-size: 20px;
             font-weight: 600;
             color: #6B4E9B;
-            margin-top: 20px;
+            margin-top: 30px;
             height: 30px;
         }
         
@@ -835,10 +857,14 @@
                     <div class="phase-dot" id="dot3"></div>
                 </div>
                 
-                <!-- Breathing bubble for phase 1 -->
+                <!-- Breathing orb for phase 1 -->
                 <div class="breathing-container" id="breathingContainer">
-                    <div class="breathing-track">
-                        <div class="breathing-bubble" id="breathingBubble"></div>
+                    <div class="breathing-orb-wrapper">
+                        <div class="breathing-orb" id="breathingOrb"></div>
+                        <div class="breathing-wave"></div>
+                        <div class="breathing-wave"></div>
+                        <div class="breathing-wave"></div>
+                        <div class="breathing-wave"></div>
                     </div>
                     <div class="breathing-label" id="breathingLabel">Inspire...</div>
                 </div>
@@ -1196,10 +1222,12 @@
                 mins + ':' + secs.toString().padStart(2, '0');
         }
         
-        // ========== AUDIO SYSTEM ==========
+        // ========== AUDIO SYSTEM - OCEAN WAVES ==========
         let audioContext = null;
-        let waterSource = null;
-        let waterGain = null;
+        let oceanSource = null;
+        let oceanGain = null;
+        let oceanFilter = null;
+        let isOceanPlaying = false;
         
         function initAudio() {
             if (!audioContext) {
@@ -1210,138 +1238,149 @@
             }
         }
         
-        function playDing() {
+        function startOceanSound() {
             initAudio();
+            if (isOceanPlaying) return;
             
-            const osc = audioContext.createOscillator();
-            const gain = audioContext.createGain();
-            
-            // Son de bol tibétain / cloche
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(528, audioContext.currentTime); // Fréquence "miracle" 528Hz
-            
-            gain.gain.setValueAtTime(0.3, audioContext.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 2);
-            
-            osc.connect(gain);
-            gain.connect(audioContext.destination);
-            
-            osc.start(audioContext.currentTime);
-            osc.stop(audioContext.currentTime + 2);
-            
-            // Harmonique pour plus de richesse
-            const osc2 = audioContext.createOscillator();
-            const gain2 = audioContext.createGain();
-            osc2.type = 'sine';
-            osc2.frequency.setValueAtTime(528 * 2, audioContext.currentTime);
-            gain2.gain.setValueAtTime(0.1, audioContext.currentTime);
-            gain2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.5);
-            osc2.connect(gain2);
-            gain2.connect(audioContext.destination);
-            osc2.start(audioContext.currentTime);
-            osc2.stop(audioContext.currentTime + 1.5);
-        }
-        
-        function startWaterSound() {
-            initAudio();
-            
-            // Créer du bruit blanc filtré pour simuler l'eau
+            // Créer du bruit pour simuler l'océan
             const bufferSize = 2 * audioContext.sampleRate;
             const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
             const output = noiseBuffer.getChannelData(0);
             
+            // Bruit rose (plus doux que le bruit blanc)
+            let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
             for (let i = 0; i < bufferSize; i++) {
-                output[i] = Math.random() * 2 - 1;
+                const white = Math.random() * 2 - 1;
+                b0 = 0.99886 * b0 + white * 0.0555179;
+                b1 = 0.99332 * b1 + white * 0.0750759;
+                b2 = 0.96900 * b2 + white * 0.1538520;
+                b3 = 0.86650 * b3 + white * 0.3104856;
+                b4 = 0.55000 * b4 + white * 0.5329522;
+                b5 = -0.7616 * b5 - white * 0.0168980;
+                output[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+                b6 = white * 0.115926;
             }
             
-            waterSource = audioContext.createBufferSource();
-            waterSource.buffer = noiseBuffer;
-            waterSource.loop = true;
+            oceanSource = audioContext.createBufferSource();
+            oceanSource.buffer = noiseBuffer;
+            oceanSource.loop = true;
             
-            // Filtre passe-bas pour son d'eau
-            const filter = audioContext.createBiquadFilter();
-            filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(400, audioContext.currentTime);
-            filter.Q.setValueAtTime(1, audioContext.currentTime);
+            // Filtre passe-bas pour son d'océan doux
+            oceanFilter = audioContext.createBiquadFilter();
+            oceanFilter.type = 'lowpass';
+            oceanFilter.frequency.setValueAtTime(300, audioContext.currentTime);
+            oceanFilter.Q.setValueAtTime(1, audioContext.currentTime);
             
-            // Filtre passe-haut pour enlever les basses
+            // Filtre passe-haut pour enlever les basses trop lourdes
             const highpass = audioContext.createBiquadFilter();
             highpass.type = 'highpass';
-            highpass.frequency.setValueAtTime(100, audioContext.currentTime);
+            highpass.frequency.setValueAtTime(80, audioContext.currentTime);
             
-            waterGain = audioContext.createGain();
-            waterGain.gain.setValueAtTime(0.08, audioContext.currentTime);
+            oceanGain = audioContext.createGain();
+            oceanGain.gain.setValueAtTime(0.15, audioContext.currentTime);
             
-            waterSource.connect(filter);
-            filter.connect(highpass);
-            highpass.connect(waterGain);
-            waterGain.connect(audioContext.destination);
+            oceanSource.connect(oceanFilter);
+            oceanFilter.connect(highpass);
+            highpass.connect(oceanGain);
+            oceanGain.connect(audioContext.destination);
             
-            waterSource.start();
+            oceanSource.start();
+            isOceanPlaying = true;
         }
         
-        function stopWaterSound() {
-            if (waterSource) {
-                waterSource.stop();
-                waterSource = null;
+        function modulateOceanInhale() {
+            if (!oceanGain || !oceanFilter) return;
+            
+            // Vague qui arrive : volume monte, fréquence monte
+            const now = audioContext.currentTime;
+            oceanGain.gain.cancelScheduledValues(now);
+            oceanGain.gain.setValueAtTime(oceanGain.gain.value, now);
+            oceanGain.gain.linearRampToValueAtTime(0.25, now + 4.5);
+            
+            oceanFilter.frequency.cancelScheduledValues(now);
+            oceanFilter.frequency.setValueAtTime(oceanFilter.frequency.value, now);
+            oceanFilter.frequency.linearRampToValueAtTime(500, now + 4.5);
+        }
+        
+        function modulateOceanExhale() {
+            if (!oceanGain || !oceanFilter) return;
+            
+            // Vague qui repart : volume descend, fréquence descend
+            const now = audioContext.currentTime;
+            oceanGain.gain.cancelScheduledValues(now);
+            oceanGain.gain.setValueAtTime(oceanGain.gain.value, now);
+            oceanGain.gain.linearRampToValueAtTime(0.08, now + 4.5);
+            
+            oceanFilter.frequency.cancelScheduledValues(now);
+            oceanFilter.frequency.setValueAtTime(oceanFilter.frequency.value, now);
+            oceanFilter.frequency.linearRampToValueAtTime(200, now + 4.5);
+        }
+        
+        function stopOceanSound() {
+            if (oceanSource) {
+                oceanSource.stop();
+                oceanSource = null;
+                oceanGain = null;
+                oceanFilter = null;
+                isOceanPlaying = false;
             }
         }
         
-        // ========== BREATHING BUBBLE ==========
+        // ========== BREATHING ORB ==========
         let breathingCycleInterval = null;
         let isInhaling = true;
         
-        function startBreathingBubble() {
-            const bubble = document.getElementById('breathingBubble');
+        function startBreathingOrb() {
+            const orb = document.getElementById('breathingOrb');
             const label = document.getElementById('breathingLabel');
             
-            // Start water sound
-            startWaterSound();
+            // Start ocean sound
+            startOceanSound();
             
-            // Initial state
+            // Initial state - inhale
             isInhaling = true;
-            bubble.classList.remove('exhale');
-            bubble.classList.add('inhale');
+            orb.classList.remove('exhale');
+            orb.classList.add('inhale');
             label.textContent = 'Inspire...';
-            playDing();
+            modulateOceanInhale();
             
             // Toggle every 5 seconds
             breathingCycleInterval = setInterval(() => {
                 isInhaling = !isInhaling;
-                playDing();
                 
                 if (isInhaling) {
-                    bubble.classList.remove('exhale');
-                    bubble.classList.add('inhale');
+                    orb.classList.remove('exhale');
+                    orb.classList.add('inhale');
                     label.textContent = 'Inspire...';
+                    modulateOceanInhale();
                 } else {
-                    bubble.classList.remove('inhale');
-                    bubble.classList.add('exhale');
+                    orb.classList.remove('inhale');
+                    orb.classList.add('exhale');
                     label.textContent = 'Expire...';
+                    modulateOceanExhale();
                 }
             }, 5000);
         }
         
-        function stopBreathingBubble() {
+        function stopBreathingOrb() {
             if (breathingCycleInterval) {
                 clearInterval(breathingCycleInterval);
                 breathingCycleInterval = null;
             }
-            stopWaterSound();
+            stopOceanSound();
             
-            // Reset bubble
-            const bubble = document.getElementById('breathingBubble');
-            bubble.classList.remove('inhale', 'exhale');
+            // Reset orb
+            const orb = document.getElementById('breathingOrb');
+            if (orb) {
+                orb.classList.remove('inhale', 'exhale');
+            }
         }
         
-        // Old functions kept for compatibility
-        function startBreathingHints() {
-            // Now handled by startBreathingBubble
-        }
-        
-        function stopBreathingHints() {
-            stopBreathingBubble();
-        }
+        // Compatibility aliases
+        function startBreathingBubble() { startBreathingOrb(); }
+        function stopBreathingBubble() { stopBreathingOrb(); }
+        function startBreathingHints() {}
+        function stopBreathingHints() { stopBreathingOrb(); }
         
         function endDeepSession() {
             stopBreathingBubble();
