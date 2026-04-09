@@ -434,6 +434,50 @@
             margin-top: 10px;
         }
         
+        /* Vision display during relecture phase */
+        .deep-vision-display {
+            display: none;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .deep-vision-display.visible {
+            display: block;
+        }
+        
+        .deep-vision-text {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #333;
+            white-space: pre-wrap;
+            text-align: left;
+        }
+        
+        .deep-voice-btn {
+            display: block;
+            margin: 15px auto 0;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            border: none;
+            border-radius: 20px;
+            color: white;
+            font-family: 'Comfortaa', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .deep-voice-btn.playing {
+            background: rgba(107, 78, 155, 0.3);
+        }
+        
         /* ========== SESSION SIMPLE (matin/soir) ========== */
         .simple-session {
             display: none;
@@ -699,9 +743,9 @@
                         <div class="mode-card-emoji">🔥</div>
                         <div class="mode-card-content">
                             <div class="mode-card-title">Session profonde</div>
-                            <div class="mode-card-desc">Cohérence + cœur + visualisation</div>
+                            <div class="mode-card-desc">Cohérence + relecture + ancrage</div>
                         </div>
-                        <div class="mode-card-duration">~12 min</div>
+                        <div class="mode-card-duration">~3 min</div>
                         <div class="mode-card-check">✓</div>
                     </div>
                 </div>
@@ -730,16 +774,15 @@
                 </div>
             </div>
             
-            <!-- ===== SESSION PROFONDE - 4 PHASES ===== -->
+            <!-- ===== SESSION PROFONDE - 3 PHASES ===== -->
             <div class="deep-session" id="deepSession">
                 <div class="phase-progress">
                     <div class="phase-dot" id="dot1"></div>
                     <div class="phase-dot" id="dot2"></div>
                     <div class="phase-dot" id="dot3"></div>
-                    <div class="phase-dot" id="dot4"></div>
                 </div>
                 
-                <div class="orb-container">
+                <div class="orb-container" id="orbContainer">
                     <div class="orb coherence breathing" id="orb"></div>
                     <div class="ring"></div>
                     <div class="ring"></div>
@@ -748,8 +791,14 @@
                 
                 <div class="phase-title" id="phaseTitle">Phase 1</div>
                 <div class="phase-instruction" id="phaseInstruction">Prépare-toi...</div>
-                <div class="phase-timer" id="phaseTimer">5:00</div>
+                <div class="phase-timer" id="phaseTimer">1:00</div>
                 <div class="breathing-hint" id="breathingHint"></div>
+                
+                <!-- Vision display for relecture phase -->
+                <div class="deep-vision-display" id="deepVisionDisplay">
+                    <div class="deep-vision-text" id="deepVisionText"></div>
+                    <button class="deep-voice-btn" id="deepVoiceBtn" onclick="toggleDeepVoice()">🔊 Écouter</button>
+                </div>
             </div>
             
             <!-- ===== SESSION SIMPLE (matin/soir) ===== -->
@@ -826,51 +875,38 @@
         let speechSynth = window.speechSynthesis;
         let bilanData = { emotion: 0, clarity: 0, notes: '' };
         
-        // ========== DEEP SESSION PHASES ==========
+        // ========== DEEP SESSION PHASES (3 min total) ==========
         const DEEP_PHASES = [
             {
-                name: 'Cohérence cardiaque',
-                duration: 300, // 5 min
+                name: 'Cohérence & Cœur',
+                duration: 60, // 1 min
                 orbClass: 'coherence',
                 animation: 'breathing',
                 instructions: [
                     { time: 0, text: 'Pose tes mains sur ton cœur...', speak: true },
-                    { time: 10, text: 'Respire lentement...', speak: true },
-                    { time: 20, text: 'Inspire... 5 secondes', speak: false },
+                    { time: 8, text: 'Respire lentement...', speak: true },
+                    { time: 20, text: 'Ressens la gratitude...', speak: true },
+                    { time: 35, text: 'Pense à quelqu\'un que tu aimes...', speak: true },
                 ]
             },
             {
-                name: 'Ouverture du cœur',
-                duration: 150, // 2.5 min
-                orbClass: 'heart',
-                animation: 'heartbeat',
-                instructions: [
-                    { time: 0, text: 'Ressens la gratitude dans ton cœur...', speak: true },
-                    { time: 15, text: 'Pense à quelqu\'un que tu aimes...', speak: true },
-                    { time: 45, text: 'Laisse l\'amour rayonner...', speak: true },
-                ]
-            },
-            {
-                name: 'Visualisation',
-                duration: 210, // 3.5 min
+                name: 'Relecture',
+                duration: 90, // 1.5 min
                 orbClass: 'vision',
                 animation: 'glow-pulse',
+                showVision: true,
                 instructions: [
-                    { time: 0, text: 'Ferme les yeux...', speak: true },
-                    { time: 10, text: 'Tu es dans ta vie idéale...', speak: true },
-                    { time: 25, text: 'Vois les détails, les couleurs...', speak: true },
-                    { time: 45, text: 'Ressens comme si c\'était maintenant...', speak: true },
+                    { time: 0, text: 'Lis ta vision... Ressens chaque mot...', speak: true },
                 ]
             },
             {
-                name: 'Ancrage gratitude',
-                duration: 60, // 1 min
+                name: 'Ancrage',
+                duration: 30, // 30s
                 orbClass: 'gratitude',
                 animation: 'glow-pulse',
                 instructions: [
                     { time: 0, text: 'Merci...', speak: true },
-                    { time: 10, text: 'Merci pour cette vie...', speak: true },
-                    { time: 25, text: 'C\'est fait.', speak: true },
+                    { time: 10, text: 'C\'est fait.', speak: true },
                 ]
             }
         ];
@@ -1015,11 +1051,17 @@
                 return;
             }
             
+            // Cancel any ongoing speech from previous phase
+            speechSynth.cancel();
+            const deepVoiceBtn = document.getElementById('deepVoiceBtn');
+            deepVoiceBtn.classList.remove('playing');
+            deepVoiceBtn.textContent = '🔊 Écouter';
+            
             currentPhase = phaseIndex;
             const phase = DEEP_PHASES[phaseIndex];
             
-            // Update dots
-            for (let i = 0; i < 4; i++) {
+            // Update dots (3 dots now)
+            for (let i = 0; i < 3; i++) {
                 const dot = document.getElementById('dot' + (i + 1));
                 dot.classList.remove('active', 'completed');
                 if (i < phaseIndex) dot.classList.add('completed');
@@ -1029,6 +1071,19 @@
             // Update orb
             const orb = document.getElementById('orb');
             orb.className = 'orb ' + phase.orbClass + ' ' + phase.animation;
+            
+            // Show/hide vision display
+            const visionDisplay = document.getElementById('deepVisionDisplay');
+            const orbContainer = document.getElementById('orbContainer');
+            
+            if (phase.showVision) {
+                visionDisplay.classList.add('visible');
+                orbContainer.style.display = 'none';
+                document.getElementById('deepVisionText').textContent = visionData.text;
+            } else {
+                visionDisplay.classList.remove('visible');
+                orbContainer.style.display = 'block';
+            }
             
             // Update text
             document.getElementById('phaseTitle').textContent = phase.name;
@@ -1104,6 +1159,11 @@
         
         function endDeepSession() {
             stopBreathingHints();
+            speechSynth.cancel();
+            document.getElementById('deepVoiceBtn').classList.remove('playing');
+            document.getElementById('deepVoiceBtn').textContent = '🔊 Écouter';
+            document.getElementById('deepVisionDisplay').classList.remove('visible');
+            document.getElementById('orbContainer').style.display = 'block';
             document.getElementById('deepSession').classList.remove('active');
             document.getElementById('bilanScreen').classList.add('active');
         }
@@ -1199,6 +1259,34 @@
             };
             
             speechSynth.speak(utterance);
+        }
+        
+        function toggleDeepVoice() {
+            const btn = document.getElementById('deepVoiceBtn');
+            
+            if (btn.classList.contains('playing')) {
+                speechSynth.cancel();
+                btn.classList.remove('playing');
+                btn.textContent = '🔊 Écouter';
+            } else {
+                const utterance = new SpeechSynthesisUtterance(visionData.text);
+                utterance.lang = 'fr-FR';
+                utterance.rate = 0.75;
+                utterance.pitch = 1.1;
+                
+                const voices = speechSynth.getVoices();
+                const frenchVoice = voices.find(v => v.lang.includes('fr'));
+                if (frenchVoice) utterance.voice = frenchVoice;
+                
+                utterance.onend = () => {
+                    btn.classList.remove('playing');
+                    btn.textContent = '🔊 Écouter';
+                };
+                
+                speechSynth.speak(utterance);
+                btn.classList.add('playing');
+                btn.textContent = '🔇 Stop';
+            }
         }
         
         // ========== BILAN ==========
