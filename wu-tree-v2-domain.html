@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Wu Tree - Domaine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: 'Comfortaa', sans-serif;
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            padding: 20px;
+        }
+        
+        .phone-frame {
+            width: 100%; max-width: 390px;
+            height: 844px; max-height: 95vh;
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+            border-radius: 45px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.15);
+        }
+        
+        /* Pétales flottants */
+        .petal {
+            position: absolute;
+            width: 10px; height: 10px;
+            background: linear-gradient(135deg, rgba(255, 182, 193, 0.8), rgba(255, 105, 180, 0.6));
+            border-radius: 50% 0 50% 0;
+            animation: fall linear infinite;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .petal:nth-child(1) { left: 10%; animation-duration: 12s; width: 8px; }
+        .petal:nth-child(2) { left: 25%; animation-duration: 14s; animation-delay: 2s; }
+        .petal:nth-child(3) { left: 40%; animation-duration: 16s; animation-delay: 4s; }
+        .petal:nth-child(4) { left: 55%; animation-duration: 13s; animation-delay: 1s; }
+        .petal:nth-child(5) { left: 70%; animation-duration: 15s; animation-delay: 3s; }
+        .petal:nth-child(6) { left: 85%; animation-duration: 17s; animation-delay: 5s; }
+        
+        @keyframes fall {
+            0% { transform: translateY(-50px) rotate(0deg); opacity: 0.8; }
+            100% { transform: translateY(900px) rotate(360deg); opacity: 0; }
+        }
+        
+        /* Nuages */
+        .cloud {
+            position: absolute;
+            color: white;
+            font-size: 50px;
+            opacity: 0.5;
+            animation: float-cloud linear infinite;
+            pointer-events: none;
+            z-index: 5;
+        }
+        .cloud:nth-child(7) { top: 100px; animation-duration: 180s; }
+        .cloud:nth-child(8) { top: 200px; animation-duration: 220s; animation-delay: -60s; font-size: 40px; }
+        
+        @keyframes float-cloud {
+            0% { transform: translateX(-80px); }
+            100% { transform: translateX(470px); }
+        }
+        
+        .status-bar {
+            height: 47px;
+            padding: 15px 25px 0;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(0,0,0,0.6);
+            position: relative;
+            z-index: 100;
+        }
+        
+        .header {
+            padding: 10px 20px 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            z-index: 100;
+        }
+        
+        .back-btn {
+            width: 44px; height: 44px;
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 50%;
+            color: #333;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .header-content {
+            flex: 1;
+        }
+        
+        .header-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .header-subtitle {
+            font-size: 11px;
+            color: rgba(0,0,0,0.5);
+            margin-top: 3px;
+        }
+        
+        /* Content */
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 15px;
+            height: calc(100% - 180px);
+            overflow-y: auto;
+            position: relative;
+            z-index: 50;
+        }
+        
+        /* Bubbles grid */
+        .bubbles-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+            padding: 10px;
+        }
+        
+        /* Bulles flottantes */
+        .bubble {
+            width: 95px; height: 95px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(15px);
+            border: 3px solid rgba(255, 255, 255, 0.6);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 
+                0 8px 32px rgba(0,0,0,0.1),
+                inset 0 2px 10px rgba(255,255,255,0.4);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+        
+        .bubble:hover {
+            box-shadow: 
+                0 15px 40px rgba(0,0,0,0.15),
+                inset 0 2px 10px rgba(255,255,255,0.4);
+        }
+        
+        .bubble:active {
+            transform: scale(0.95) !important;
+        }
+        
+        /* Animations flottantes organiques */
+        .bubble:nth-child(1) { animation: float1 6s ease-in-out infinite; }
+        .bubble:nth-child(2) { animation: float2 7s ease-in-out infinite; animation-delay: -1s; }
+        .bubble:nth-child(3) { animation: float3 6.5s ease-in-out infinite; animation-delay: -2s; }
+        .bubble:nth-child(4) { animation: float4 7.5s ease-in-out infinite; animation-delay: -0.5s; }
+        .bubble:nth-child(5) { animation: float1 6.8s ease-in-out infinite; animation-delay: -3s; }
+        .bubble:nth-child(6) { animation: float2 7.2s ease-in-out infinite; animation-delay: -1.5s; }
+        
+        @keyframes float1 {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(8px, -12px) rotate(2deg); }
+            50% { transform: translate(-5px, -8px) rotate(-1deg); }
+            75% { transform: translate(10px, -15px) rotate(1deg); }
+        }
+        
+        @keyframes float2 {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(-10px, -10px) rotate(-2deg); }
+            50% { transform: translate(6px, -18px) rotate(1deg); }
+            75% { transform: translate(-8px, -6px) rotate(-1deg); }
+        }
+        
+        @keyframes float3 {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(6px, -15px) rotate(1deg); }
+            50% { transform: translate(-8px, -10px) rotate(-2deg); }
+            75% { transform: translate(4px, -8px) rotate(0deg); }
+        }
+        
+        @keyframes float4 {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(-6px, -8px) rotate(-1deg); }
+            50% { transform: translate(10px, -14px) rotate(2deg); }
+            75% { transform: translate(-4px, -12px) rotate(0deg); }
+        }
+        
+        .bubble-emoji {
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+        
+        .bubble-label {
+            font-size: 9px;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+            line-height: 1.2;
+            max-width: 80px;
+        }
+        
+        /* Effet de brillance */
+        .bubble::before {
+            content: '';
+            position: absolute;
+            top: 10%; left: 15%;
+            width: 30%; height: 20%;
+            background: rgba(255,255,255,0.5);
+            border-radius: 50%;
+            filter: blur(5px);
+        }
+        
+        /* Badge compteur */
+        .bubble-badge {
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            min-width: 18px;
+            height: 18px;
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            border-radius: 9px;
+            color: white;
+            font-size: 9px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            box-shadow: 0 2px 8px rgba(107, 78, 155, 0.4);
+        }
+        
+        .bubble-badge.empty {
+            display: none;
+        }
+        
+        /* Bulle d'ajout */
+        .bubble.add-bubble {
+            background: rgba(255, 255, 255, 0.25);
+            border: 3px dashed rgba(255, 255, 255, 0.5);
+        }
+        
+        .bubble.add-bubble .bubble-emoji {
+            font-size: 28px;
+            opacity: 0.6;
+        }
+        
+        .bubble.add-bubble .bubble-label {
+            opacity: 0.6;
+        }
+        
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .empty-emoji {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        
+        .empty-text {
+            font-size: 14px;
+            color: rgba(0,0,0,0.5);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .empty-btn {
+            padding: 14px 30px;
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            border: none;
+            border-radius: 25px;
+            color: white;
+            font-family: 'Comfortaa', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+        
+        .modal-overlay.show {
+            display: flex;
+        }
+        
+        .modal {
+            width: 85%;
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            padding: 18px 20px;
+            background: rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .modal-title {
+            flex: 1;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .modal-close {
+            width: 32px; height: 32px;
+            background: rgba(255,255,255,0.4);
+            border: none;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            padding: 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 18px;
+        }
+        
+        .input-label {
+            display: block;
+            font-size: 11px;
+            color: rgba(0,0,0,0.6);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 14px;
+            font-size: 15px;
+            font-family: 'Comfortaa', sans-serif;
+            background: rgba(255,255,255,0.4);
+            color: #333;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #6B4E9B;
+        }
+        
+        .input-field::placeholder {
+            color: rgba(0,0,0,0.3);
+        }
+        
+        .emoji-picker {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .emoji-option {
+            width: 44px; height: 44px;
+            background: rgba(255,255,255,0.4);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .emoji-option.selected {
+            border-color: #6B4E9B;
+            background: rgba(255,255,255,0.7);
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 14px;
+            font-family: 'Comfortaa', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.5);
+            color: #333;
+        }
+        
+        /* Bottom menu */
+        .bottom-menu {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.4);
+            z-index: 90;
+        }
+        
+        .menu-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 16px;
+            transition: all 0.3s;
+        }
+        
+        .menu-item.active {
+            background: rgba(255, 255, 255, 0.6);
+        }
+        
+        .menu-icon { font-size: 24px; }
+        .menu-label { font-size: 10px; color: rgba(0,0,0,0.6); font-weight: 500; }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <!-- Pétales -->
+        <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+        <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+        <!-- Nuages -->
+        <div class="cloud">☁️</div><div class="cloud">☁️</div>
+        
+        <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
+        
+        <div class="header">
+            <button class="back-btn" onclick="goBack()">←</button>
+            <div class="header-content">
+                <div class="header-title">
+                    <span id="domainEmoji">💪</span>
+                    <span id="domainName">Santé</span>
+                </div>
+                <div class="header-subtitle">Tes actions dans ce domaine</div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="bubbles-container" id="bubblesContainer">
+                <!-- Rempli par JS -->
+            </div>
+        </div>
+        
+        <div class="bottom-menu">
+            <div class="menu-item" onclick="goToWellbeing()">
+                <div class="menu-icon">✨</div>
+                <div class="menu-label">Bien-être</div>
+            </div>
+            <div class="menu-item active">
+                <div class="menu-icon">🌳</div>
+                <div class="menu-label">Arbre</div>
+            </div>
+            <div class="menu-item" onclick="goToTasks()">
+                <div class="menu-icon">📋</div>
+                <div class="menu-label">Tâches</div>
+            </div>
+        </div>
+        
+        <!-- Modal ajout action -->
+        <div class="modal-overlay" id="addModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title">Nouvelle action</div>
+                    <button class="modal-close" onclick="closeModal()">×</button>
+                </div>
+                <div class="modal-content">
+                    <div class="input-group">
+                        <label class="input-label">Nom de l'action</label>
+                        <input type="text" class="input-field" id="actionName" placeholder="Ex: Musculation, Méditation...">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Emoji</label>
+                        <div class="emoji-picker" id="emojiPicker">
+                            <!-- Rempli par JS -->
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+                        <button class="btn btn-primary" onclick="saveAction()">Ajouter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ========== STATE ==========
+        let currentDomainId = localStorage.getItem('wutree_current_domain') || 'sante';
+        let selectedEmoji = '⭐';
+        
+        // ========== DEFAULT EMOJIS BY DOMAIN ==========
+        const DOMAIN_EMOJIS = {
+            sante: ['🏋️', '🧘', '🥋', '🏃', '🚴', '🥗', '💊', '😴', '🧠', '💪'],
+            business: ['📈', '💻', '📊', '🎯', '📱', '💡', '📝', '🤝', '💵', '🏦'],
+            relations: ['👨‍👩‍👧', '💑', '👥', '🤝', '💬', '🎁', '📞', '❤️', '👋', '🫂'],
+            connaissance: ['📖', '🎓', '💻', '🧪', '🎨', '🎵', '🌍', '🧩', '✍️', '🔬'],
+            loisirs: ['🎮', '🎬', '🎵', '📚', '🎨', '⚽', '🎯', '🎸', '📷', '🎭'],
+            maison: ['🧹', '🛠️', '🌱', '🍳', '🛋️', '🔧', '📦', '🏠', '🪴', '✨'],
+            voyages: ['✈️', '🏖️', '⛺', '🗺️', '🎒', '🚗', '🏔️', '🌴', '📸', '🧳']
+        };
+        
+        // ========== LOAD DOMAIN ==========
+        function loadDomain() {
+            const domains = JSON.parse(localStorage.getItem('wutree_domains') || '[]');
+            const domain = domains.find(d => d.id === currentDomainId);
+            
+            if (domain) {
+                document.getElementById('domainEmoji').textContent = domain.emoji;
+                document.getElementById('domainName').textContent = domain.name;
+            }
+        }
+        
+        // ========== ACTIONS ==========
+        function loadActions() {
+            const actions = JSON.parse(localStorage.getItem('wutree_actions') || '[]');
+            return actions.filter(a => a.domainId === currentDomainId);
+        }
+        
+        function saveActions(actions) {
+            const allActions = JSON.parse(localStorage.getItem('wutree_actions') || '[]');
+            const otherActions = allActions.filter(a => a.domainId !== currentDomainId);
+            localStorage.setItem('wutree_actions', JSON.stringify([...otherActions, ...actions]));
+        }
+        
+        function getTaskCountForAction(actionId) {
+            const tasks = JSON.parse(localStorage.getItem('wutree_tasks') || '[]');
+            return tasks.filter(t => t.actionId === actionId && !t.completed).length;
+        }
+        
+        function renderBubbles() {
+            const container = document.getElementById('bubblesContainer');
+            const actions = loadActions();
+            
+            if (actions.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-emoji">🌱</div>
+                        <div class="empty-text">
+                            Aucune action dans ce domaine.<br>
+                            Ajoute ta première action !
+                        </div>
+                        <button class="empty-btn" onclick="openModal()">+ Ajouter</button>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = actions.map(action => {
+                const taskCount = getTaskCountForAction(action.id);
+                const badgeClass = taskCount === 0 ? 'bubble-badge empty' : 'bubble-badge';
+                
+                return `
+                    <div class="bubble" onclick="openAction('${action.id}')">
+                        <div class="${badgeClass}">${taskCount}</div>
+                        <div class="bubble-emoji">${action.emoji}</div>
+                        <div class="bubble-label">${action.name}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            // Ajouter la bulle d'ajout
+            html += `
+                <div class="bubble add-bubble" onclick="openModal()">
+                    <div class="bubble-emoji">+</div>
+                    <div class="bubble-label">Ajouter</div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+        
+        function openAction(actionId) {
+            localStorage.setItem('wutree_current_action', actionId);
+            window.location.href = 'wu-tree-v2-action.html';
+        }
+        
+        // ========== MODAL ==========
+        function openModal() {
+            // Remplir le picker d'emojis
+            const emojis = DOMAIN_EMOJIS[currentDomainId] || DOMAIN_EMOJIS.sante;
+            const picker = document.getElementById('emojiPicker');
+            
+            picker.innerHTML = emojis.map((emoji, i) => `
+                <div class="emoji-option ${i === 0 ? 'selected' : ''}" onclick="selectEmoji('${emoji}', this)">${emoji}</div>
+            `).join('');
+            
+            selectedEmoji = emojis[0];
+            document.getElementById('actionName').value = '';
+            document.getElementById('addModal').classList.add('show');
+        }
+        
+        function closeModal() {
+            document.getElementById('addModal').classList.remove('show');
+        }
+        
+        function selectEmoji(emoji, element) {
+            document.querySelectorAll('.emoji-option').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedEmoji = emoji;
+        }
+        
+        function saveAction() {
+            const name = document.getElementById('actionName').value.trim();
+            
+            if (!name) {
+                alert('Entre un nom pour l\'action !');
+                return;
+            }
+            
+            const actions = loadActions();
+            const newAction = {
+                id: 'action_' + Date.now(),
+                domainId: currentDomainId,
+                name: name,
+                emoji: selectedEmoji,
+                createdAt: new Date().toISOString()
+            };
+            
+            actions.push(newAction);
+            saveActions(actions);
+            closeModal();
+            renderBubbles();
+        }
+        
+        // ========== NAVIGATION ==========
+        function goBack() {
+            window.location.href = 'wu-tree-v2-home.html';
+        }
+        
+        function goToWellbeing() {
+            window.location.href = 'wu-tree-v2-wellbeing.html';
+        }
+        
+        function goToTasks() {
+            window.location.href = 'wu-tree-v2-tasks.html';
+        }
+        
+        // ========== INIT ==========
+        loadDomain();
+        renderBubbles();
+    </script>
+</body>
+</html>
