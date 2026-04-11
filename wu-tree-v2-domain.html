@@ -26,7 +26,6 @@
             box-shadow: 0 25px 80px rgba(0,0,0,0.15);
         }
         
-        /* Pétales flottants */
         .petal {
             position: absolute;
             width: 10px; height: 10px;
@@ -36,34 +35,15 @@
             pointer-events: none;
             z-index: 10;
         }
-        .petal:nth-child(1) { left: 10%; animation-duration: 12s; width: 8px; }
-        .petal:nth-child(2) { left: 25%; animation-duration: 14s; animation-delay: 2s; }
-        .petal:nth-child(3) { left: 40%; animation-duration: 16s; animation-delay: 4s; }
-        .petal:nth-child(4) { left: 55%; animation-duration: 13s; animation-delay: 1s; }
-        .petal:nth-child(5) { left: 70%; animation-duration: 15s; animation-delay: 3s; }
-        .petal:nth-child(6) { left: 85%; animation-duration: 17s; animation-delay: 5s; }
+        .petal:nth-child(1) { left: 10%; animation-duration: 12s; }
+        .petal:nth-child(2) { left: 30%; animation-duration: 14s; animation-delay: 2s; }
+        .petal:nth-child(3) { left: 50%; animation-duration: 16s; animation-delay: 4s; }
+        .petal:nth-child(4) { left: 70%; animation-duration: 13s; animation-delay: 1s; }
+        .petal:nth-child(5) { left: 90%; animation-duration: 15s; animation-delay: 3s; }
         
         @keyframes fall {
             0% { transform: translateY(-50px) rotate(0deg); opacity: 0.8; }
             100% { transform: translateY(900px) rotate(360deg); opacity: 0; }
-        }
-        
-        /* Nuages */
-        .cloud {
-            position: absolute;
-            color: white;
-            font-size: 50px;
-            opacity: 0.5;
-            animation: float-cloud linear infinite;
-            pointer-events: none;
-            z-index: 5;
-        }
-        .cloud:nth-child(7) { top: 100px; animation-duration: 180s; }
-        .cloud:nth-child(8) { top: 200px; animation-duration: 220s; animation-delay: -60s; font-size: 40px; }
-        
-        @keyframes float-cloud {
-            0% { transform: translateX(-80px); }
-            100% { transform: translateX(470px); }
         }
         
         .status-bar {
@@ -101,9 +81,7 @@
             justify-content: center;
         }
         
-        .header-content {
-            flex: 1;
-        }
+        .header-content { flex: 1; }
         
         .header-title {
             font-size: 20px;
@@ -120,30 +98,83 @@
             margin-top: 3px;
         }
         
-        /* Content */
         .content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px 15px;
-            height: calc(100% - 180px);
+            padding: 0 20px 100px;
+            height: calc(100% - 120px);
             overflow-y: auto;
             position: relative;
             z-index: 50;
         }
         
-        /* Bubbles grid */
-        .bubbles-container {
+        .section { margin-bottom: 25px; }
+        
+        .section-header {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 25px;
-            padding: 10px;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
         }
         
-        /* Bulles flottantes */
-        .bubble {
-            width: 95px; height: 95px;
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .section-add {
+            width: 28px; height: 28px;
+            background: rgba(255,255,255,0.5);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 50%;
+            font-size: 18px;
+            color: #6B4E9B;
+            cursor: pointer;
+        }
+        
+        /* OBJECTIFS */
+        .objective-card {
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        
+        .objective-card:active { transform: scale(0.98); }
+        
+        .objective-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        
+        .objective-emoji { font-size: 28px; }
+        .objective-content { flex: 1; }
+        .objective-name { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 4px; }
+        .objective-deadline { font-size: 11px; color: #6B4E9B; font-weight: 600; }
+        
+        .objective-progress { margin-top: 10px; }
+        .progress-bar { height: 6px; background: rgba(255,255,255,0.5); border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #6B4E9B, #9B6B9B); border-radius: 3px; }
+        .progress-text { font-size: 10px; color: rgba(0,0,0,0.5); margin-top: 4px; text-align: right; }
+        
+        .objective-card.completed { background: rgba(76, 175, 80, 0.2); border-color: rgba(76, 175, 80, 0.4); }
+        .objective-card.completed .objective-name { text-decoration: line-through; opacity: 0.7; }
+        
+        /* HABITUDES */
+        .habits-scroll {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding: 5px 0 15px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .habits-scroll::-webkit-scrollbar { display: none; }
+        
+        .habit-bubble {
+            min-width: 85px; width: 85px; height: 85px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.4);
             backdrop-filter: blur(15px);
@@ -153,153 +184,80 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            box-shadow: 
-                0 8px 32px rgba(0,0,0,0.1),
-                inset 0 2px 10px rgba(255,255,255,0.4);
-            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
             position: relative;
+            flex-shrink: 0;
         }
         
-        .bubble:hover {
-            box-shadow: 
-                0 15px 40px rgba(0,0,0,0.15),
-                inset 0 2px 10px rgba(255,255,255,0.4);
-        }
+        .habit-bubble:active { transform: scale(0.95); }
+        .habit-bubble.done-today { background: rgba(76, 175, 80, 0.3); border-color: rgba(76, 175, 80, 0.5); }
         
-        .bubble:active {
-            transform: scale(0.95) !important;
-        }
-        
-        /* Animations flottantes organiques */
-        .bubble:nth-child(1) { animation: float1 6s ease-in-out infinite; }
-        .bubble:nth-child(2) { animation: float2 7s ease-in-out infinite; animation-delay: -1s; }
-        .bubble:nth-child(3) { animation: float3 6.5s ease-in-out infinite; animation-delay: -2s; }
-        .bubble:nth-child(4) { animation: float4 7.5s ease-in-out infinite; animation-delay: -0.5s; }
-        .bubble:nth-child(5) { animation: float1 6.8s ease-in-out infinite; animation-delay: -3s; }
-        .bubble:nth-child(6) { animation: float2 7.2s ease-in-out infinite; animation-delay: -1.5s; }
-        
-        @keyframes float1 {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(8px, -12px) rotate(2deg); }
-            50% { transform: translate(-5px, -8px) rotate(-1deg); }
-            75% { transform: translate(10px, -15px) rotate(1deg); }
-        }
-        
-        @keyframes float2 {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(-10px, -10px) rotate(-2deg); }
-            50% { transform: translate(6px, -18px) rotate(1deg); }
-            75% { transform: translate(-8px, -6px) rotate(-1deg); }
-        }
-        
-        @keyframes float3 {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(6px, -15px) rotate(1deg); }
-            50% { transform: translate(-8px, -10px) rotate(-2deg); }
-            75% { transform: translate(4px, -8px) rotate(0deg); }
-        }
-        
-        @keyframes float4 {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(-6px, -8px) rotate(-1deg); }
-            50% { transform: translate(10px, -14px) rotate(2deg); }
-            75% { transform: translate(-4px, -12px) rotate(0deg); }
-        }
-        
-        .bubble-emoji {
-            font-size: 32px;
-            margin-bottom: 5px;
-        }
-        
-        .bubble-label {
-            font-size: 9px;
-            font-weight: 600;
-            color: #333;
-            text-align: center;
-            line-height: 1.2;
-            max-width: 80px;
-        }
-        
-        /* Effet de brillance */
-        .bubble::before {
+        .habit-bubble::before {
             content: '';
             position: absolute;
             top: 10%; left: 15%;
-            width: 30%; height: 20%;
+            width: 25%; height: 15%;
             background: rgba(255,255,255,0.5);
             border-radius: 50%;
-            filter: blur(5px);
+            filter: blur(3px);
         }
         
-        /* Badge compteur */
-        .bubble-badge {
+        .habit-emoji { font-size: 28px; margin-bottom: 4px; }
+        .habit-name { font-size: 8px; font-weight: 600; color: #333; text-align: center; max-width: 70px; }
+        
+        .habit-streak {
             position: absolute;
-            top: 3px;
-            right: 3px;
-            min-width: 18px;
-            height: 18px;
-            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
-            border-radius: 9px;
-            color: white;
+            bottom: -5px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            padding: 2px 8px;
+            border-radius: 10px;
             font-size: 9px;
             font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 4px;
-            box-shadow: 0 2px 8px rgba(107, 78, 155, 0.4);
+            color: #333;
         }
         
-        .bubble-badge.empty {
-            display: none;
-        }
-        
-        /* Bulle d'ajout */
-        .bubble.add-bubble {
+        .habit-bubble.add-habit {
             background: rgba(255, 255, 255, 0.25);
             border: 3px dashed rgba(255, 255, 255, 0.5);
         }
+        .habit-bubble.add-habit .habit-emoji { opacity: 0.5; }
         
-        .bubble.add-bubble .bubble-emoji {
-            font-size: 28px;
-            opacity: 0.6;
-        }
-        
-        .bubble.add-bubble .bubble-label {
-            opacity: 0.6;
-        }
-        
-        /* Empty state */
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-        }
-        
-        .empty-emoji {
-            font-size: 60px;
-            margin-bottom: 20px;
-        }
-        
-        .empty-text {
-            font-size: 14px;
-            color: rgba(0,0,0,0.5);
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-        
-        .empty-btn {
-            padding: 14px 30px;
-            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
-            border: none;
-            border-radius: 25px;
-            color: white;
-            font-family: 'Comfortaa', sans-serif;
-            font-size: 14px;
-            font-weight: 600;
+        /* TÂCHES */
+        .task-item {
+            background: rgba(255,255,255,0.4);
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 16px;
+            padding: 14px 16px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
             cursor: pointer;
         }
         
-        /* Modal */
+        .task-item:active { transform: scale(0.98); }
+        
+        .task-checkbox {
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            border: 2px solid rgba(107, 78, 155, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: transparent;
+            flex-shrink: 0;
+        }
+        
+        .task-item.completed .task-checkbox { background: #4CAF50; border-color: #4CAF50; color: white; }
+        .task-content { flex: 1; }
+        .task-name { font-size: 13px; font-weight: 500; color: #333; }
+        .task-item.completed .task-name { text-decoration: line-through; opacity: 0.6; }
+        .task-due { font-size: 10px; color: #6B4E9B; margin-top: 2px; }
+        
+        .empty-section { text-align: center; padding: 20px; color: rgba(0,0,0,0.4); font-size: 12px; }
+        
+        /* MODALS */
         .modal-overlay {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
@@ -309,13 +267,10 @@
             justify-content: center;
             z-index: 200;
         }
-        
-        .modal-overlay.show {
-            display: flex;
-        }
+        .modal-overlay.show { display: flex; }
         
         .modal {
-            width: 85%;
+            width: 90%;
             background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
             border-radius: 24px;
             overflow: hidden;
@@ -323,127 +278,35 @@
         }
         
         .modal-header {
-            padding: 18px 20px;
+            padding: 16px 20px;
             background: rgba(255,255,255,0.3);
             display: flex;
             align-items: center;
-            gap: 12px;
             border-bottom: 1px solid rgba(255,255,255,0.3);
         }
         
-        .modal-title {
-            flex: 1;
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-        }
+        .modal-title { flex: 1; font-size: 16px; font-weight: 600; color: #333; }
+        .modal-close { width: 32px; height: 32px; background: rgba(255,255,255,0.4); border: none; border-radius: 50%; font-size: 18px; cursor: pointer; }
+        .modal-content { padding: 20px; }
         
-        .modal-close {
-            width: 32px; height: 32px;
-            background: rgba(255,255,255,0.4);
-            border: none;
-            border-radius: 50%;
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        .input-group { margin-bottom: 16px; }
+        .input-label { display: block; font-size: 11px; color: rgba(0,0,0,0.6); text-transform: uppercase; font-weight: 600; margin-bottom: 8px; }
+        .input-field { width: 100%; padding: 12px 14px; border: 2px solid rgba(255,255,255,0.5); border-radius: 12px; font-size: 14px; font-family: 'Comfortaa', sans-serif; background: rgba(255,255,255,0.4); color: #333; }
+        .input-field:focus { outline: none; border-color: #6B4E9B; }
         
-        .modal-content {
-            padding: 20px;
-        }
+        .emoji-picker { display: flex; flex-wrap: wrap; gap: 8px; }
+        .emoji-option { width: 40px; height: 40px; background: rgba(255,255,255,0.4); border: 2px solid transparent; border-radius: 10px; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .emoji-option.selected { border-color: #6B4E9B; background: rgba(255,255,255,0.7); }
         
-        .input-group {
-            margin-bottom: 18px;
-        }
-        
-        .input-label {
-            display: block;
-            font-size: 11px;
-            color: rgba(0,0,0,0.6);
-            text-transform: uppercase;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-        
-        .input-field {
-            width: 100%;
-            padding: 14px 16px;
-            border: 2px solid rgba(255,255,255,0.5);
-            border-radius: 14px;
-            font-size: 15px;
-            font-family: 'Comfortaa', sans-serif;
-            background: rgba(255,255,255,0.4);
-            color: #333;
-        }
-        
-        .input-field:focus {
-            outline: none;
-            border-color: #6B4E9B;
-        }
-        
-        .input-field::placeholder {
-            color: rgba(0,0,0,0.3);
-        }
-        
-        .emoji-picker {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        
-        .emoji-option {
-            width: 44px; height: 44px;
-            background: rgba(255,255,255,0.4);
-            border: 2px solid transparent;
-            border-radius: 12px;
-            font-size: 24px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-        
-        .emoji-option.selected {
-            border-color: #6B4E9B;
-            background: rgba(255,255,255,0.7);
-        }
-        
-        .modal-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 20px;
-        }
-        
-        .btn {
-            flex: 1;
-            padding: 14px;
-            border: none;
-            border-radius: 14px;
-            font-family: 'Comfortaa', sans-serif;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
-            color: white;
-        }
-        
-        .btn-secondary {
-            background: rgba(255,255,255,0.5);
-            color: #333;
-        }
+        .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+        .btn { flex: 1; padding: 14px; border: none; border-radius: 14px; font-family: 'Comfortaa', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; }
+        .btn-primary { background: linear-gradient(135deg, #6B4E9B, #9B6B9B); color: white; }
+        .btn-secondary { background: rgba(255,255,255,0.5); color: #333; }
         
         /* Bottom menu */
         .bottom-menu {
             position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            bottom: 0; left: 0; right: 0;
             height: 70px;
             background: rgba(255, 255, 255, 0.5);
             backdrop-filter: blur(20px);
@@ -454,32 +317,16 @@
             z-index: 90;
         }
         
-        .menu-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            cursor: pointer;
-            padding: 8px 16px;
-            border-radius: 16px;
-            transition: all 0.3s;
-        }
-        
-        .menu-item.active {
-            background: rgba(255, 255, 255, 0.6);
-        }
-        
+        .menu-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 8px 16px; border-radius: 16px; }
+        .menu-item.active { background: rgba(255, 255, 255, 0.6); }
         .menu-icon { font-size: 24px; }
         .menu-label { font-size: 10px; color: rgba(0,0,0,0.6); font-weight: 500; }
     </style>
 </head>
 <body>
     <div class="phone-frame">
-        <!-- Pétales -->
         <div class="petal"></div><div class="petal"></div><div class="petal"></div>
-        <div class="petal"></div><div class="petal"></div><div class="petal"></div>
-        <!-- Nuages -->
-        <div class="cloud">☁️</div><div class="cloud">☁️</div>
+        <div class="petal"></div><div class="petal"></div>
         
         <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
         
@@ -490,13 +337,36 @@
                     <span id="domainEmoji">💪</span>
                     <span id="domainName">Santé</span>
                 </div>
-                <div class="header-subtitle">Tes actions dans ce domaine</div>
+                <div class="header-subtitle">Objectifs, habitudes & actions</div>
             </div>
         </div>
         
         <div class="content">
-            <div class="bubbles-container" id="bubblesContainer">
-                <!-- Rempli par JS -->
+            <!-- OBJECTIFS -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">🎯 Objectifs</div>
+                    <button class="section-add" onclick="openModal('objective')">+</button>
+                </div>
+                <div id="objectivesContainer"></div>
+            </div>
+            
+            <!-- HABITUDES -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">🌱 Habitudes</div>
+                    <button class="section-add" onclick="openModal('habit')">+</button>
+                </div>
+                <div class="habits-scroll" id="habitsContainer"></div>
+            </div>
+            
+            <!-- TÂCHES -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">✓ Tâches</div>
+                    <button class="section-add" onclick="openModal('task')">+</button>
+                </div>
+                <div id="tasksContainer"></div>
             </div>
         </div>
         
@@ -515,27 +385,77 @@
             </div>
         </div>
         
-        <!-- Modal ajout action -->
-        <div class="modal-overlay" id="addModal">
+        <!-- Modal Objectif -->
+        <div class="modal-overlay" id="objectiveModal">
             <div class="modal">
                 <div class="modal-header">
-                    <div class="modal-title">Nouvelle action</div>
-                    <button class="modal-close" onclick="closeModal()">×</button>
+                    <div class="modal-title">🎯 Nouvel objectif</div>
+                    <button class="modal-close" onclick="closeModal('objective')">×</button>
                 </div>
                 <div class="modal-content">
                     <div class="input-group">
-                        <label class="input-label">Nom de l'action</label>
-                        <input type="text" class="input-field" id="actionName" placeholder="Ex: Musculation, Méditation...">
+                        <label class="input-label">Objectif</label>
+                        <input type="text" class="input-field" id="objectiveName" placeholder="Ex: Refaire des pompes">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Deadline</label>
+                        <input type="date" class="input-field" id="objectiveDeadline">
                     </div>
                     <div class="input-group">
                         <label class="input-label">Emoji</label>
-                        <div class="emoji-picker" id="emojiPicker">
-                            <!-- Rempli par JS -->
-                        </div>
+                        <div class="emoji-picker" id="objectiveEmojis"></div>
                     </div>
                     <div class="modal-actions">
-                        <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
-                        <button class="btn btn-primary" onclick="saveAction()">Ajouter</button>
+                        <button class="btn btn-secondary" onclick="closeModal('objective')">Annuler</button>
+                        <button class="btn btn-primary" onclick="saveObjective()">Ajouter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal Habitude -->
+        <div class="modal-overlay" id="habitModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title">🌱 Nouvelle habitude</div>
+                    <button class="modal-close" onclick="closeModal('habit')">×</button>
+                </div>
+                <div class="modal-content">
+                    <div class="input-group">
+                        <label class="input-label">Habitude</label>
+                        <input type="text" class="input-field" id="habitName" placeholder="Ex: Jeûne 16/8">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Emoji</label>
+                        <div class="emoji-picker" id="habitEmojis"></div>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="closeModal('habit')">Annuler</button>
+                        <button class="btn btn-primary" onclick="saveHabit()">Ajouter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal Tâche -->
+        <div class="modal-overlay" id="taskModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title">✓ Nouvelle tâche</div>
+                    <button class="modal-close" onclick="closeModal('task')">×</button>
+                </div>
+                <div class="modal-content">
+                    <div class="input-group">
+                        <label class="input-label">Tâche</label>
+                        <input type="text" class="input-field" id="taskName" placeholder="Ex: RDV kiné">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Échéance (optionnel)</label>
+                        <input type="date" class="input-field" id="taskDue">
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="closeModal('task')">Annuler</button>
+                        <button class="btn btn-primary" onclick="saveTask()">Ajouter</button>
                     </div>
                 </div>
             </div>
@@ -543,160 +463,249 @@
     </div>
     
     <script>
-        // ========== STATE ==========
-        let currentDomainId = localStorage.getItem('wutree_current_domain') || 'sante';
-        let selectedEmoji = '⭐';
+        const currentDomainId = localStorage.getItem('wutree_current_domain') || 'sante';
         
-        // ========== DEFAULT EMOJIS BY DOMAIN ==========
-        const DOMAIN_EMOJIS = {
-            sante: ['🏋️', '🧘', '🥋', '🏃', '🚴', '🥗', '💊', '😴', '🧠', '💪'],
-            business: ['📈', '💻', '📊', '🎯', '📱', '💡', '📝', '🤝', '💵', '🏦'],
-            relations: ['👨‍👩‍👧', '💑', '👥', '🤝', '💬', '🎁', '📞', '❤️', '👋', '🫂'],
-            connaissance: ['📖', '🎓', '💻', '🧪', '🎨', '🎵', '🌍', '🧩', '✍️', '🔬'],
-            loisirs: ['🎮', '🎬', '🎵', '📚', '🎨', '⚽', '🎯', '🎸', '📷', '🎭'],
-            maison: ['🧹', '🛠️', '🌱', '🍳', '🛋️', '🔧', '📦', '🏠', '🪴', '✨'],
-            voyages: ['✈️', '🏖️', '⛺', '🗺️', '🎒', '🚗', '🏔️', '🌴', '📸', '🧳']
+        const OBJECTIVE_EMOJIS = ['🎯', '💪', '🏆', '⭐', '🚀', '📈', '✨', '🔥', '💎', '🌟'];
+        const HABIT_EMOJIS = {
+            sante: ['🧘', '🏃', '🥗', '💊', '😴', '🚿', '⏰', '💧', '🍎', '🧠'],
+            business: ['📊', '💻', '📈', '📝', '🎯', '💡', '📱', '🤝', '💰', '⏰'],
+            relations: ['💬', '📞', '🤝', '❤️', '🎁', '✉️', '👋', '🫂', '☕', '🍽️'],
+            connaissance: ['📖', '✍️', '🎧', '💻', '📝', '🧩', '🎓', '🔬', '🌍', '📚'],
+            loisirs: ['🎨', '🎵', '📚', '🎮', '📷', '🎸', '✏️', '🎬', '🧩', '🌿'],
+            maison: ['🧹', '🌱', '🍳', '📦', '🛠️', '✨', '🧺', '🪴', '🛋️', '🔧'],
+            voyages: ['📸', '🗺️', '✈️', '🎒', '📝', '🌍', '⛺', '🚗', '🏔️', '🌴']
         };
         
-        // ========== LOAD DOMAIN ==========
-        function loadDomain() {
+        function init() {
+            loadDomainInfo();
+            renderObjectives();
+            renderHabits();
+            renderTasks();
+            setupEmojiPickers();
+        }
+        
+        function loadDomainInfo() {
             const domains = JSON.parse(localStorage.getItem('wutree_domains') || '[]');
             const domain = domains.find(d => d.id === currentDomainId);
-            
             if (domain) {
                 document.getElementById('domainEmoji').textContent = domain.emoji;
                 document.getElementById('domainName').textContent = domain.name;
             }
         }
         
-        // ========== ACTIONS ==========
-        function loadActions() {
-            const actions = JSON.parse(localStorage.getItem('wutree_actions') || '[]');
-            return actions.filter(a => a.domainId === currentDomainId);
-        }
-        
-        function saveActions(actions) {
-            const allActions = JSON.parse(localStorage.getItem('wutree_actions') || '[]');
-            const otherActions = allActions.filter(a => a.domainId !== currentDomainId);
-            localStorage.setItem('wutree_actions', JSON.stringify([...otherActions, ...actions]));
-        }
-        
-        function getTaskCountForAction(actionId) {
-            const tasks = JSON.parse(localStorage.getItem('wutree_tasks') || '[]');
-            return tasks.filter(t => t.actionId === actionId && !t.completed).length;
-        }
-        
-        function renderBubbles() {
-            const container = document.getElementById('bubblesContainer');
-            const actions = loadActions();
+        function setupEmojiPickers() {
+            document.getElementById('objectiveEmojis').innerHTML = OBJECTIVE_EMOJIS.map((e, i) => 
+                `<div class="emoji-option ${i === 0 ? 'selected' : ''}" onclick="selectEmoji(this)">${e}</div>`
+            ).join('');
             
-            if (actions.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-emoji">🌱</div>
-                        <div class="empty-text">
-                            Aucune action dans ce domaine.<br>
-                            Ajoute ta première action !
-                        </div>
-                        <button class="empty-btn" onclick="openModal()">+ Ajouter</button>
-                    </div>
-                `;
+            const habitEmojis = HABIT_EMOJIS[currentDomainId] || HABIT_EMOJIS.sante;
+            document.getElementById('habitEmojis').innerHTML = habitEmojis.map((e, i) => 
+                `<div class="emoji-option ${i === 0 ? 'selected' : ''}" onclick="selectEmoji(this)">${e}</div>`
+            ).join('');
+        }
+        
+        // ========== OBJECTIFS ==========
+        function getObjectives() {
+            return JSON.parse(localStorage.getItem('wutree_objectives') || '[]').filter(o => o.domainId === currentDomainId);
+        }
+        
+        function saveObjectives(objectives) {
+            const all = JSON.parse(localStorage.getItem('wutree_objectives') || '[]').filter(o => o.domainId !== currentDomainId);
+            localStorage.setItem('wutree_objectives', JSON.stringify([...all, ...objectives]));
+        }
+        
+        function renderObjectives() {
+            const container = document.getElementById('objectivesContainer');
+            const objectives = getObjectives();
+            
+            if (objectives.length === 0) {
+                container.innerHTML = '<div class="empty-section">Aucun objectif. Clique + pour en ajouter.</div>';
                 return;
             }
             
-            let html = actions.map(action => {
-                const taskCount = getTaskCountForAction(action.id);
-                const badgeClass = taskCount === 0 ? 'bubble-badge empty' : 'bubble-badge';
+            container.innerHTML = objectives.map(obj => {
+                const deadline = new Date(obj.deadline);
+                const today = new Date();
+                const total = Math.ceil((deadline - new Date(obj.createdAt)) / (1000 * 60 * 60 * 24));
+                const remaining = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+                const progress = Math.max(0, Math.min(100, ((total - remaining) / total) * 100));
+                const deadlineStr = deadline.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
                 
                 return `
-                    <div class="bubble" onclick="openAction('${action.id}')">
-                        <div class="${badgeClass}">${taskCount}</div>
-                        <div class="bubble-emoji">${action.emoji}</div>
-                        <div class="bubble-label">${action.name}</div>
+                    <div class="objective-card ${obj.completed ? 'completed' : ''}" onclick="toggleObjective('${obj.id}')">
+                        <div class="objective-header">
+                            <div class="objective-emoji">${obj.emoji}</div>
+                            <div class="objective-content">
+                                <div class="objective-name">${obj.name}</div>
+                                <div class="objective-deadline">📅 ${deadlineStr} ${remaining > 0 ? `(${remaining}j)` : ''}</div>
+                            </div>
+                        </div>
+                        <div class="objective-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${obj.completed ? 100 : progress}%"></div>
+                            </div>
+                            <div class="progress-text">${obj.completed ? '✓ Complété' : `${Math.round(progress)}%`}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function toggleObjective(id) {
+            const objectives = getObjectives();
+            const obj = objectives.find(o => o.id === id);
+            if (obj) { obj.completed = !obj.completed; saveObjectives(objectives); renderObjectives(); }
+        }
+        
+        function saveObjective() {
+            const name = document.getElementById('objectiveName').value.trim();
+            const deadline = document.getElementById('objectiveDeadline').value;
+            const emoji = document.querySelector('#objectiveEmojis .selected')?.textContent || '🎯';
+            
+            if (!name || !deadline) { alert('Remplis tous les champs !'); return; }
+            
+            const objectives = getObjectives();
+            objectives.push({ id: 'obj_' + Date.now(), domainId: currentDomainId, name, deadline, emoji, completed: false, createdAt: new Date().toISOString() });
+            saveObjectives(objectives);
+            closeModal('objective');
+            document.getElementById('objectiveName').value = '';
+            document.getElementById('objectiveDeadline').value = '';
+            renderObjectives();
+        }
+        
+        // ========== HABITUDES ==========
+        function getHabits() {
+            return JSON.parse(localStorage.getItem('wutree_domain_habits') || '[]').filter(h => h.domainId === currentDomainId);
+        }
+        
+        function saveHabits(habits) {
+            const all = JSON.parse(localStorage.getItem('wutree_domain_habits') || '[]').filter(h => h.domainId !== currentDomainId);
+            localStorage.setItem('wutree_domain_habits', JSON.stringify([...all, ...habits]));
+        }
+        
+        function renderHabits() {
+            const container = document.getElementById('habitsContainer');
+            const habits = getHabits();
+            const today = new Date().toISOString().split('T')[0];
+            
+            let html = habits.map(habit => {
+                const doneToday = habit.completedDays?.includes(today);
+                const streak = calculateStreak(habit.completedDays || []);
+                const streakHtml = streak > 0 ? `<div class="habit-streak">🔥${streak}</div>` : '';
+                
+                return `
+                    <div class="habit-bubble ${doneToday ? 'done-today' : ''}" onclick="toggleHabit('${habit.id}')">
+                        <div class="habit-emoji">${habit.emoji}</div>
+                        <div class="habit-name">${habit.name}</div>
+                        ${streakHtml}
                     </div>
                 `;
             }).join('');
             
-            // Ajouter la bulle d'ajout
-            html += `
-                <div class="bubble add-bubble" onclick="openModal()">
-                    <div class="bubble-emoji">+</div>
-                    <div class="bubble-label">Ajouter</div>
-                </div>
-            `;
-            
+            html += `<div class="habit-bubble add-habit" onclick="openModal('habit')"><div class="habit-emoji">+</div></div>`;
             container.innerHTML = html;
         }
         
-        function openAction(actionId) {
-            localStorage.setItem('wutree_current_action', actionId);
-            window.location.href = 'wu-tree-v2-action.html';
+        function calculateStreak(completedDays) {
+            if (!completedDays?.length) return 0;
+            const sorted = [...completedDays].sort().reverse();
+            const today = new Date().toISOString().split('T')[0];
+            let streak = 0, checkDate = new Date();
+            if (sorted[0] !== today) checkDate.setDate(checkDate.getDate() - 1);
+            for (let i = 0; i < 365; i++) {
+                const dateStr = checkDate.toISOString().split('T')[0];
+                if (sorted.includes(dateStr)) { streak++; checkDate.setDate(checkDate.getDate() - 1); }
+                else break;
+            }
+            return streak;
         }
         
-        // ========== MODAL ==========
-        function openModal() {
-            // Remplir le picker d'emojis
-            const emojis = DOMAIN_EMOJIS[currentDomainId] || DOMAIN_EMOJIS.sante;
-            const picker = document.getElementById('emojiPicker');
+        function toggleHabit(id) {
+            const habits = getHabits();
+            const habit = habits.find(h => h.id === id);
+            const today = new Date().toISOString().split('T')[0];
+            if (!habit.completedDays) habit.completedDays = [];
+            if (habit.completedDays.includes(today)) habit.completedDays = habit.completedDays.filter(d => d !== today);
+            else habit.completedDays.push(today);
+            saveHabits(habits);
+            renderHabits();
+        }
+        
+        function saveHabit() {
+            const name = document.getElementById('habitName').value.trim();
+            const emoji = document.querySelector('#habitEmojis .selected')?.textContent || '🌱';
+            if (!name) { alert('Entre un nom !'); return; }
+            const habits = getHabits();
+            habits.push({ id: 'habit_' + Date.now(), domainId: currentDomainId, name, emoji, completedDays: [], createdAt: new Date().toISOString() });
+            saveHabits(habits);
+            closeModal('habit');
+            document.getElementById('habitName').value = '';
+            renderHabits();
+        }
+        
+        // ========== TÂCHES ==========
+        function getTasks() {
+            return JSON.parse(localStorage.getItem('wutree_domain_tasks') || '[]').filter(t => t.domainId === currentDomainId);
+        }
+        
+        function saveTasks(tasks) {
+            const all = JSON.parse(localStorage.getItem('wutree_domain_tasks') || '[]').filter(t => t.domainId !== currentDomainId);
+            localStorage.setItem('wutree_domain_tasks', JSON.stringify([...all, ...tasks]));
+        }
+        
+        function renderTasks() {
+            const container = document.getElementById('tasksContainer');
+            const tasks = getTasks().sort((a, b) => a.completed - b.completed);
             
-            picker.innerHTML = emojis.map((emoji, i) => `
-                <div class="emoji-option ${i === 0 ? 'selected' : ''}" onclick="selectEmoji('${emoji}', this)">${emoji}</div>
-            `).join('');
-            
-            selectedEmoji = emojis[0];
-            document.getElementById('actionName').value = '';
-            document.getElementById('addModal').classList.add('show');
-        }
-        
-        function closeModal() {
-            document.getElementById('addModal').classList.remove('show');
-        }
-        
-        function selectEmoji(emoji, element) {
-            document.querySelectorAll('.emoji-option').forEach(el => el.classList.remove('selected'));
-            element.classList.add('selected');
-            selectedEmoji = emoji;
-        }
-        
-        function saveAction() {
-            const name = document.getElementById('actionName').value.trim();
-            
-            if (!name) {
-                alert('Entre un nom pour l\'action !');
+            if (tasks.length === 0) {
+                container.innerHTML = '<div class="empty-section">Aucune tâche. Clique + pour en ajouter.</div>';
                 return;
             }
             
-            const actions = loadActions();
-            const newAction = {
-                id: 'action_' + Date.now(),
-                domainId: currentDomainId,
-                name: name,
-                emoji: selectedEmoji,
-                createdAt: new Date().toISOString()
-            };
-            
-            actions.push(newAction);
-            saveActions(actions);
-            closeModal();
-            renderBubbles();
+            container.innerHTML = tasks.map(task => {
+                const dueHtml = task.due ? `<div class="task-due">📅 ${new Date(task.due).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}</div>` : '';
+                return `
+                    <div class="task-item ${task.completed ? 'completed' : ''}" onclick="toggleTask('${task.id}')">
+                        <div class="task-checkbox">✓</div>
+                        <div class="task-content">
+                            <div class="task-name">${task.name}</div>
+                            ${dueHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
         
-        // ========== NAVIGATION ==========
-        function goBack() {
-            window.location.href = 'wu-tree-v2-home.html';
+        function toggleTask(id) {
+            const tasks = getTasks();
+            const task = tasks.find(t => t.id === id);
+            if (task) { task.completed = !task.completed; saveTasks(tasks); renderTasks(); }
         }
         
-        function goToWellbeing() {
-            window.location.href = 'wu-tree-v2-wellbeing.html';
+        function saveTask() {
+            const name = document.getElementById('taskName').value.trim();
+            const due = document.getElementById('taskDue').value;
+            if (!name) { alert('Entre un nom !'); return; }
+            const tasks = getTasks();
+            tasks.push({ id: 'task_' + Date.now(), domainId: currentDomainId, name, due: due || null, completed: false, createdAt: new Date().toISOString() });
+            saveTasks(tasks);
+            closeModal('task');
+            document.getElementById('taskName').value = '';
+            document.getElementById('taskDue').value = '';
+            renderTasks();
         }
         
-        function goToTasks() {
-            window.location.href = 'wu-tree-v2-tasks.html';
-        }
+        // ========== MODALS ==========
+        function openModal(type) { document.getElementById(type + 'Modal').classList.add('show'); }
+        function closeModal(type) { document.getElementById(type + 'Modal').classList.remove('show'); }
+        function selectEmoji(el) { el.parentElement.querySelectorAll('.emoji-option').forEach(e => e.classList.remove('selected')); el.classList.add('selected'); }
         
-        // ========== INIT ==========
-        loadDomain();
-        renderBubbles();
+        // ========== NAV ==========
+        function goBack() { window.location.href = 'wu-tree-v2-home.html'; }
+        function goToWellbeing() { window.location.href = 'wu-tree-v2-wellbeing.html'; }
+        function goToTasks() { window.location.href = 'wu-tree-v2-tasks.html'; }
+        
+        init();
     </script>
 </body>
 </html>
