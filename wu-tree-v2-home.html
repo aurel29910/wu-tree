@@ -2,424 +2,539 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Wu Tree</title>
-    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(180deg, #87CEEB 0%, #FFB6C1 100%);
-            min-height: 100vh; display: flex; justify-content: center; align-items: center;
-        }
-        .phone-frame {
-            width: 375px; height: 812px;
+            font-family: 'Comfortaa', sans-serif;
             background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
-            border-radius: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-            position: relative; overflow: hidden;
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            padding: 20px;
         }
-        .petal { position: absolute; width: 10px; height: 10px;
+        
+        .phone-frame {
+            width: 100%; max-width: 390px;
+            height: 844px; max-height: 95vh;
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+            border-radius: 45px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.15);
+        }
+        
+        /* Pétales flottants */
+        .petal {
+            position: absolute;
+            width: 10px; height: 10px;
             background: linear-gradient(135deg, rgba(255, 182, 193, 0.8), rgba(255, 105, 180, 0.6));
-            border-radius: 50% 0 50% 0; animation: fall linear infinite; pointer-events: none; z-index: 50; }
+            border-radius: 50% 0 50% 0;
+            animation: fall linear infinite;
+            pointer-events: none;
+            z-index: 10;
+        }
         .petal:nth-child(1) { left: 10%; animation-duration: 12s; width: 8px; }
-        .petal:nth-child(2) { left: 20%; animation-duration: 14s; animation-delay: 2s; }
-        .petal:nth-child(3) { left: 30%; animation-duration: 16s; animation-delay: 4s; }
-        .petal:nth-child(4) { left: 40%; animation-duration: 13s; animation-delay: 1s; }
-        .petal:nth-child(5) { left: 50%; animation-duration: 15s; animation-delay: 3s; }
-        .petal:nth-child(6) { left: 60%; animation-duration: 17s; animation-delay: 5s; }
-        .petal:nth-child(7) { left: 70%; animation-duration: 14s; animation-delay: 6s; }
-        .petal:nth-child(8) { left: 80%; animation-duration: 16s; animation-delay: 7s; }
-        .petal:nth-child(9) { left: 90%; animation-duration: 13s; animation-delay: 8s; }
-        .petal:nth-child(10) { left: 15%; animation-duration: 15s; animation-delay: 9s; }
-        @keyframes fall { 0% { transform: translateY(-50px) rotate(0deg); opacity: 0.8; }
-            100% { transform: translateY(812px) rotate(360deg); opacity: 0; } }
-        .cloud { position: absolute; color: white; font-size: 50px; opacity: 0.7;
-            animation: float-cloud linear infinite; pointer-events: none; z-index: 40; }
-        .cloud:nth-child(11) { top: 60px; animation-duration: 180s; }
-        .cloud:nth-child(12) { top: 100px; animation-duration: 220s; animation-delay: -60s; font-size: 40px; }
-        .cloud:nth-child(13) { top: 140px; animation-duration: 200s; animation-delay: -120s; font-size: 45px; }
-        @keyframes float-cloud { 0% { transform: translateX(-80px); } 100% { transform: translateX(455px); } }
-        .status-bar { position: absolute; top: 0; left: 0; right: 0; height: 44px;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 20px; color: rgba(255,255,255,0.95); font-size: 14px; z-index: 100; }
-        .content { position: relative; height: calc(100% - 44px - 70px); margin-top: 44px; z-index: 60; overflow: hidden; }
+        .petal:nth-child(2) { left: 25%; animation-duration: 14s; animation-delay: 2s; }
+        .petal:nth-child(3) { left: 40%; animation-duration: 16s; animation-delay: 4s; }
+        .petal:nth-child(4) { left: 55%; animation-duration: 13s; animation-delay: 1s; }
+        .petal:nth-child(5) { left: 70%; animation-duration: 15s; animation-delay: 3s; }
+        .petal:nth-child(6) { left: 85%; animation-duration: 17s; animation-delay: 5s; }
         
-        .tree-container { width: 100%; height: 100%; position: relative; }
+        @keyframes fall {
+            0% { transform: translateY(-50px) rotate(0deg); opacity: 0.8; }
+            100% { transform: translateY(900px) rotate(360deg); opacity: 0; }
+        }
         
-        svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; pointer-events: none; }
+        /* Nuages */
+        .cloud {
+            position: absolute;
+            color: white;
+            font-size: 50px;
+            opacity: 0.5;
+            animation: float-cloud linear infinite;
+            pointer-events: none;
+            z-index: 5;
+        }
+        .cloud:nth-child(7) { top: 80px; animation-duration: 180s; }
+        .cloud:nth-child(8) { top: 180px; animation-duration: 220s; animation-delay: -60s; font-size: 40px; }
         
-        .branches { position: absolute; top: 50px; left: 0; right: 0;
-            display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
-            z-index: 10; padding: 0 20px; }
-        .branch { width: 75px; height: 75px; border-radius: 50%;
-            background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(10px);
+        @keyframes float-cloud {
+            0% { transform: translateX(-80px); }
+            100% { transform: translateX(470px); }
+        }
+        
+        .status-bar {
+            height: 47px;
+            padding: 15px 25px 0;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(0,0,0,0.6);
+            position: relative;
+            z-index: 100;
+        }
+        
+        .header {
+            padding: 15px 20px 10px;
+            text-align: center;
+            position: relative;
+            z-index: 100;
+        }
+        
+        .header-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .header-subtitle {
+            font-size: 12px;
+            color: rgba(0,0,0,0.5);
+            margin-top: 5px;
+        }
+        
+        /* Content */
+        .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px 15px;
+            height: calc(100% - 180px);
+            overflow-y: auto;
+            position: relative;
+            z-index: 50;
+        }
+        
+        /* Bubbles grid */
+        .bubbles-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 10px;
+        }
+        
+        /* Bulles flottantes */
+        .bubble {
+            width: 100px; height: 100px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(15px);
             border: 3px solid rgba(255, 255, 255, 0.6);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: all 0.3s;
-            position: relative; }
-        .branch:active { transform: scale(0.95); }
-        .branch-emoji { font-size: 30px; }
-        .branch-name { font-size: 9px; font-weight: 600; color: white;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.2); margin-top: 2px; }
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 
+                0 8px 32px rgba(0,0,0,0.1),
+                inset 0 2px 10px rgba(255,255,255,0.4);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
         
-        .roots { position: absolute; bottom: 180px; left: 0; right: 0;
-            display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
-            z-index: 10; padding: 0 20px; }
-        .root { width: 65px; height: 65px; border-radius: 50%;
-            background: rgba(255, 255, 255, 0.35); backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 26px; box-shadow: 0 3px 12px rgba(0,0,0,0.06);
-            cursor: pointer; position: relative; transition: all 0.3s; }
-        .root:active { transform: scale(0.95); }
+        .bubble:hover {
+            box-shadow: 
+                0 15px 40px rgba(0,0,0,0.15),
+                inset 0 2px 10px rgba(255,255,255,0.4);
+        }
         
-        .foundations { position: absolute; bottom: 100px; left: 0; right: 0;
-            display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;
-            font-size: 32px; z-index: 10; padding: 0 20px; }
-        .foundation { cursor: pointer; transition: all 0.3s; position: relative; }
-        .foundation:active { transform: scale(0.95); }
+        .bubble:active {
+            transform: scale(0.95) !important;
+        }
         
-        .empty { text-align: center; padding: 250px 30px; }
-        .empty-icon { font-size: 64px; margin-bottom: 20px; }
-        .empty-text { font-size: 16px; color: white; line-height: 1.8; text-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        /* Animations flottantes organiques */
+        .bubble:nth-child(1) { animation: float1 6s ease-in-out infinite; }
+        .bubble:nth-child(2) { animation: float2 7s ease-in-out infinite; animation-delay: -1s; }
+        .bubble:nth-child(3) { animation: float3 6.5s ease-in-out infinite; animation-delay: -2s; }
+        .bubble:nth-child(4) { animation: float4 7.5s ease-in-out infinite; animation-delay: -0.5s; }
+        .bubble:nth-child(5) { animation: float1 6.8s ease-in-out infinite; animation-delay: -3s; }
+        .bubble:nth-child(6) { animation: float2 7.2s ease-in-out infinite; animation-delay: -1.5s; }
+        .bubble:nth-child(7) { animation: float3 6.3s ease-in-out infinite; animation-delay: -2.5s; }
         
-        .fab { position: absolute; bottom: 90px; right: 20px; width: 56px; height: 56px; border-radius: 50%;
-            background: linear-gradient(135deg, #FFB6C1 0%, #FF69B4 100%);
-            color: white; font-size: 28px; font-weight: 300;
-            cursor: pointer; box-shadow: 0 4px 20px rgba(255, 105, 180, 0.4);
-            z-index: 100; display: flex; align-items: center; justify-content: center;
-            border: 2px solid rgba(255, 255, 255, 0.6); transition: all 0.3s; }
-        .fab:hover { transform: scale(1.05); box-shadow: 0 6px 25px rgba(255, 105, 180, 0.5); }
-        .fab:active { transform: scale(0.95); }
+        @keyframes float1 {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(8px, -12px) rotate(2deg); }
+            50% { transform: translate(-5px, -8px) rotate(-1deg); }
+            75% { transform: translate(10px, -15px) rotate(1deg); }
+        }
         
-        .bottom-menu { position: absolute; bottom: 0; left: 0; right: 0; height: 70px;
-            background: rgba(255, 255, 255, 0.5); backdrop-filter: blur(20px);
-            display: flex; justify-content: space-around; align-items: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.4); z-index: 90; }
-        .menu-item { display: flex; flex-direction: column; align-items: center; gap: 4px;
-            cursor: pointer; padding: 8px 12px; border-radius: 12px; transition: all 0.3s; }
-        .menu-item.active { background: rgba(255, 255, 255, 0.6); }
+        @keyframes float2 {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(-10px, -10px) rotate(-2deg); }
+            50% { transform: translate(6px, -18px) rotate(1deg); }
+            75% { transform: translate(-8px, -6px) rotate(-1deg); }
+        }
+        
+        @keyframes float3 {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(6px, -15px) rotate(1deg); }
+            50% { transform: translate(-8px, -10px) rotate(-2deg); }
+            75% { transform: translate(4px, -8px) rotate(0deg); }
+        }
+        
+        @keyframes float4 {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(-6px, -8px) rotate(-1deg); }
+            50% { transform: translate(10px, -14px) rotate(2deg); }
+            75% { transform: translate(-4px, -12px) rotate(0deg); }
+        }
+        
+        .bubble-emoji {
+            font-size: 36px;
+            margin-bottom: 5px;
+        }
+        
+        .bubble-label {
+            font-size: 9px;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+            line-height: 1.2;
+        }
+        
+        /* Effet de brillance */
+        .bubble::before {
+            content: '';
+            position: absolute;
+            top: 10%; left: 15%;
+            width: 30%; height: 20%;
+            background: rgba(255,255,255,0.5);
+            border-radius: 50%;
+            filter: blur(5px);
+        }
+        
+        /* Priority badge */
+        .bubble-priority {
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border-radius: 50%;
+            color: #333;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(255, 165, 0, 0.4);
+            border: 2px solid white;
+        }
+        
+        .bubble-priority.hidden {
+            display: none;
+        }
+        
+        /* Badge compteur */
+        .bubble-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            min-width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            border-radius: 10px;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            box-shadow: 0 2px 8px rgba(107, 78, 155, 0.4);
+        }
+        
+        .bubble-badge.empty {
+            display: none;
+        }
+        
+        /* Edit mode */
+        .edit-mode .bubble {
+            animation: none !important;
+            animation: shake 0.3s ease-in-out infinite !important;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: rotate(-1deg); }
+            50% { transform: rotate(1deg); }
+        }
+        
+        .edit-btn {
+            position: absolute;
+            top: 55px;
+            right: 20px;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 20px;
+            font-family: 'Comfortaa', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            color: #333;
+            cursor: pointer;
+            z-index: 100;
+        }
+        
+        .edit-btn.active {
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            color: white;
+            border-color: transparent;
+        }
+        
+        /* Arrows for reordering */
+        .bubble-arrows {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            gap: 10px;
+        }
+        
+        .edit-mode .bubble-arrows {
+            display: flex;
+        }
+        
+        .arrow-btn {
+            width: 28px;
+            height: 28px;
+            background: rgba(255,255,255,0.8);
+            border: 2px solid rgba(107, 78, 155, 0.3);
+            border-radius: 50%;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .arrow-btn:active {
+            background: #6B4E9B;
+            color: white;
+        }
+        
+        /* Quote */
+        .quote-container {
+            position: absolute;
+            bottom: 90px;
+            left: 30px;
+            right: 30px;
+            text-align: center;
+            z-index: 50;
+        }
+        
+        .quote-text {
+            font-size: 11px;
+            color: rgba(0,0,0,0.4);
+            font-style: italic;
+            line-height: 1.5;
+        }
+        
+        /* Bottom menu */
+        .bottom-menu {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.4);
+            z-index: 90;
+        }
+        
+        .menu-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 16px;
+            transition: all 0.3s;
+        }
+        
+        .menu-item.active {
+            background: rgba(255, 255, 255, 0.6);
+        }
+        
         .menu-icon { font-size: 24px; }
-        .menu-label { font-size: 10px; color: rgba(74, 90, 79, 0.8); font-weight: 500; }
-        
-        /* Modal édition */
-        .modal-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.5); z-index: 200; display: none;
-            align-items: center; justify-content: center; }
-        .modal-overlay.show { display: flex; }
-        .modal { width: 85%; background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
-            border-radius: 24px; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
-        .modal-header { padding: 16px 20px; background: rgba(255, 255, 255, 0.3);
-            display: flex; align-items: center; gap: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
-        .modal-icon { font-size: 24px; }
-        .modal-title { flex: 1; font-family: 'Comfortaa', cursive; font-size: 16px;
-            font-weight: 600; color: white; }
-        .modal-close { width: 32px; height: 32px; border-radius: 50%;
-            background: rgba(255, 255, 255, 0.3); display: flex; align-items: center; justify-content: center;
-            cursor: pointer; font-size: 18px; color: white; border: 2px solid rgba(255, 255, 255, 0.5); }
-        .modal-content { padding: 20px; }
-        .input-group { margin-bottom: 18px; }
-        .input-label { display: block; font-size: 12px; color: rgba(255, 255, 255, 0.9);
-            text-transform: uppercase; font-weight: 600; margin-bottom: 8px; }
-        .input-field { width: 100%; padding: 12px 14px; border: 2px solid rgba(255, 255, 255, 0.4);
-            border-radius: 12px; font-size: 15px; background: rgba(255, 255, 255, 0.3);
-            color: white; }
-        .input-field:focus { outline: none; border-color: rgba(255, 255, 255, 0.7); }
-        .input-field::placeholder { color: rgba(255,255,255,0.5); }
-        .color-picker { display: flex; gap: 10px; flex-wrap: wrap; }
-        .color-option { width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
-            border: 3px solid transparent; transition: all 0.3s; }
-        .color-option:hover { transform: scale(1.1); }
-        .color-option.selected { border-color: white; box-shadow: 0 0 10px rgba(255,255,255,0.5); }
-        .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
-        .btn { flex: 1; padding: 14px; border: none; border-radius: 14px;
-            font-family: 'Comfortaa', cursive; font-size: 14px; font-weight: 600; cursor: pointer; }
-        .btn-primary { background: rgba(255, 255, 255, 0.9); color: #B4A7D6; }
-        .btn-danger { background: rgba(255, 107, 107, 0.8); color: white; }
-        .btn:active { transform: scale(0.98); }
+        .menu-label { font-size: 10px; color: rgba(0,0,0,0.6); font-weight: 500; }
     </style>
 </head>
 <body>
     <div class="phone-frame">
-        <div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div>
-        <div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div>
-        <div class="cloud">☁️</div><div class="cloud">☁️</div><div class="cloud">☁️</div>
-        <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
-        <div class="content">
-            <div class="tree-container" id="treeContainer"></div>
-        </div>
-        <button class="fab" onclick="createProject()">+</button>
+        <!-- Pétales -->
+        <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+        <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+        <!-- Nuages -->
+        <div class="cloud">☁️</div><div class="cloud">☁️</div>
         
-        <!-- Modal édition projet -->
-        <div class="modal-overlay" id="editModal">
-            <div class="modal">
-                <div class="modal-header">
-                    <div class="modal-icon" id="editModalIcon">✏️</div>
-                    <div class="modal-title">Modifier le projet</div>
-                    <div class="modal-close" onclick="closeEditModal()">×</div>
-                </div>
-                <div class="modal-content">
-                    <div class="input-group">
-                        <label class="input-label">Nom du projet</label>
-                        <input type="text" class="input-field" id="editNameInput" placeholder="Nom...">
-                    </div>
-                    <div class="input-group">
-                        <label class="input-label">Couleur</label>
-                        <div class="color-picker" id="colorPicker"></div>
-                    </div>
-                    <div class="modal-actions">
-                        <button class="btn btn-danger" onclick="deleteEditingProject()">🗑️ Supprimer</button>
-                        <button class="btn btn-primary" onclick="saveProjectEdit()">💾 Enregistrer</button>
-                    </div>
-                </div>
+        <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
+        
+        <button class="edit-btn" id="editBtn" onclick="toggleEditMode()">Prioriser</button>
+        
+        <div class="header">
+            <div class="header-title">🌳 Wu Tree</div>
+            <div class="header-subtitle">Agis dans le flow</div>
+        </div>
+        
+        <div class="content">
+            <div class="bubbles-container" id="bubblesContainer">
+                <!-- Rempli par JS -->
+            </div>
+        </div>
+        
+        <div class="quote-container">
+            <div class="quote-text">
+                « Le voyage de mille lieues<br>commence par un pas. »
             </div>
         </div>
         
         <div class="bottom-menu">
-            <div class="menu-item" onclick="goToWellbeing()"><div class="menu-icon">✨</div><div class="menu-label">Bien-être</div></div>
-            <div class="menu-item active"><div class="menu-icon">🌳</div><div class="menu-label">Arbre</div></div>
-            <div class="menu-item" onclick="goToTasks()"><div class="menu-icon">📋</div><div class="menu-label">Tâches</div></div>
+            <div class="menu-item" onclick="goToWellbeing()">
+                <div class="menu-icon">✨</div>
+                <div class="menu-label">Bien-être</div>
+            </div>
+            <div class="menu-item active">
+                <div class="menu-icon">🌳</div>
+                <div class="menu-label">Arbre</div>
+            </div>
+            <div class="menu-item" onclick="goToTasks()">
+                <div class="menu-icon">📋</div>
+                <div class="menu-label">Tâches</div>
+            </div>
         </div>
     </div>
+    
     <script>
-        function loadTree() {
-            const projects = JSON.parse(localStorage.getItem('wutree_projects') || '[]');
-            const container = document.getElementById('treeContainer');
-            
-            if (projects.length === 0) {
-                container.innerHTML = '<div class="empty"><div class="empty-icon">🌳</div><p class="empty-text">Ton arbre est prêt à grandir</p></div>';
-                return;
-            }
-            
-            let html = '';
-            
-            if (projects.length > 0) {
-                html += '<div class="branches" id="branchesContainer">';
-                projects.forEach(p => {
-                    const color = p.color || '#FFFFFF';
-                    html += `<div class="branch" data-project-id="${p.id}" 
-                        style="border-color: ${color}; box-shadow: 0 4px 15px ${color}40;"
-                        onmousedown="startLongPress('${p.id}')"
-                        onmouseup="handleMouseUp('${p.id}')"
-                        onmouseleave="cancelLongPress()"
-                        ontouchstart="startLongPress('${p.id}')"
-                        ontouchend="handleMouseUp('${p.id}')"
-                        ontouchcancel="cancelLongPress()">
-                        <div class="branch-emoji">${p.emoji}</div>
-                        <div class="branch-name">${p.name}</div>
-                    </div>`;
-                });
-                html += '</div>';
-            }
-            
-            container.innerHTML = html;
-        }
+        // ========== STATE ==========
+        let isEditMode = false;
         
-        function drawLines() {
-            const container = document.getElementById('treeContainer');
-            const branchElements = container.querySelectorAll('.branch');
-            const rootElements = container.querySelectorAll('.root');
-            
-            if (branchElements.length === 0 || rootElements.length === 0) return;
-            
-            const containerRect = container.getBoundingClientRect();
-            const centerX = container.offsetWidth / 2;
-            
-            const branchPositions = Array.from(branchElements).map(el => {
-                const rect = el.getBoundingClientRect();
-                return {
-                    x: rect.left + rect.width / 2 - containerRect.left,
-                    y: rect.bottom - containerRect.top
-                };
-            });
-            
-            const rootPositions = Array.from(rootElements).map(el => {
-                const rect = el.getBoundingClientRect();
-                return {
-                    x: rect.left + rect.width / 2 - containerRect.left,
-                    y: rect.top - containerRect.top
-                };
-            });
-            
-            // TRONC PLUS COURT : jonctions éloignées
-            const branchesBottom = Math.max(...branchPositions.map(p => p.y));
-            const topJunction = branchesBottom + 100;
-            
-            const rootsTop = Math.min(...rootPositions.map(p => p.y));
-            const bottomJunction = rootsTop - 100;
-            
-            let svgContent = '';
-            
-            // TRONC VERTICAL CENTRAL
-            svgContent += `<line x1="${centerX}" y1="${topJunction}" x2="${centerX}" y2="${bottomJunction}" 
-                stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round"/>`;
-            
-            // COURBES BRANCHES → JONCTION HAUTE
-            branchPositions.forEach(pos => {
-                const dx = centerX - pos.x;
-                const dy = topJunction - pos.y;
-                
-                const ctrlX = pos.x + dx * 0.5;
-                const ctrlY = pos.y + dy * 0.6;
-                
-                svgContent += `<path d="M ${pos.x} ${pos.y} Q ${ctrlX} ${ctrlY} ${centerX} ${topJunction}" 
-                    stroke="rgba(255,255,255,0.35)" stroke-width="2" fill="none" stroke-linecap="round"/>`;
-            });
-            
-            // COURBES RACINES → JONCTION BASSE
-            rootPositions.forEach(pos => {
-                const dx = centerX - pos.x;
-                const dy = bottomJunction - pos.y;
-                
-                const ctrlX = pos.x + dx * 0.5;
-                const ctrlY = pos.y + dy * 0.4;
-                
-                svgContent += `<path d="M ${pos.x} ${pos.y} Q ${ctrlX} ${ctrlY} ${centerX} ${bottomJunction}" 
-                    stroke="rgba(255,255,255,0.35)" stroke-width="2" fill="none" stroke-linecap="round"/>`;
-            });
-            
-            const existingSvg = container.querySelector('svg');
-            if (existingSvg) existingSvg.remove();
-            
-            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            svg.innerHTML = svgContent;
-            container.insertBefore(svg, container.firstChild);
-        }
-        
-        function deleteProject(id) {
-            if (confirm('Supprimer ce projet ?')) {
-                let projects = JSON.parse(localStorage.getItem('wutree_projects') || '[]');
-                projects = projects.filter(p => p.id !== id);
-                localStorage.setItem('wutree_projects', JSON.stringify(projects));
-                loadTree();
-            }
-        }
-        
-        // Long press pour éditer
-        let longPressTimer = null;
-        let isLongPress = false;
-        let editingProjectId = null;
-        
-        const COLORS = [
-            { name: 'Blanc', hex: '#FFFFFF' },
-            { name: 'Rose', hex: '#FF69B4' },
-            { name: 'Corail', hex: '#FF6B6B' },
-            { name: 'Orange', hex: '#FFA500' },
-            { name: 'Jaune', hex: '#FFD700' },
-            { name: 'Vert', hex: '#4CAF50' },
-            { name: 'Turquoise', hex: '#40E0D0' },
-            { name: 'Bleu', hex: '#4A90D9' },
-            { name: 'Violet', hex: '#9B59B6' },
-            { name: 'Lavande', hex: '#B4A7D6' }
+        // ========== DOMAINES ==========
+        const DEFAULT_DOMAINS = [
+            { id: 'sante', emoji: '💪', name: 'Santé', order: 0 },
+            { id: 'business', emoji: '💰', name: 'Business & Finance', order: 1 },
+            { id: 'relations', emoji: '❤️', name: 'Relations', order: 2 },
+            { id: 'connaissance', emoji: '📚', name: 'Connaissance', order: 3 },
+            { id: 'loisirs', emoji: '🎨', name: 'Loisirs', order: 4 },
+            { id: 'maison', emoji: '🏠', name: 'Maison', order: 5 },
+            { id: 'voyages', emoji: '✈️', name: 'Voyages', order: 6 }
         ];
         
-        function startLongPress(projectId) {
-            isLongPress = false;
-            longPressTimer = setTimeout(() => {
-                isLongPress = true;
-                navigator.vibrate && navigator.vibrate(50);
-                openEditModal(projectId);
-            }, 600);
+        function loadDomains() {
+            let domains = JSON.parse(localStorage.getItem('wutree_domains') || 'null');
+            
+            if (!domains) {
+                domains = DEFAULT_DOMAINS;
+                localStorage.setItem('wutree_domains', JSON.stringify(domains));
+            }
+            
+            return domains.sort((a, b) => a.order - b.order);
         }
         
-        function cancelLongPress() {
-            if (longPressTimer) {
-                clearTimeout(longPressTimer);
-                longPressTimer = null;
+        function saveDomains(domains) {
+            localStorage.setItem('wutree_domains', JSON.stringify(domains));
+        }
+        
+        function getTaskCountForDomain(domainId) {
+            const tasks = JSON.parse(localStorage.getItem('wutree_tasks') || '[]');
+            return tasks.filter(t => t.domain === domainId && !t.completed).length;
+        }
+        
+        function renderBubbles() {
+            const container = document.getElementById('bubblesContainer');
+            const domains = loadDomains();
+            
+            container.innerHTML = domains.map((domain, index) => {
+                const taskCount = getTaskCountForDomain(domain.id);
+                const badgeClass = taskCount === 0 ? 'bubble-badge empty' : 'bubble-badge';
+                const priorityClass = index < 3 ? 'bubble-priority' : 'bubble-priority hidden';
+                
+                return `
+                    <div class="bubble" data-id="${domain.id}" data-order="${domain.order}" onclick="handleBubbleClick('${domain.id}')">
+                        <div class="${priorityClass}">${index + 1}</div>
+                        <div class="${badgeClass}">${taskCount}</div>
+                        <div class="bubble-emoji">${domain.emoji}</div>
+                        <div class="bubble-label">${domain.name}</div>
+                        <div class="bubble-arrows">
+                            <button class="arrow-btn" onclick="event.stopPropagation(); moveDomain('${domain.id}', -1)">↑</button>
+                            <button class="arrow-btn" onclick="event.stopPropagation(); moveDomain('${domain.id}', 1)">↓</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function handleBubbleClick(domainId) {
+            if (isEditMode) return;
+            openDomain(domainId);
+        }
+        
+        function openDomain(domainId) {
+            localStorage.setItem('wutree_current_domain', domainId);
+            window.location.href = 'wu-tree-v2-domain.html';
+        }
+        
+        // ========== EDIT MODE ==========
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            const btn = document.getElementById('editBtn');
+            const container = document.getElementById('bubblesContainer');
+            
+            if (isEditMode) {
+                btn.textContent = '✓ Terminé';
+                btn.classList.add('active');
+                container.classList.add('edit-mode');
+            } else {
+                btn.textContent = 'Prioriser';
+                btn.classList.remove('active');
+                container.classList.remove('edit-mode');
             }
         }
         
-        function handleMouseUp(projectId) {
-            cancelLongPress();
-            if (!isLongPress) {
-                openProject(projectId);
-            }
-            isLongPress = false;
-        }
-        
-        function openEditModal(projectId) {
-            cancelLongPress();
-            editingProjectId = projectId;
+        function moveDomain(domainId, direction) {
+            let domains = loadDomains();
+            const currentIndex = domains.findIndex(d => d.id === domainId);
+            const newIndex = currentIndex + direction;
             
-            const projects = JSON.parse(localStorage.getItem('wutree_projects') || '[]');
-            const project = projects.find(p => p.id === projectId);
-            if (!project) return;
+            if (newIndex < 0 || newIndex >= domains.length) return;
             
-            document.getElementById('editModalIcon').textContent = project.emoji;
-            document.getElementById('editNameInput').value = project.name;
+            // Swap orders
+            const temp = domains[currentIndex].order;
+            domains[currentIndex].order = domains[newIndex].order;
+            domains[newIndex].order = temp;
             
-            // Générer le color picker
-            const colorPicker = document.getElementById('colorPicker');
-            const currentColor = project.color || '#FFFFFF';
+            saveDomains(domains);
+            renderBubbles();
             
-            colorPicker.innerHTML = COLORS.map(c => `
-                <div class="color-option ${c.hex === currentColor ? 'selected' : ''}" 
-                     style="background: ${c.hex};"
-                     data-color="${c.hex}"
-                     onclick="selectColor('${c.hex}')"></div>
-            `).join('');
-            
-            document.getElementById('editModal').classList.add('show');
-        }
-        
-        function closeEditModal() {
-            document.getElementById('editModal').classList.remove('show');
-            editingProjectId = null;
-            isLongPress = false;
-        }
-        
-        function selectColor(hex) {
-            document.querySelectorAll('.color-option').forEach(el => {
-                el.classList.toggle('selected', el.dataset.color === hex);
-            });
-        }
-        
-        function saveProjectEdit() {
-            if (!editingProjectId) return;
-            
-            const newName = document.getElementById('editNameInput').value.trim();
-            const selectedColor = document.querySelector('.color-option.selected');
-            const newColor = selectedColor ? selectedColor.dataset.color : '#FFFFFF';
-            
-            if (!newName) {
-                alert('Entre un nom pour le projet !');
-                return;
-            }
-            
-            let projects = JSON.parse(localStorage.getItem('wutree_projects') || '[]');
-            const projectIndex = projects.findIndex(p => p.id === editingProjectId);
-            
-            if (projectIndex > -1) {
-                projects[projectIndex].name = newName;
-                projects[projectIndex].color = newColor;
-                localStorage.setItem('wutree_projects', JSON.stringify(projects));
-            }
-            
-            closeEditModal();
-            loadTree();
-        }
-        
-        function deleteEditingProject() {
-            if (!editingProjectId) return;
-            if (confirm('Supprimer ce projet et tous ses sous-projets ?')) {
-                let projects = JSON.parse(localStorage.getItem('wutree_projects') || '[]');
-                projects = projects.filter(p => p.id !== editingProjectId);
-                localStorage.setItem('wutree_projects', JSON.stringify(projects));
-                closeEditModal();
-                loadTree();
+            // Re-apply edit mode class
+            if (isEditMode) {
+                document.getElementById('bubblesContainer').classList.add('edit-mode');
             }
         }
         
-        function openProject(id) {
-            localStorage.setItem('wutree_current_project', id);
-            window.location.href = 'wu-tree-v2-project-domain.html';
+        // ========== NAVIGATION ==========
+        function goToWellbeing() {
+            window.location.href = 'wu-tree-v2-wellbeing.html';
         }
-        function createProject() { window.location.href = 'wu-tree-v2-project-create.html'; }
-        function goToWellbeing() { window.location.href = 'wu-tree-v2-wellbeing.html'; }
-        function goToTasks() { window.location.href = 'wu-tree-v2-tasks.html'; }
         
-        loadTree();
+        function goToTasks() {
+            window.location.href = 'wu-tree-v2-tasks.html';
+        }
+        
+        // ========== INIT ==========
+        renderBubbles();
     </script>
 </body>
 </html>
