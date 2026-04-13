@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Wu Tree - Objectif</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: 'Comfortaa', sans-serif;
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            padding: 20px;
+        }
+        
+        .phone-frame {
+            width: 100%; max-width: 390px;
+            height: 844px; max-height: 95vh;
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+            border-radius: 45px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.15);
+        }
+        
+        .petal {
+            position: absolute;
+            width: 10px; height: 10px;
+            background: linear-gradient(135deg, rgba(255, 182, 193, 0.8), rgba(255, 105, 180, 0.6));
+            border-radius: 50% 0 50% 0;
+            animation: fall linear infinite;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .petal:nth-child(1) { left: 10%; animation-duration: 12s; }
+        .petal:nth-child(2) { left: 30%; animation-duration: 14s; animation-delay: 2s; }
+        .petal:nth-child(3) { left: 70%; animation-duration: 13s; animation-delay: 1s; }
+        .petal:nth-child(4) { left: 90%; animation-duration: 15s; animation-delay: 3s; }
+        
+        @keyframes fall {
+            0% { transform: translateY(-50px) rotate(0deg); opacity: 0.8; }
+            100% { transform: translateY(900px) rotate(360deg); opacity: 0; }
+        }
+        
+        .status-bar {
+            height: 47px;
+            padding: 15px 25px 0;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(0,0,0,0.6);
+            position: relative;
+            z-index: 100;
+        }
+        
+        .header {
+            padding: 10px 20px 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            z-index: 100;
+        }
+        
+        .back-btn {
+            width: 40px; height: 40px;
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 50%;
+            color: #333;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .header-content { flex: 1; min-width: 0; }
+        
+        .header-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .header-subtitle {
+            font-size: 11px;
+            color: rgba(0,0,0,0.5);
+            margin-top: 2px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .header-btn {
+            width: 36px; height: 36px;
+            background: rgba(255,255,255,0.5);
+            border: none;
+            border-radius: 50%;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .header-btn.delete {
+            background: rgba(244, 67, 54, 0.15);
+        }
+        
+        .content {
+            padding: 0 20px 100px;
+            height: calc(100% - 120px);
+            overflow-y: auto;
+            position: relative;
+            z-index: 50;
+        }
+        
+        /* Progress card */
+        .progress-card {
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .progress-deadline {
+            font-size: 12px;
+            color: #6B4E9B;
+            font-weight: 600;
+        }
+        
+        .progress-remaining {
+            font-size: 11px;
+            color: rgba(0,0,0,0.5);
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6B4E9B, #9B6B9B);
+            border-radius: 4px;
+            transition: width 0.5s;
+        }
+        
+        .progress-text {
+            font-size: 10px;
+            color: rgba(0,0,0,0.5);
+            margin-top: 6px;
+            text-align: center;
+        }
+        
+        /* Sections */
+        .section {
+            margin-bottom: 20px;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .section-add {
+            width: 28px; height: 28px;
+            background: rgba(255,255,255,0.5);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 50%;
+            font-size: 16px;
+            color: #6B4E9B;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Week selector */
+        .week-selector {
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+        
+        .week-days {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .week-day {
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.4);
+            border: 2px solid rgba(255,255,255,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(0,0,0,0.4);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .week-day.active {
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            border-color: #6B4E9B;
+            color: white;
+        }
+        
+        .week-info {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 11px;
+            color: rgba(0,0,0,0.5);
+        }
+        
+        /* Session cards */
+        .session-card {
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .session-card:active {
+            transform: scale(0.98);
+        }
+        
+        .session-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        
+        .session-emoji {
+            font-size: 24px;
+        }
+        
+        .session-info {
+            flex: 1;
+        }
+        
+        .session-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .session-day {
+            font-size: 10px;
+            color: #6B4E9B;
+            font-weight: 600;
+        }
+        
+        .session-program {
+            font-size: 11px;
+            color: rgba(0,0,0,0.6);
+            line-height: 1.4;
+            padding: 10px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 10px;
+        }
+        
+        .session-program.empty {
+            color: rgba(0,0,0,0.3);
+            font-style: italic;
+            text-align: center;
+        }
+        
+        .session-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .session-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Comfortaa', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        
+        .session-btn.primary {
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            color: white;
+        }
+        
+        .session-btn.secondary {
+            background: rgba(255,255,255,0.5);
+            color: #333;
+        }
+        
+        .session-btn.voice {
+            background: linear-gradient(135deg, #4CAF50, #66BB6A);
+            color: white;
+        }
+        
+        /* History items */
+        .history-item {
+            background: rgba(255,255,255,0.4);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .history-date {
+            font-size: 10px;
+            font-weight: 600;
+            color: #333;
+            min-width: 60px;
+        }
+        
+        .history-content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .history-exercises {
+            font-size: 10px;
+            color: #6B4E9B;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .history-notes {
+            font-size: 9px;
+            color: rgba(0,0,0,0.5);
+            font-style: italic;
+            margin-top: 2px;
+        }
+        
+        .history-rating {
+            font-size: 10px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 20px;
+            color: rgba(0,0,0,0.4);
+            font-size: 11px;
+        }
+        
+        /* Add session button */
+        .add-card {
+            background: rgba(255,255,255,0.25);
+            border: 2px dashed rgba(255,255,255,0.5);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .add-card:active {
+            transform: scale(0.98);
+        }
+        
+        .add-card-icon {
+            font-size: 24px;
+            opacity: 0.5;
+            margin-bottom: 5px;
+        }
+        
+        .add-card-text {
+            font-size: 11px;
+            color: rgba(0,0,0,0.4);
+        }
+        
+        /* Habits section */
+        .habits-row {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 5px 0;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .habits-row::-webkit-scrollbar { display: none; }
+        
+        .habit-mini {
+            min-width: 70px;
+            padding: 10px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        
+        .habit-mini.done {
+            background: rgba(76, 175, 80, 0.3);
+        }
+        
+        .habit-mini-emoji {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        .habit-mini-name {
+            font-size: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .habit-add {
+            min-width: 70px;
+            padding: 10px;
+            background: rgba(255,255,255,0.25);
+            border: 2px dashed rgba(255,255,255,0.4);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        
+        /* Modals */
+        .modal-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+        
+        .modal-overlay.show { display: flex; }
+        
+        .modal {
+            width: 90%;
+            max-height: 85%;
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .modal-title { flex: 1; font-size: 15px; font-weight: 600; color: #333; }
+        .modal-close { width: 32px; height: 32px; background: rgba(255,255,255,0.4); border: none; border-radius: 50%; font-size: 18px; cursor: pointer; }
+        
+        .modal-content {
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 60vh;
+        }
+        
+        .input-group { margin-bottom: 16px; }
+        .input-label { display: block; font-size: 11px; color: rgba(0,0,0,0.6); text-transform: uppercase; font-weight: 600; margin-bottom: 8px; }
+        .input-field { width: 100%; padding: 12px 14px; border: 2px solid rgba(255,255,255,0.5); border-radius: 12px; font-size: 14px; font-family: 'Comfortaa', sans-serif; background: rgba(255,255,255,0.4); color: #333; }
+        .input-field:focus { outline: none; border-color: #6B4E9B; }
+        
+        .input-textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 12px;
+            font-size: 13px;
+            font-family: 'Comfortaa', sans-serif;
+            background: rgba(255,255,255,0.4);
+            color: #333;
+            resize: none;
+            min-height: 80px;
+        }
+        
+        .input-textarea:focus { outline: none; border-color: #6B4E9B; }
+        
+        .emoji-picker { display: flex; flex-wrap: wrap; gap: 8px; }
+        .emoji-option { width: 40px; height: 40px; background: rgba(255,255,255,0.4); border: 2px solid transparent; border-radius: 10px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .emoji-option.selected { border-color: #6B4E9B; background: rgba(255,255,255,0.7); }
+        
+        .day-picker { display: flex; flex-wrap: wrap; gap: 8px; }
+        .day-option { padding: 10px 14px; background: rgba(255,255,255,0.4); border: 2px solid transparent; border-radius: 10px; font-size: 12px; cursor: pointer; font-weight: 600; }
+        .day-option.selected { border-color: #6B4E9B; background: rgba(255,255,255,0.7); color: #6B4E9B; }
+        
+        .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+        .btn { flex: 1; padding: 14px; border: none; border-radius: 14px; font-family: 'Comfortaa', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; }
+        .btn-primary { background: linear-gradient(135deg, #6B4E9B, #9B6B9B); color: white; }
+        .btn-secondary { background: rgba(255,255,255,0.5); color: #333; }
+        .btn-danger { background: rgba(244, 67, 54, 0.8); color: white; }
+        
+        /* Rating */
+        .rating-container { display: flex; gap: 8px; justify-content: center; }
+        .rating-star { font-size: 28px; cursor: pointer; opacity: 0.3; transition: all 0.2s; }
+        .rating-star.active { opacity: 1; }
+        
+        /* Voice button */
+        .voice-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #4CAF50, #66BB6A);
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-family: 'Comfortaa', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .voice-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Bottom menu */
+        .bottom-menu {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.4);
+            z-index: 90;
+        }
+        
+        .menu-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 8px 16px; border-radius: 16px; }
+        .menu-item.active { background: rgba(255, 255, 255, 0.6); }
+        .menu-icon { font-size: 24px; }
+        .menu-label { font-size: 10px; color: rgba(0,0,0,0.6); font-weight: 500; }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="petal"></div><div class="petal"></div>
+        <div class="petal"></div><div class="petal"></div>
+        
+        <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
+        
+        <div class="header">
+            <button class="back-btn" onclick="goBack()">←</button>
+            <div class="header-content">
+                <div class="header-title">
+                    <span id="objectiveEmoji">🎯</span>
+                    <span id="objectiveName">Objectif</span>
+                </div>
+                <div class="header-subtitle" id="headerSubtitle">💪 Santé › 🏋️ Sport</div>
+            </div>
+            <div class="header-actions">
+                <button class="header-btn" onclick="openEditModal()" title="Modifier">✏️</button>
+                <button class="header-btn delete" onclick="deleteObjective()" title="Supprimer">🗑️</button>
+            </div>
+        </div>
+        
+        <div class="content">
+            <!-- Progress -->
+            <div class="progress-card">
+                <div class="progress-header">
+                    <div class="progress-deadline" id="progressDeadline">📅 15 juin 2026</div>
+                    <div class="progress-remaining" id="progressRemaining">65 jours restants</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 35%"></div>
+                </div>
+                <div class="progress-text" id="progressText">35% du temps écoulé</div>
+            </div>
+            
+            <!-- Séances de la semaine -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">📅 Séances de la semaine</div>
+                </div>
+                <div class="week-selector">
+                    <div class="week-days" id="weekDays"></div>
+                    <div class="week-info" id="weekInfo">Clique pour ajouter/retirer des jours</div>
+                </div>
+            </div>
+            
+            <!-- Mes séances -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">🏋️ Mes séances</div>
+                    <button class="section-add" onclick="openSessionModal()">+</button>
+                </div>
+                <div id="sessionsContainer"></div>
+            </div>
+            
+            <!-- Historique -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">📝 Historique</div>
+                    <button class="section-add" onclick="openLogModal()">+</button>
+                </div>
+                <div id="historyContainer"></div>
+            </div>
+            
+            <!-- Habitudes liées -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">🌱 Habitudes liées</div>
+                </div>
+                <div class="habits-row" id="habitsContainer"></div>
+            </div>
+        </div>
+        
+        <div class="bottom-menu">
+            <div class="menu-item" onclick="goToVision()">
+                <div class="menu-icon">🔮</div>
+                <div class="menu-label">Vision</div>
+            </div>
+            <div class="menu-item active">
+                <div class="menu-icon">🌳</div>
+                <div class="menu-label">Arbre</div>
+            </div>
+            <div class="menu-item" onclick="goToTasks()">
+                <div class="menu-icon">📋</div>
+                <div class="menu-label">Tâches</div>
+            </div>
+        </div>
+        
+        <!-- Modal Edit Objectif -->
+        <div class="modal-overlay" id="editModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title">✏️ Modifier l'objectif</div>
+                    <button class="modal-close" onclick="closeModal('edit')">×</button>
+                </div>
+                <div class="modal-content">
+                    <div class="input-group">
+                        <label class="input-label">Nom de l'objectif</label>
+                        <input type="text" class="input-field" id="editName">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Deadline</label>
+                        <input type="date" class="input-field" id="editDeadline">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Emoji</label>
+                        <div class="emoji-picker" id="editEmojis"></div>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="closeModal('edit')">Annuler</button>
+                        <button class="btn btn-primary" onclick="saveEdit()">Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal Nouvelle Séance -->
+        <div class="modal-overlay" id="sessionModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title">🏋️ Nouvelle séance</div>
+                    <button class="modal-close" onclick="closeModal('session')">×</button>
+                </div>
+                <div class="modal-content">
+                    <div class="input-group">
+                        <label class="input-label">Nom de la séance</label>
+                        <input type="text" class="input-field" id="sessionName" placeholder="Ex: Séance haut du corps">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Jour de la semaine</label>
+                        <div class="day-picker" id="dayPicker"></div>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Emoji</label>
+                        <div class="emoji-picker" id="sessionEmojis"></div>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="closeModal('session')">Annuler</button>
+                        <button class="btn btn-primary" onclick="saveSession()">Créer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal Programme Séance -->
+        <div class="modal-overlay" id="programModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title" id="programModalTitle">📝 Programme</div>
+                    <button class="modal-close" onclick="closeModal('program')">×</button>
+                </div>
+                <div class="modal-content">
+                    <button class="voice-btn" onclick="startVoiceInput()" id="voiceBtn">
+                        🎤 Dicter le programme (IA)
+                    </button>
+                    <div class="input-group">
+                        <label class="input-label">Programme de la séance</label>
+                        <textarea class="input-textarea" id="programContent" placeholder="Ex:
+2x20 pompes (repos 1min)
+2x10 tractions assistées
+3x15 abdos
+1x30s gainage"></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="closeModal('program')">Annuler</button>
+                        <button class="btn btn-primary" onclick="saveProgram()">Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal Log Séance -->
+        <div class="modal-overlay" id="logModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title">📝 Enregistrer une séance</div>
+                    <button class="modal-close" onclick="closeModal('log')">×</button>
+                </div>
+                <div class="modal-content">
+                    <div class="input-group">
+                        <label class="input-label">Date</label>
+                        <input type="date" class="input-field" id="logDate">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Séance</label>
+                        <select class="input-field" id="logSession"></select>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Exercices réalisés</label>
+                        <textarea class="input-textarea" id="logExercises" placeholder="Ce que tu as fait..."></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Comment ça s'est passé ?</label>
+                        <input type="hidden" id="logRating" value="3">
+                        <div class="rating-container">
+                            <span class="rating-star active" onclick="setRating(1)">⭐</span>
+                            <span class="rating-star active" onclick="setRating(2)">⭐</span>
+                            <span class="rating-star active" onclick="setRating(3)">⭐</span>
+                            <span class="rating-star" onclick="setRating(4)">⭐</span>
+                            <span class="rating-star" onclick="setRating(5)">⭐</span>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Notes (optionnel)</label>
+                        <textarea class="input-textarea" id="logNotes" placeholder="Ressenti, difficultés..."></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="closeModal('log')">Annuler</button>
+                        <button class="btn btn-primary" onclick="saveLog()">Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal Habit -->
+        <div class="modal-overlay" id="habitModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title">🌱 Nouvelle habitude</div>
+                    <button class="modal-close" onclick="closeModal('habit')">×</button>
+                </div>
+                <div class="modal-content">
+                    <div class="input-group">
+                        <label class="input-label">Habitude liée à cet objectif</label>
+                        <input type="text" class="input-field" id="habitName" placeholder="Ex: Protéines après séance">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Emoji</label>
+                        <div class="emoji-picker" id="habitEmojis"></div>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="closeModal('habit')">Annuler</button>
+                        <button class="btn btn-primary" onclick="saveHabit()">Ajouter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const currentObjectiveId = localStorage.getItem('wutree_current_objective') || '';
+        const currentActivityId = localStorage.getItem('wutree_current_activity') || '';
+        const currentDomainId = localStorage.getItem('wutree_current_domain') || '';
+        
+        const DAYS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+        const DAYS_SHORT = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+        const EMOJIS = ['🎯', '💪', '🏋️', '🏃', '🧘', '🚴', '⭐', '🔥', '🏆', '✨'];
+        const HABIT_EMOJIS = ['🥤', '🧘', '💧', '🍎', '😴', '📖', '🚿', '💊', '🧠', '✨'];
+        
+        let currentSessionIdForProgram = null;
+        let objective = null;
+        
+        function init() {
+            loadObjective();
+            renderProgress();
+            renderWeekDays();
+            renderSessions();
+            renderHistory();
+            renderHabits();
+            setupPickers();
+        }
+        
+        function loadObjective() {
+            const objectives = JSON.parse(localStorage.getItem('wutree_objectives') || '[]');
+            objective = objectives.find(o => o.id === currentObjectiveId);
+            
+            if (!objective) {
+                goBack();
+                return;
+            }
+            
+            document.getElementById('objectiveEmoji').textContent = objective.emoji;
+            document.getElementById('objectiveName').textContent = objective.name;
+            
+            // Load breadcrumb
+            const activities = JSON.parse(localStorage.getItem('wutree_activities') || '[]');
+            const domains = JSON.parse(localStorage.getItem('wutree_domains') || '[]');
+            const activity = activities.find(a => a.id === currentActivityId);
+            const domain = domains.find(d => d.id === currentDomainId);
+            
+            if (activity && domain) {
+                document.getElementById('headerSubtitle').textContent = `${domain.emoji} ${domain.name} › ${activity.emoji} ${activity.name}`;
+            }
+        }
+        
+        function renderProgress() {
+            if (!objective) return;
+            
+            const deadline = new Date(objective.deadline);
+            const today = new Date();
+            const created = new Date(objective.createdAt);
+            const total = Math.ceil((deadline - created) / (1000 * 60 * 60 * 24));
+            const remaining = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+            const progress = Math.max(0, Math.min(100, ((total - remaining) / total) * 100));
+            
+            document.getElementById('progressDeadline').textContent = `📅 ${deadline.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+            document.getElementById('progressRemaining').textContent = remaining > 0 ? `${remaining} jours restants` : 'Échéance passée';
+            document.getElementById('progressFill').style.width = `${progress}%`;
+            document.getElementById('progressText').textContent = `${Math.round(progress)}% du temps écoulé`;
+        }
+        
+        // ========== WEEK DAYS ==========
+        function renderWeekDays() {
+            if (!objective) return;
+            const selectedDays = objective.weekDays || [];
+            
+            document.getElementById('weekDays').innerHTML = DAYS_SHORT.map((day, i) => `
+                <div class="week-day ${selectedDays.includes(i) ? 'active' : ''}" onclick="toggleWeekDay(${i})">${day}</div>
+            `).join('');
+            
+            const count = selectedDays.length;
+            document.getElementById('weekInfo').textContent = count > 0 
+                ? `${count} séance${count > 1 ? 's' : ''} par semaine`
+                : 'Clique pour ajouter des jours';
+        }
+        
+        function toggleWeekDay(dayIndex) {
+            if (!objective.weekDays) objective.weekDays = [];
+            
+            if (objective.weekDays.includes(dayIndex)) {
+                objective.weekDays = objective.weekDays.filter(d => d !== dayIndex);
+            } else {
+                objective.weekDays.push(dayIndex);
+                objective.weekDays.sort();
+            }
+            
+            saveObjective();
+            renderWeekDays();
+        }
+        
+        // ========== SESSIONS ==========
+        function getSessions() {
+            return JSON.parse(localStorage.getItem('wutree_objective_sessions_templates') || '[]')
+                .filter(s => s.objectiveId === currentObjectiveId);
+        }
+        
+        function saveSessions(sessions) {
+            const all = JSON.parse(localStorage.getItem('wutree_objective_sessions_templates') || '[]')
+                .filter(s => s.objectiveId !== currentObjectiveId);
+            localStorage.setItem('wutree_objective_sessions_templates', JSON.stringify([...all, ...sessions]));
+        }
+        
+        function renderSessions() {
+            const container = document.getElementById('sessionsContainer');
+            const sessions = getSessions();
+            
+            if (sessions.length === 0) {
+                container.innerHTML = `
+                    <div class="add-card" onclick="openSessionModal()">
+                        <div class="add-card-icon">+</div>
+                        <div class="add-card-text">Créer ta première séance</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = sessions.map(session => `
+                <div class="session-card">
+                    <div class="session-header">
+                        <div class="session-emoji">${session.emoji}</div>
+                        <div class="session-info">
+                            <div class="session-name">${session.name}</div>
+                            <div class="session-day">${DAYS[session.dayIndex]}</div>
+                        </div>
+                    </div>
+                    <div class="session-program ${!session.program ? 'empty' : ''}">
+                        ${session.program || 'Aucun programme défini'}
+                    </div>
+                    <div class="session-actions">
+                        <button class="session-btn secondary" onclick="editSessionProgram('${session.id}')">✏️ Modifier</button>
+                        <button class="session-btn voice" onclick="voiceSessionProgram('${session.id}')">🎤 Vocal IA</button>
+                        <button class="session-btn primary" onclick="logSessionDone('${session.id}')">✓ Fait</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function openSessionModal() {
+            document.getElementById('sessionName').value = '';
+            setupDayPicker();
+            setupSessionEmojis();
+            openModal('session');
+        }
+        
+        function setupDayPicker() {
+            const selectedDays = objective?.weekDays || [];
+            document.getElementById('dayPicker').innerHTML = DAYS.map((day, i) => `
+                <div class="day-option ${selectedDays.includes(i) ? 'selected' : ''}" onclick="selectDay(this, ${i})" data-day="${i}">${day}</div>
+            `).join('');
+        }
+        
+        function selectDay(el, dayIndex) {
+            document.querySelectorAll('.day-option').forEach(d => d.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+        
+        function setupSessionEmojis() {
+            document.getElementById('sessionEmojis').innerHTML = EMOJIS.map((e, i) => 
+                `<div class="emoji-option ${i === 2 ? 'selected' : ''}" onclick="selectEmoji(this)">${e}</div>`
+            ).join('');
+        }
+        
+        function saveSession() {
+            const name = document.getElementById('sessionName').value.trim();
+            const dayEl = document.querySelector('.day-option.selected');
+            const emoji = document.querySelector('#sessionEmojis .emoji-option.selected')?.textContent || '🏋️';
+            
+            if (!name) { alert('Entre un nom !'); return; }
+            if (!dayEl) { alert('Choisis un jour !'); return; }
+            
+            const dayIndex = parseInt(dayEl.dataset.day);
+            const sessions = getSessions();
+            
+            sessions.push({
+                id: 'sess_' + Date.now(),
+                objectiveId: currentObjectiveId,
+                name,
+                dayIndex,
+                emoji,
+                program: '',
+                createdAt: new Date().toISOString()
+            });
+            
+            saveSessions(sessions);
+            
+            // Add day to week if not already
+            if (!objective.weekDays) objective.weekDays = [];
+            if (!objective.weekDays.includes(dayIndex)) {
+                objective.weekDays.push(dayIndex);
+                objective.weekDays.sort();
+                saveObjective();
+            }
+            
+            closeModal('session');
+            renderWeekDays();
+            renderSessions();
+        }
+        
+        function editSessionProgram(sessionId) {
+            currentSessionIdForProgram = sessionId;
+            const sessions = getSessions();
+            const session = sessions.find(s => s.id === sessionId);
+            
+            document.getElementById('programModalTitle').textContent = `📝 ${session.name}`;
+            document.getElementById('programContent').value = session.program || '';
+            openModal('program');
+        }
+        
+        function voiceSessionProgram(sessionId) {
+            currentSessionIdForProgram = sessionId;
+            const sessions = getSessions();
+            const session = sessions.find(s => s.id === sessionId);
+            
+            document.getElementById('programModalTitle').textContent = `🎤 ${session.name}`;
+            document.getElementById('programContent').value = session.program || '';
+            openModal('program');
+            
+            // Start voice input
+            startVoiceInput();
+        }
+        
+        function startVoiceInput() {
+            const btn = document.getElementById('voiceBtn');
+            
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert('La reconnaissance vocale n\'est pas supportée par ton navigateur. Utilise Chrome ou Safari.');
+                return;
+            }
+            
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            
+            recognition.lang = 'fr-FR';
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            
+            btn.textContent = '🎤 Écoute en cours...';
+            btn.disabled = true;
+            
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                const textarea = document.getElementById('programContent');
+                textarea.value = (textarea.value ? textarea.value + '\n' : '') + transcript;
+                btn.innerHTML = '🎤 Dicter le programme (IA)';
+                btn.disabled = false;
+            };
+            
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                btn.innerHTML = '🎤 Dicter le programme (IA)';
+                btn.disabled = false;
+                alert('Erreur de reconnaissance vocale. Réessaie.');
+            };
+            
+            recognition.onend = () => {
+                btn.innerHTML = '🎤 Dicter le programme (IA)';
+                btn.disabled = false;
+            };
+            
+            recognition.start();
+        }
+        
+        function saveProgram() {
+            const content = document.getElementById('programContent').value.trim();
+            const sessions = getSessions();
+            const session = sessions.find(s => s.id === currentSessionIdForProgram);
+            
+            if (session) {
+                session.program = content;
+                saveSessions(sessions);
+            }
+            
+            closeModal('program');
+            renderSessions();
+        }
+        
+        // ========== HISTORY ==========
+        function getHistory() {
+            return JSON.parse(localStorage.getItem('wutree_objective_logs') || '[]')
+                .filter(l => l.objectiveId === currentObjectiveId)
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+        }
+        
+        function saveHistory(logs) {
+            const all = JSON.parse(localStorage.getItem('wutree_objective_logs') || '[]')
+                .filter(l => l.objectiveId !== currentObjectiveId);
+            localStorage.setItem('wutree_objective_logs', JSON.stringify([...all, ...logs]));
+        }
+        
+        function renderHistory() {
+            const container = document.getElementById('historyContainer');
+            const history = getHistory();
+            
+            if (history.length === 0) {
+                container.innerHTML = '<div class="empty-state">Aucune séance enregistrée</div>';
+                return;
+            }
+            
+            container.innerHTML = history.slice(0, 5).map(log => `
+                <div class="history-item">
+                    <div class="history-date">${new Date(log.date).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' })}</div>
+                    <div class="history-content">
+                        ${log.exercises ? `<div class="history-exercises">${log.exercises}</div>` : ''}
+                        ${log.notes ? `<div class="history-notes">"${log.notes}"</div>` : ''}
+                    </div>
+                    <div class="history-rating">${'⭐'.repeat(log.rating || 3)}</div>
+                </div>
+            `).join('');
+        }
+        
+        function openLogModal(sessionId) {
+            document.getElementById('logDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('logExercises').value = '';
+            document.getElementById('logNotes').value = '';
+            document.getElementById('logRating').value = '3';
+            document.querySelectorAll('.rating-star').forEach((s, i) => s.classList.toggle('active', i < 3));
+            
+            // Fill session selector
+            const sessions = getSessions();
+            const select = document.getElementById('logSession');
+            select.innerHTML = sessions.map(s => `<option value="${s.id}">${s.emoji} ${s.name}</option>`).join('');
+            if (sessions.length === 0) {
+                select.innerHTML = '<option value="">Aucune séance</option>';
+            }
+            if (sessionId) {
+                select.value = sessionId;
+                // Pre-fill with program
+                const session = sessions.find(s => s.id === sessionId);
+                if (session?.program) {
+                    document.getElementById('logExercises').value = session.program;
+                }
+            }
+            
+            openModal('log');
+        }
+        
+        function logSessionDone(sessionId) {
+            openLogModal(sessionId);
+        }
+        
+        function setRating(rating) {
+            document.getElementById('logRating').value = rating;
+            document.querySelectorAll('.rating-star').forEach((s, i) => s.classList.toggle('active', i < rating));
+        }
+        
+        function saveLog() {
+            const date = document.getElementById('logDate').value;
+            const sessionId = document.getElementById('logSession').value;
+            const exercises = document.getElementById('logExercises').value.trim();
+            const notes = document.getElementById('logNotes').value.trim();
+            const rating = parseInt(document.getElementById('logRating').value) || 3;
+            
+            if (!date) { alert('Choisis une date !'); return; }
+            
+            const history = getHistory();
+            history.push({
+                id: 'log_' + Date.now(),
+                objectiveId: currentObjectiveId,
+                sessionId,
+                date,
+                exercises,
+                notes,
+                rating,
+                createdAt: new Date().toISOString()
+            });
+            
+            saveHistory(history);
+            closeModal('log');
+            renderHistory();
+        }
+        
+        // ========== HABITS ==========
+        function getHabits() {
+            return JSON.parse(localStorage.getItem('wutree_objective_habits') || '[]')
+                .filter(h => h.objectiveId === currentObjectiveId);
+        }
+        
+        function saveHabits(habits) {
+            const all = JSON.parse(localStorage.getItem('wutree_objective_habits') || '[]')
+                .filter(h => h.objectiveId !== currentObjectiveId);
+            localStorage.setItem('wutree_objective_habits', JSON.stringify([...all, ...habits]));
+        }
+        
+        function renderHabits() {
+            const container = document.getElementById('habitsContainer');
+            const habits = getHabits();
+            const today = new Date().toISOString().split('T')[0];
+            
+            let html = habits.map(h => {
+                const done = h.completedDays?.includes(today);
+                return `
+                    <div class="habit-mini ${done ? 'done' : ''}" onclick="toggleHabit('${h.id}')">
+                        <div class="habit-mini-emoji">${h.emoji}</div>
+                        <div class="habit-mini-name">${h.name}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            html += `
+                <div class="habit-add" onclick="openHabitModal()">
+                    <div class="habit-mini-emoji" style="opacity: 0.4">+</div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+        
+        function toggleHabit(habitId) {
+            const habits = getHabits();
+            const habit = habits.find(h => h.id === habitId);
+            const today = new Date().toISOString().split('T')[0];
+            
+            if (!habit.completedDays) habit.completedDays = [];
+            
+            if (habit.completedDays.includes(today)) {
+                habit.completedDays = habit.completedDays.filter(d => d !== today);
+            } else {
+                habit.completedDays.push(today);
+            }
+            
+            saveHabits(habits);
+            renderHabits();
+        }
+        
+        function openHabitModal() {
+            document.getElementById('habitName').value = '';
+            document.getElementById('habitEmojis').innerHTML = HABIT_EMOJIS.map((e, i) => 
+                `<div class="emoji-option ${i === 0 ? 'selected' : ''}" onclick="selectEmoji(this)">${e}</div>`
+            ).join('');
+            openModal('habit');
+        }
+        
+        function saveHabit() {
+            const name = document.getElementById('habitName').value.trim();
+            const emoji = document.querySelector('#habitEmojis .emoji-option.selected')?.textContent || '🌱';
+            
+            if (!name) { alert('Entre un nom !'); return; }
+            
+            const habits = getHabits();
+            habits.push({
+                id: 'habit_' + Date.now(),
+                objectiveId: currentObjectiveId,
+                name,
+                emoji,
+                completedDays: [],
+                createdAt: new Date().toISOString()
+            });
+            
+            saveHabits(habits);
+            closeModal('habit');
+            renderHabits();
+        }
+        
+        // ========== EDIT OBJECTIVE ==========
+        function setupPickers() {
+            document.getElementById('editEmojis').innerHTML = EMOJIS.map((e, i) => 
+                `<div class="emoji-option ${objective?.emoji === e ? 'selected' : (i === 0 && !objective ? 'selected' : '')}" onclick="selectEmoji(this)">${e}</div>`
+            ).join('');
+        }
+        
+        function openEditModal() {
+            document.getElementById('editName').value = objective.name;
+            document.getElementById('editDeadline').value = objective.deadline;
+            
+            document.querySelectorAll('#editEmojis .emoji-option').forEach(el => {
+                el.classList.toggle('selected', el.textContent === objective.emoji);
+            });
+            
+            openModal('edit');
+        }
+        
+        function saveEdit() {
+            const name = document.getElementById('editName').value.trim();
+            const deadline = document.getElementById('editDeadline').value;
+            const emoji = document.querySelector('#editEmojis .emoji-option.selected')?.textContent || '🎯';
+            
+            if (!name || !deadline) { alert('Remplis tous les champs !'); return; }
+            
+            objective.name = name;
+            objective.deadline = deadline;
+            objective.emoji = emoji;
+            
+            saveObjective();
+            closeModal('edit');
+            
+            document.getElementById('objectiveEmoji').textContent = emoji;
+            document.getElementById('objectiveName').textContent = name;
+            renderProgress();
+        }
+        
+        function saveObjective() {
+            const all = JSON.parse(localStorage.getItem('wutree_objectives') || '[]');
+            const index = all.findIndex(o => o.id === currentObjectiveId);
+            if (index !== -1) {
+                all[index] = objective;
+                localStorage.setItem('wutree_objectives', JSON.stringify(all));
+            }
+        }
+        
+        function deleteObjective() {
+            if (confirm('Supprimer cet objectif et toutes ses données ?')) {
+                // Delete objective
+                let all = JSON.parse(localStorage.getItem('wutree_objectives') || '[]');
+                all = all.filter(o => o.id !== currentObjectiveId);
+                localStorage.setItem('wutree_objectives', JSON.stringify(all));
+                
+                // Delete related data
+                let sessions = JSON.parse(localStorage.getItem('wutree_objective_sessions_templates') || '[]');
+                sessions = sessions.filter(s => s.objectiveId !== currentObjectiveId);
+                localStorage.setItem('wutree_objective_sessions_templates', JSON.stringify(sessions));
+                
+                let logs = JSON.parse(localStorage.getItem('wutree_objective_logs') || '[]');
+                logs = logs.filter(l => l.objectiveId !== currentObjectiveId);
+                localStorage.setItem('wutree_objective_logs', JSON.stringify(logs));
+                
+                let habits = JSON.parse(localStorage.getItem('wutree_objective_habits') || '[]');
+                habits = habits.filter(h => h.objectiveId !== currentObjectiveId);
+                localStorage.setItem('wutree_objective_habits', JSON.stringify(habits));
+                
+                goBack();
+            }
+        }
+        
+        // ========== MODALS ==========
+        function openModal(type) { document.getElementById(type + 'Modal').classList.add('show'); }
+        function closeModal(type) { document.getElementById(type + 'Modal').classList.remove('show'); }
+        function selectEmoji(el) {
+            el.parentElement.querySelectorAll('.emoji-option').forEach(e => e.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+        
+        // ========== NAV ==========
+        function goBack() { window.location.href = 'wu-tree-v2-activity.html'; }
+        function goToVision() { window.location.href = 'wu-tree-v2-visualization.html'; }
+        function goToTasks() { window.location.href = 'wu-tree-v2-tasks.html'; }
+        
+        init();
+    </script>
+</body>
+</html>
