@@ -248,6 +248,187 @@
         
         .empty-section { text-align: center; padding: 20px; color: rgba(0,0,0,0.4); font-size: 12px; }
         
+        /* PROGRAMME */
+        .program-card {
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 15px;
+        }
+        
+        .program-days {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        
+        .program-day {
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.4);
+            border: 2px solid rgba(255,255,255,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(0,0,0,0.5);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .program-day.active {
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            border-color: #6B4E9B;
+            color: white;
+        }
+        
+        .program-day.done {
+            background: rgba(76, 175, 80, 0.5);
+            border-color: rgba(76, 175, 80, 0.6);
+            color: white;
+        }
+        
+        .program-info {
+            text-align: center;
+            font-size: 11px;
+            color: rgba(0,0,0,0.5);
+        }
+        
+        .program-info strong {
+            color: #6B4E9B;
+        }
+        
+        /* MINI CALENDRIER */
+        .calendar-mini {
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 20px;
+            padding: 16px;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .calendar-month {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .calendar-nav {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .calendar-nav button {
+            width: 28px; height: 28px;
+            background: rgba(255,255,255,0.6);
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 50%;
+            font-size: 14px;
+            cursor: pointer;
+            color: #333;
+        }
+        
+        .calendar-nav-btn {
+            width: 28px; height: 28px;
+            background: rgba(255,255,255,0.6);
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 50%;
+            font-size: 14px;
+            cursor: pointer;
+            color: #333;
+        }
+        
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 8px;
+        }
+        
+        .calendar-weekday {
+            text-align: center;
+            font-size: 9px;
+            color: rgba(0,0,0,0.4);
+            font-weight: 600;
+        }
+        
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: rgba(0,0,0,0.5);
+            border-radius: 50%;
+            position: relative;
+        }
+        
+        .calendar-day.other-month {
+            opacity: 0.3;
+        }
+        
+        .calendar-day.today {
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .calendar-day.planned {
+            background: rgba(107, 78, 155, 0.2);
+            color: #6B4E9B;
+            font-weight: 600;
+        }
+        
+        .calendar-day.done {
+            background: rgba(76, 175, 80, 0.5);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .calendar-day.missed {
+            background: rgba(244, 67, 54, 0.2);
+            color: #c62828;
+        }
+        
+        .calendar-legend {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 12px;
+            font-size: 9px;
+            color: rgba(0,0,0,0.5);
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .legend-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+        }
+        
+        .legend-dot.planned { background: rgba(107, 78, 155, 0.4); }
+        .legend-dot.done { background: rgba(76, 175, 80, 0.5); }
+        .legend-dot.missed { background: rgba(244, 67, 54, 0.3); }
+        
         /* MODALS */
         .modal-overlay {
             position: absolute;
@@ -339,6 +520,41 @@
                     <button class="section-add" onclick="openModal('objective')">+</button>
                 </div>
                 <div id="objectivesContainer"></div>
+            </div>
+            
+            <!-- PROGRAMME -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">📅 Programme</div>
+                </div>
+                <div class="program-card">
+                    <div class="program-days" id="programDays"></div>
+                    <div class="program-info" id="programInfo">Clique sur les jours pour planifier tes séances</div>
+                </div>
+                
+                <!-- Mini calendrier -->
+                <div class="calendar-mini">
+                    <div class="calendar-header">
+                        <button class="calendar-nav-btn" onclick="prevMonth()">‹</button>
+                        <div class="calendar-month" id="calendarMonth">Avril 2026</div>
+                        <button class="calendar-nav-btn" onclick="nextMonth()">›</button>
+                    </div>
+                    <div class="calendar-weekdays">
+                        <div class="calendar-weekday">L</div>
+                        <div class="calendar-weekday">M</div>
+                        <div class="calendar-weekday">M</div>
+                        <div class="calendar-weekday">J</div>
+                        <div class="calendar-weekday">V</div>
+                        <div class="calendar-weekday">S</div>
+                        <div class="calendar-weekday">D</div>
+                    </div>
+                    <div class="calendar-days" id="calendarDays"></div>
+                    <div class="calendar-legend">
+                        <div class="legend-item"><div class="legend-dot planned"></div> Prévu</div>
+                        <div class="legend-item"><div class="legend-dot done"></div> Fait</div>
+                        <div class="legend-item"><div class="legend-dot missed"></div> Raté</div>
+                    </div>
+                </div>
             </div>
             
             <!-- HABITUDES -->
@@ -456,11 +672,19 @@
         const currentActivityId = localStorage.getItem('wutree_current_activity') || '';
         const currentDomainId = localStorage.getItem('wutree_current_domain') || 'sante';
         
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        
+        const DAYS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+        const MONTHS = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+        
         const OBJECTIVE_EMOJIS = ['🎯', '💪', '🏆', '⭐', '🚀', '📈', '✨', '🔥', '💎', '🌟'];
         const HABIT_EMOJIS = ['🏋️', '🧘', '🏃', '🥗', '💊', '😴', '🚿', '⏰', '💧', '📖', '✍️', '🧠'];
         
         function init() {
             loadActivityInfo();
+            renderProgram();
+            renderCalendar();
             renderObjectives();
             renderHabits();
             renderTasks();
@@ -482,6 +706,158 @@
             if (domain) {
                 document.getElementById('headerSubtitle').textContent = `${domain.emoji} ${domain.name}`;
             }
+        }
+        
+        // ========== PROGRAMME ==========
+        function getProgram() {
+            const programs = JSON.parse(localStorage.getItem('wutree_programs') || '[]');
+            return programs.find(p => p.activityId === currentActivityId) || { activityId: currentActivityId, days: [] };
+        }
+        
+        function saveProgram(program) {
+            let programs = JSON.parse(localStorage.getItem('wutree_programs') || '[]');
+            programs = programs.filter(p => p.activityId !== currentActivityId);
+            programs.push(program);
+            localStorage.setItem('wutree_programs', JSON.stringify(programs));
+        }
+        
+        function getCompletedSessions() {
+            return JSON.parse(localStorage.getItem('wutree_activity_sessions') || '[]')
+                .filter(s => s.activityId === currentActivityId);
+        }
+        
+        function saveSession(date) {
+            let sessions = JSON.parse(localStorage.getItem('wutree_activity_sessions') || '[]');
+            const existing = sessions.find(s => s.activityId === currentActivityId && s.date === date);
+            
+            if (existing) {
+                sessions = sessions.filter(s => !(s.activityId === currentActivityId && s.date === date));
+            } else {
+                sessions.push({ activityId: currentActivityId, date, completedAt: new Date().toISOString() });
+            }
+            
+            localStorage.setItem('wutree_activity_sessions', JSON.stringify(sessions));
+        }
+        
+        function renderProgram() {
+            const program = getProgram();
+            const today = new Date().getDay(); // 0 = dimanche
+            const todayIndex = today === 0 ? 6 : today - 1; // Convertir en index L=0, D=6
+            
+            const completedSessions = getCompletedSessions();
+            const todayStr = new Date().toISOString().split('T')[0];
+            const doneToday = completedSessions.some(s => s.date === todayStr);
+            
+            const container = document.getElementById('programDays');
+            container.innerHTML = DAYS.map((day, i) => {
+                let classes = 'program-day';
+                if (program.days.includes(i)) classes += ' active';
+                if (i === todayIndex && doneToday) classes += ' done';
+                
+                return `<div class="${classes}" onclick="toggleProgramDay(${i})">${day}</div>`;
+            }).join('');
+            
+            // Info
+            const sessionsPerWeek = program.days.length;
+            const info = document.getElementById('programInfo');
+            if (sessionsPerWeek === 0) {
+                info.innerHTML = 'Clique sur les jours pour planifier tes séances';
+            } else {
+                info.innerHTML = `<strong>${sessionsPerWeek}x</strong> par semaine`;
+            }
+        }
+        
+        function toggleProgramDay(dayIndex) {
+            const program = getProgram();
+            if (program.days.includes(dayIndex)) {
+                program.days = program.days.filter(d => d !== dayIndex);
+            } else {
+                program.days.push(dayIndex);
+                program.days.sort();
+            }
+            saveProgram(program);
+            renderProgram();
+            renderCalendar();
+        }
+        
+        // ========== CALENDRIER ==========
+        function renderCalendar() {
+            const program = getProgram();
+            const completedSessions = getCompletedSessions();
+            const completedDates = completedSessions.map(s => s.date);
+            
+            document.getElementById('calendarMonth').textContent = `${MONTHS[currentMonth]} ${currentYear}`;
+            
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+            const today = new Date();
+            const todayStr = today.toISOString().split('T')[0];
+            
+            // Adjust for Monday start
+            let startDay = firstDay.getDay() - 1;
+            if (startDay < 0) startDay = 6;
+            
+            const container = document.getElementById('calendarDays');
+            let html = '';
+            
+            // Previous month days
+            const prevMonthLastDay = new Date(currentYear, currentMonth, 0).getDate();
+            for (let i = startDay - 1; i >= 0; i--) {
+                html += `<div class="calendar-day other-month">${prevMonthLastDay - i}</div>`;
+            }
+            
+            // Current month days
+            for (let d = 1; d <= lastDay.getDate(); d++) {
+                const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const date = new Date(currentYear, currentMonth, d);
+                const dayOfWeek = date.getDay();
+                const dayIndex = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+                
+                const isPlanned = program.days.includes(dayIndex);
+                const isDone = completedDates.includes(dateStr);
+                const isPast = date < today && dateStr !== todayStr;
+                const isToday = dateStr === todayStr;
+                
+                let classes = 'calendar-day';
+                if (isToday) classes += ' today';
+                
+                if (isDone) {
+                    classes += ' done';
+                } else if (isPlanned && isPast) {
+                    classes += ' missed';
+                } else if (isPlanned) {
+                    classes += ' planned';
+                }
+                
+                html += `<div class="${classes}" onclick="toggleSession('${dateStr}')">${d}</div>`;
+            }
+            
+            // Next month days
+            const totalCells = Math.ceil((startDay + lastDay.getDate()) / 7) * 7;
+            const remaining = totalCells - startDay - lastDay.getDate();
+            for (let i = 1; i <= remaining; i++) {
+                html += `<div class="calendar-day other-month">${i}</div>`;
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        function toggleSession(dateStr) {
+            saveSession(dateStr);
+            renderProgram();
+            renderCalendar();
+        }
+        
+        function prevMonth() {
+            currentMonth--;
+            if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+            renderCalendar();
+        }
+        
+        function nextMonth() {
+            currentMonth++;
+            if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+            renderCalendar();
         }
         
         function setupEmojiPickers() {
