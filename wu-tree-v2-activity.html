@@ -134,17 +134,36 @@
             border: 2px solid rgba(255,255,255,0.6);
             border-radius: 20px;
             padding: 16px;
-            margin-bottom: 10px;
-            cursor: pointer;
+            margin-bottom: 12px;
+            position: relative;
         }
-        
-        .objective-card:active { transform: scale(0.98); }
         
         .objective-header { display: flex; align-items: flex-start; gap: 12px; }
         .objective-emoji { font-size: 28px; }
         .objective-content { flex: 1; }
-        .objective-name { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 4px; }
+        .objective-name { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 4px; padding-right: 30px; }
         .objective-deadline { font-size: 11px; color: #6B4E9B; font-weight: 600; }
+        
+        .objective-delete {
+            position: absolute;
+            top: 12px; right: 12px;
+            width: 28px; height: 28px;
+            background: rgba(244, 67, 54, 0.1);
+            border: none;
+            border-radius: 50%;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.6;
+            transition: all 0.2s;
+        }
+        
+        .objective-delete:hover, .objective-delete:active {
+            background: rgba(244, 67, 54, 0.3);
+            opacity: 1;
+        }
         
         .objective-progress { margin-top: 10px; }
         .progress-bar { height: 6px; background: rgba(255,255,255,0.5); border-radius: 3px; overflow: hidden; }
@@ -153,6 +172,137 @@
         
         .objective-card.completed { background: rgba(76, 175, 80, 0.2); border-color: rgba(76, 175, 80, 0.4); }
         .objective-card.completed .objective-name { text-decoration: line-through; opacity: 0.7; }
+        
+        /* Expand button */
+        .objective-expand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255,255,255,0.5);
+            font-size: 11px;
+            color: #6B4E9B;
+            cursor: pointer;
+            gap: 5px;
+        }
+        
+        /* Objective detail panel */
+        .objective-details {
+            display: none;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.5);
+        }
+        
+        .objective-details.show { display: block; }
+        
+        .detail-section {
+            margin-bottom: 15px;
+        }
+        
+        .detail-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(0,0,0,0.6);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        
+        /* Programme semaine */
+        .week-program {
+            background: rgba(255,255,255,0.3);
+            border-radius: 12px;
+            padding: 12px;
+        }
+        
+        .week-day-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .week-day-row:last-child { border-bottom: none; }
+        
+        .week-day-name {
+            width: 60px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #6B4E9B;
+        }
+        
+        .week-day-content {
+            flex: 1;
+            font-size: 11px;
+            color: #333;
+        }
+        
+        .week-day-content.empty {
+            color: rgba(0,0,0,0.3);
+            font-style: italic;
+        }
+        
+        .week-day-edit {
+            width: 24px; height: 24px;
+            background: rgba(107, 78, 155, 0.1);
+            border: none;
+            border-radius: 50%;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        /* Sessions historique */
+        .session-item {
+            background: rgba(255,255,255,0.3);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+        
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        
+        .session-date {
+            font-size: 11px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .session-rating {
+            font-size: 12px;
+        }
+        
+        .session-notes {
+            font-size: 10px;
+            color: rgba(0,0,0,0.6);
+            font-style: italic;
+        }
+        
+        .session-exercises {
+            font-size: 10px;
+            color: #6B4E9B;
+            margin-top: 4px;
+        }
+        
+        .add-session-btn {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-family: 'Comfortaa', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+        }
         
         /* HABITUDES */
         .habits-scroll {
@@ -475,6 +625,44 @@
         .btn-primary { background: linear-gradient(135deg, #6B4E9B, #9B6B9B); color: white; }
         .btn-secondary { background: rgba(255,255,255,0.5); color: #333; }
         
+        /* Rating stars */
+        .rating-container {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+        
+        .rating-star {
+            font-size: 28px;
+            cursor: pointer;
+            opacity: 0.3;
+            transition: all 0.2s;
+        }
+        
+        .rating-star.active {
+            opacity: 1;
+        }
+        
+        .rating-star:hover {
+            transform: scale(1.2);
+        }
+        
+        /* Textarea */
+        .input-textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 12px;
+            font-size: 13px;
+            font-family: 'Comfortaa', sans-serif;
+            background: rgba(255,255,255,0.4);
+            color: #333;
+            resize: none;
+            min-height: 70px;
+        }
+        
+        .input-textarea:focus { outline: none; border-color: #6B4E9B; }
+        
         /* Bottom menu */
         .bottom-menu {
             position: absolute;
@@ -520,41 +708,6 @@
                     <button class="section-add" onclick="openModal('objective')">+</button>
                 </div>
                 <div id="objectivesContainer"></div>
-            </div>
-            
-            <!-- PROGRAMME -->
-            <div class="section">
-                <div class="section-header">
-                    <div class="section-title">📅 Programme</div>
-                </div>
-                <div class="program-card">
-                    <div class="program-days" id="programDays"></div>
-                    <div class="program-info" id="programInfo">Clique sur les jours pour planifier tes séances</div>
-                </div>
-                
-                <!-- Mini calendrier -->
-                <div class="calendar-mini">
-                    <div class="calendar-header">
-                        <button class="calendar-nav-btn" onclick="prevMonth()">‹</button>
-                        <div class="calendar-month" id="calendarMonth">Avril 2026</div>
-                        <button class="calendar-nav-btn" onclick="nextMonth()">›</button>
-                    </div>
-                    <div class="calendar-weekdays">
-                        <div class="calendar-weekday">L</div>
-                        <div class="calendar-weekday">M</div>
-                        <div class="calendar-weekday">M</div>
-                        <div class="calendar-weekday">J</div>
-                        <div class="calendar-weekday">V</div>
-                        <div class="calendar-weekday">S</div>
-                        <div class="calendar-weekday">D</div>
-                    </div>
-                    <div class="calendar-days" id="calendarDays"></div>
-                    <div class="calendar-legend">
-                        <div class="legend-item"><div class="legend-dot planned"></div> Prévu</div>
-                        <div class="legend-item"><div class="legend-dot done"></div> Fait</div>
-                        <div class="legend-item"><div class="legend-dot missed"></div> Raté</div>
-                    </div>
-                </div>
             </div>
             
             <!-- HABITUDES -->
@@ -666,6 +819,45 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Modal Séance -->
+        <div class="modal-overlay" id="sessionModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title">📝 Nouvelle séance</div>
+                    <button class="modal-close" onclick="closeModal('session')">×</button>
+                </div>
+                <div class="modal-content">
+                    <div class="input-group">
+                        <label class="input-label">Date</label>
+                        <input type="date" class="input-field" id="sessionDate">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Exercices réalisés</label>
+                        <textarea class="input-textarea" id="sessionExercises" placeholder="Ex: 2x15 pompes, 2x8 tractions, 1x20 abdos..."></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Comment ça s'est passé ?</label>
+                        <input type="hidden" id="sessionRating" value="3">
+                        <div class="rating-container">
+                            <span class="rating-star active" onclick="setRating(1)">⭐</span>
+                            <span class="rating-star active" onclick="setRating(2)">⭐</span>
+                            <span class="rating-star active" onclick="setRating(3)">⭐</span>
+                            <span class="rating-star" onclick="setRating(4)">⭐</span>
+                            <span class="rating-star" onclick="setRating(5)">⭐</span>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Notes (optionnel)</label>
+                        <textarea class="input-textarea" id="sessionNotes" placeholder="Ressenti, difficultés, progrès..."></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="closeModal('session')">Annuler</button>
+                        <button class="btn btn-primary" onclick="saveSession()">Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <script>
@@ -683,8 +875,6 @@
         
         function init() {
             loadActivityInfo();
-            renderProgram();
-            renderCalendar();
             renderObjectives();
             renderHabits();
             renderTasks();
@@ -902,9 +1092,13 @@
                 const progress = Math.max(0, Math.min(100, ((total - remaining) / total) * 100));
                 const deadlineStr = deadline.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
                 
+                const sessions = getObjectiveSessions(obj.id);
+                const program = obj.weekProgram || {};
+                
                 return `
-                    <div class="objective-card ${obj.completed ? 'completed' : ''}" onclick="toggleObjective('${obj.id}')">
-                        <div class="objective-header">
+                    <div class="objective-card ${obj.completed ? 'completed' : ''}" id="obj-${obj.id}">
+                        <button class="objective-delete" onclick="deleteObjective('${obj.id}')" title="Supprimer">🗑️</button>
+                        <div class="objective-header" onclick="toggleObjective('${obj.id}')">
                             <div class="objective-emoji">${obj.emoji}</div>
                             <div class="objective-content">
                                 <div class="objective-name">${obj.name}</div>
@@ -917,15 +1111,163 @@
                             </div>
                             <div class="progress-text">${obj.completed ? '✓ Complété' : `${Math.round(progress)}%`}</div>
                         </div>
+                        
+                        <div class="objective-expand" onclick="toggleObjectiveDetails('${obj.id}')">
+                            <span>Voir le programme</span>
+                            <span id="expand-icon-${obj.id}">▼</span>
+                        </div>
+                        
+                        <div class="objective-details" id="details-${obj.id}">
+                            <!-- Programme semaine -->
+                            <div class="detail-section">
+                                <div class="detail-title">📅 Programme de la semaine</div>
+                                <div class="week-program">
+                                    ${renderWeekProgram(obj.id, program)}
+                                </div>
+                            </div>
+                            
+                            <!-- Historique séances -->
+                            <div class="detail-section">
+                                <div class="detail-title">📝 Séances (${sessions.length})</div>
+                                ${sessions.slice(0, 3).map(s => `
+                                    <div class="session-item">
+                                        <div class="session-header">
+                                            <div class="session-date">${new Date(s.date).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' })}</div>
+                                            <div class="session-rating">${'⭐'.repeat(s.rating || 3)}</div>
+                                        </div>
+                                        ${s.exercises ? `<div class="session-exercises">${s.exercises}</div>` : ''}
+                                        ${s.notes ? `<div class="session-notes">"${s.notes}"</div>` : ''}
+                                    </div>
+                                `).join('')}
+                                <button class="add-session-btn" onclick="openSessionModal('${obj.id}')">+ Ajouter une séance</button>
+                            </div>
+                        </div>
                     </div>
                 `;
             }).join('');
+        }
+        
+        function renderWeekProgram(objectiveId, program) {
+            const days = [
+                { key: 'lundi', label: 'Lundi' },
+                { key: 'mercredi', label: 'Mercredi' },
+                { key: 'vendredi', label: 'Vendredi' }
+            ];
+            
+            return days.map(day => `
+                <div class="week-day-row">
+                    <div class="week-day-name">${day.label}</div>
+                    <div class="week-day-content ${!program[day.key] ? 'empty' : ''}">${program[day.key] || 'Non défini'}</div>
+                    <button class="week-day-edit" onclick="editDayProgram('${objectiveId}', '${day.key}')">✏️</button>
+                </div>
+            `).join('');
+        }
+        
+        function toggleObjectiveDetails(id) {
+            const details = document.getElementById(`details-${id}`);
+            const icon = document.getElementById(`expand-icon-${id}`);
+            
+            if (details.classList.contains('show')) {
+                details.classList.remove('show');
+                icon.textContent = '▼';
+            } else {
+                details.classList.add('show');
+                icon.textContent = '▲';
+            }
+        }
+        
+        function deleteObjective(id) {
+            if (confirm('Supprimer cet objectif ?')) {
+                let objectives = getObjectives().filter(o => o.id !== id);
+                saveObjectives(objectives);
+                // Supprimer aussi les sessions liées
+                let sessions = JSON.parse(localStorage.getItem('wutree_objective_sessions') || '[]');
+                sessions = sessions.filter(s => s.objectiveId !== id);
+                localStorage.setItem('wutree_objective_sessions', JSON.stringify(sessions));
+                renderObjectives();
+            }
         }
         
         function toggleObjective(id) {
             const objectives = getObjectives();
             const obj = objectives.find(o => o.id === id);
             if (obj) { obj.completed = !obj.completed; saveObjectives(objectives); renderObjectives(); }
+        }
+        
+        // ========== SESSIONS D'OBJECTIF ==========
+        function getObjectiveSessions(objectiveId) {
+            return JSON.parse(localStorage.getItem('wutree_objective_sessions') || '[]')
+                .filter(s => s.objectiveId === objectiveId)
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+        }
+        
+        function saveObjectiveSession(session) {
+            let sessions = JSON.parse(localStorage.getItem('wutree_objective_sessions') || '[]');
+            sessions.push(session);
+            localStorage.setItem('wutree_objective_sessions', JSON.stringify(sessions));
+        }
+        
+        let currentObjectiveIdForSession = null;
+        
+        function openSessionModal(objectiveId) {
+            currentObjectiveIdForSession = objectiveId;
+            document.getElementById('sessionDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('sessionExercises').value = '';
+            document.getElementById('sessionNotes').value = '';
+            document.querySelectorAll('.rating-star').forEach((s, i) => {
+                s.classList.toggle('active', i < 3);
+            });
+            document.getElementById('sessionModal').classList.add('show');
+        }
+        
+        function setRating(rating) {
+            document.querySelectorAll('.rating-star').forEach((s, i) => {
+                s.classList.toggle('active', i < rating);
+            });
+            document.getElementById('sessionRating').value = rating;
+        }
+        
+        function saveSession() {
+            const date = document.getElementById('sessionDate').value;
+            const exercises = document.getElementById('sessionExercises').value.trim();
+            const notes = document.getElementById('sessionNotes').value.trim();
+            const rating = parseInt(document.getElementById('sessionRating').value) || 3;
+            
+            if (!date) { alert('Choisis une date !'); return; }
+            
+            saveObjectiveSession({
+                id: 'session_' + Date.now(),
+                objectiveId: currentObjectiveIdForSession,
+                date,
+                exercises,
+                notes,
+                rating,
+                createdAt: new Date().toISOString()
+            });
+            
+            closeModal('session');
+            renderObjectives();
+        }
+        
+        // ========== PROGRAMME JOUR ==========
+        function editDayProgram(objectiveId, dayKey) {
+            const objectives = getObjectives();
+            const obj = objectives.find(o => o.id === objectiveId);
+            if (!obj.weekProgram) obj.weekProgram = {};
+            
+            const currentValue = obj.weekProgram[dayKey] || '';
+            const newValue = prompt(`Programme du ${dayKey} :\n(ex: 2x20 pompes, 2x10 tractions)`, currentValue);
+            
+            if (newValue !== null) {
+                obj.weekProgram[dayKey] = newValue;
+                saveObjectives(objectives);
+                renderObjectives();
+                // Réouvrir les détails
+                setTimeout(() => {
+                    document.getElementById(`details-${objectiveId}`).classList.add('show');
+                    document.getElementById(`expand-icon-${objectiveId}`).textContent = '▲';
+                }, 50);
+            }
         }
         
         function saveObjective() {
@@ -943,7 +1285,8 @@
                 name, 
                 deadline, 
                 emoji, 
-                completed: false, 
+                completed: false,
+                weekProgram: {},
                 createdAt: new Date().toISOString() 
             });
             saveObjectives(objectives);
