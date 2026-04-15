@@ -600,6 +600,125 @@
             margin-top: 6px;
         }
         
+        /* Session type toggle */
+        .session-type-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        
+        .type-option {
+            flex: 1;
+            padding: 12px;
+            background: rgba(255,255,255,0.4);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .type-option.selected {
+            border-color: #6B4E9B;
+            background: rgba(107, 78, 155, 0.15);
+        }
+        
+        .type-option-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        
+        .type-option-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .type-option-desc {
+            font-size: 9px;
+            color: rgba(0,0,0,0.5);
+            margin-top: 2px;
+        }
+        
+        /* Frequency picker */
+        .freq-picker {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .freq-option {
+            padding: 12px 18px;
+            background: rgba(255,255,255,0.4);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .freq-option.selected {
+            border-color: #6B4E9B;
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            color: white;
+        }
+        
+        .suggestion-box {
+            background: rgba(76, 175, 80, 0.15);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-top: 10px;
+            font-size: 11px;
+            color: #2e7d32;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .suggestion-box-icon {
+            font-size: 16px;
+        }
+        
+        /* Session card flex badge */
+        .session-flex-badge {
+            font-size: 9px;
+            padding: 3px 8px;
+            background: rgba(76, 175, 80, 0.2);
+            color: #2e7d32;
+            border-radius: 10px;
+            font-weight: 600;
+            margin-left: 6px;
+        }
+        
+        .session-progress {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 6px;
+            font-size: 10px;
+            color: rgba(0,0,0,0.5);
+        }
+        
+        .session-progress-bar {
+            flex: 1;
+            height: 4px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .session-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            border-radius: 2px;
+        }
+        
+        .session-progress-fill.complete {
+            background: #4CAF50;
+        }
+        
         /* Evaluation styles (Garmin-like) */
         .eval-section {
             margin-bottom: 18px;
@@ -870,17 +989,47 @@
                 <div class="modal-content">
                     <div class="input-group">
                         <label class="input-label">Nom de la séance</label>
-                        <input type="text" class="input-field" id="sessionName" placeholder="Ex: Séance haut du corps">
+                        <input type="text" class="input-field" id="sessionName" placeholder="Ex: Musculation, Cardio, Yoga...">
                     </div>
+                    
                     <div class="input-group">
+                        <label class="input-label">Type de planification</label>
+                        <div class="session-type-toggle">
+                            <div class="type-option selected" onclick="setSessionType('fixed')" data-type="fixed">
+                                <div class="type-option-icon">📅</div>
+                                <div class="type-option-label">Jours fixes</div>
+                                <div class="type-option-desc">L/M/V par exemple</div>
+                            </div>
+                            <div class="type-option" onclick="setSessionType('flexible')" data-type="flexible">
+                                <div class="type-option-icon">🌊</div>
+                                <div class="type-option-label">Flexible</div>
+                                <div class="type-option-desc">X fois/semaine</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Fixed days picker -->
+                    <div class="input-group" id="fixedDaysGroup">
                         <label class="input-label">Jour(s) de la semaine</label>
                         <div class="day-picker" id="dayPicker"></div>
                         <div class="day-picker-hint">Tu peux sélectionner plusieurs jours</div>
                     </div>
+                    
+                    <!-- Flexible frequency picker -->
+                    <div class="input-group" id="flexibleFreqGroup" style="display: none;">
+                        <label class="input-label">Combien de fois par semaine ?</label>
+                        <div class="freq-picker" id="freqPicker"></div>
+                        <div class="suggestion-box" id="suggestionBox" style="display: none;">
+                            <span class="suggestion-box-icon">💡</span>
+                            <span id="suggestionText">Suggestion : Mardi ou Samedi (pas de muscu)</span>
+                        </div>
+                    </div>
+                    
                     <div class="input-group">
                         <label class="input-label">Emoji</label>
                         <div class="emoji-picker" id="sessionEmojis"></div>
                     </div>
+                    
                     <div class="modal-actions">
                         <button class="btn btn-secondary" onclick="closeModal('session')">Annuler</button>
                         <button class="btn btn-primary" onclick="saveSession()">Créer</button>
@@ -1053,7 +1202,7 @@
         
         const DAYS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
         const DAYS_SHORT = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
-        const EMOJIS = ['🎯', '💪', '🏋️', '🏃', '🧘', '🚴', '⭐', '🔥', '🏆', '✨'];
+        const EMOJIS = ['🎯', '💪', '🏋️', '🏃', '🧘', '🚴', '🏊', '⚽', '🎾', '🥊', '⭐', '🔥'];
         const HABIT_EMOJIS = ['🥤', '🧘', '💧', '🍎', '😴', '📖', '🚿', '💊', '🧠', '✨'];
         
         let currentSessionIdForProgram = null;
@@ -1117,10 +1266,26 @@
                 <div class="week-day ${selectedDays.includes(i) ? 'active' : ''}" onclick="toggleWeekDay(${i})">${day}</div>
             `).join('');
             
-            const count = selectedDays.length;
-            document.getElementById('weekInfo').textContent = count > 0 
-                ? `${count} séance${count > 1 ? 's' : ''} par semaine`
-                : 'Clique pour ajouter des jours';
+            // Count sessions
+            const sessions = getSessions();
+            const fixedCount = sessions.filter(s => s.type !== 'flexible').length;
+            const flexCount = sessions.filter(s => s.type === 'flexible').length;
+            
+            let infoText = '';
+            if (fixedCount > 0 || flexCount > 0) {
+                const parts = [];
+                if (selectedDays.length > 0) {
+                    parts.push(`${selectedDays.length} jour${selectedDays.length > 1 ? 's' : ''} fixe${selectedDays.length > 1 ? 's' : ''}`);
+                }
+                if (flexCount > 0) {
+                    parts.push(`${flexCount} flexible${flexCount > 1 ? 's' : ''}`);
+                }
+                infoText = parts.join(' + ');
+            } else {
+                infoText = 'Ajoute des séances ci-dessous';
+            }
+            
+            document.getElementById('weekInfo').textContent = infoText;
         }
         
         function toggleWeekDay(dayIndex) {
@@ -1164,30 +1329,70 @@
             }
             
             container.innerHTML = sessions.map(session => {
-                // Support both old single dayIndex and new days array
-                const days = session.days || [session.dayIndex];
-                const daysHtml = days.map(d => `<span class="session-day-tag">${DAYS[d]}</span>`).join('');
+                const isFlexible = session.type === 'flexible';
                 
-                return `
-                    <div class="session-card">
-                        <button class="session-delete" onclick="deleteSession('${session.id}')" title="Supprimer">🗑️</button>
-                        <div class="session-header">
-                            <div class="session-emoji">${session.emoji}</div>
-                            <div class="session-info">
-                                <div class="session-name">${session.name}</div>
-                                <div class="session-days">${daysHtml}</div>
+                if (isFlexible) {
+                    // Calculate weekly progress
+                    const weekProgress = getWeeklyProgress(session.id, session.frequency);
+                    const progressPercent = Math.min(100, (weekProgress.done / weekProgress.target) * 100);
+                    const isComplete = weekProgress.done >= weekProgress.target;
+                    
+                    return `
+                        <div class="session-card">
+                            <button class="session-delete" onclick="deleteSession('${session.id}')" title="Supprimer">🗑️</button>
+                            <div class="session-header">
+                                <div class="session-emoji">${session.emoji}</div>
+                                <div class="session-info">
+                                    <div class="session-name">
+                                        ${session.name}
+                                        <span class="session-flex-badge">🌊 Flexible</span>
+                                    </div>
+                                    <div class="session-progress">
+                                        <span>${weekProgress.done}/${weekProgress.target} cette semaine</span>
+                                        <div class="session-progress-bar">
+                                            <div class="session-progress-fill ${isComplete ? 'complete' : ''}" style="width: ${progressPercent}%"></div>
+                                        </div>
+                                        ${isComplete ? '✓' : ''}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="session-program ${!session.program ? 'empty' : ''}">
+                                ${session.program || 'Aucun programme défini'}
+                            </div>
+                            ${!isComplete ? getSuggestionHtml(session.id) : ''}
+                            <div class="session-actions">
+                                <button class="session-btn secondary" onclick="editSessionProgram('${session.id}')">✏️ Programme</button>
+                                <button class="session-btn voice" onclick="voiceSessionProgram('${session.id}')">🎤 Vocal</button>
+                                <button class="session-btn primary" onclick="logSessionDone('${session.id}')">✓ Fait</button>
                             </div>
                         </div>
-                        <div class="session-program ${!session.program ? 'empty' : ''}">
-                            ${session.program || 'Aucun programme défini'}
+                    `;
+                } else {
+                    // Fixed session - show days
+                    const days = session.days || [session.dayIndex];
+                    const daysHtml = days.map(d => `<span class="session-day-tag">${DAYS[d]}</span>`).join('');
+                    
+                    return `
+                        <div class="session-card">
+                            <button class="session-delete" onclick="deleteSession('${session.id}')" title="Supprimer">🗑️</button>
+                            <div class="session-header">
+                                <div class="session-emoji">${session.emoji}</div>
+                                <div class="session-info">
+                                    <div class="session-name">${session.name}</div>
+                                    <div class="session-days">${daysHtml}</div>
+                                </div>
+                            </div>
+                            <div class="session-program ${!session.program ? 'empty' : ''}">
+                                ${session.program || 'Aucun programme défini'}
+                            </div>
+                            <div class="session-actions">
+                                <button class="session-btn secondary" onclick="editSessionProgram('${session.id}')">✏️ Programme</button>
+                                <button class="session-btn voice" onclick="voiceSessionProgram('${session.id}')">🎤 Vocal</button>
+                                <button class="session-btn primary" onclick="logSessionDone('${session.id}')">✓ Fait</button>
+                            </div>
                         </div>
-                        <div class="session-actions">
-                            <button class="session-btn secondary" onclick="editSessionProgram('${session.id}')">✏️ Programme</button>
-                            <button class="session-btn voice" onclick="voiceSessionProgram('${session.id}')">🎤 Vocal</button>
-                            <button class="session-btn primary" onclick="logSessionDone('${session.id}')">✓ Fait</button>
-                        </div>
-                    </div>
-                `;
+                    `;
+                }
             }).join('');
             
             // Add button at the end
@@ -1197,6 +1402,58 @@
                     <div class="add-card-text">Ajouter une séance</div>
                 </div>
             `;
+        }
+        
+        function getWeeklyProgress(sessionId, targetFreq) {
+            const history = getHistory();
+            const today = new Date();
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - today.getDay() + 1); // Monday
+            startOfWeek.setHours(0, 0, 0, 0);
+            
+            const thisWeekLogs = history.filter(log => {
+                if (log.sessionId !== sessionId) return false;
+                const logDate = new Date(log.date);
+                return logDate >= startOfWeek;
+            });
+            
+            return {
+                done: thisWeekLogs.length,
+                target: targetFreq
+            };
+        }
+        
+        function getSuggestionHtml(sessionId) {
+            // Find days without fixed sessions this week
+            const sessions = getSessions();
+            const fixedDays = new Set();
+            
+            sessions.forEach(s => {
+                if (s.type !== 'flexible' && s.days) {
+                    s.days.forEach(d => fixedDays.add(d));
+                }
+            });
+            
+            const today = new Date().getDay();
+            const todayIndex = today === 0 ? 6 : today - 1;
+            
+            // Find upcoming free days
+            const freeDays = [];
+            for (let i = todayIndex; i < 7; i++) {
+                if (!fixedDays.has(i)) {
+                    freeDays.push(DAYS[i]);
+                }
+            }
+            
+            if (freeDays.length > 0) {
+                return `
+                    <div class="suggestion-box">
+                        <span class="suggestion-box-icon">💡</span>
+                        <span>Suggestion : ${freeDays.slice(0, 2).join(' ou ')}</span>
+                    </div>
+                `;
+            }
+            return '';
         }
         
         function deleteSession(sessionId) {
@@ -1211,20 +1468,86 @@
         function updateWeekDaysFromSessions() {
             const sessions = getSessions();
             const allDays = new Set();
+            
+            // Only count fixed sessions for weekDays display
             sessions.forEach(s => {
-                const days = s.days || [s.dayIndex];
-                days.forEach(d => allDays.add(d));
+                if (s.type !== 'flexible') {
+                    const days = s.days || [s.dayIndex];
+                    days.forEach(d => allDays.add(d));
+                }
             });
+            
             objective.weekDays = Array.from(allDays).sort();
             saveObjective();
             renderWeekDays();
         }
         
+        let currentSessionType = 'fixed';
+        
         function openSessionModal() {
             document.getElementById('sessionName').value = '';
+            currentSessionType = 'fixed';
             setupDayPicker();
+            setupFreqPicker();
             setupSessionEmojis();
+            setSessionType('fixed');
             openModal('session');
+        }
+        
+        function setSessionType(type) {
+            currentSessionType = type;
+            
+            document.querySelectorAll('.type-option').forEach(opt => {
+                opt.classList.toggle('selected', opt.dataset.type === type);
+            });
+            
+            document.getElementById('fixedDaysGroup').style.display = type === 'fixed' ? 'block' : 'none';
+            document.getElementById('flexibleFreqGroup').style.display = type === 'flexible' ? 'block' : 'none';
+            
+            if (type === 'flexible') {
+                updateSuggestions();
+            }
+        }
+        
+        function setupFreqPicker() {
+            const container = document.getElementById('freqPicker');
+            container.innerHTML = [1, 2, 3, 4, 5].map(n => `
+                <div class="freq-option ${n === 1 ? 'selected' : ''}" onclick="selectFreq(this, ${n})" data-freq="${n}">
+                    ${n}x/sem
+                </div>
+            `).join('');
+        }
+        
+        function selectFreq(el, freq) {
+            document.querySelectorAll('.freq-option').forEach(o => o.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+        
+        function getSelectedFreq() {
+            const selected = document.querySelector('.freq-option.selected');
+            return selected ? parseInt(selected.dataset.freq) : 1;
+        }
+        
+        function updateSuggestions() {
+            // Find days without fixed sessions
+            const sessions = getSessions();
+            const fixedDays = new Set();
+            
+            sessions.forEach(s => {
+                if (s.type !== 'flexible' && s.days) {
+                    s.days.forEach(d => fixedDays.add(d));
+                }
+            });
+            
+            const freeDays = DAYS.filter((_, i) => !fixedDays.has(i));
+            
+            if (freeDays.length > 0) {
+                document.getElementById('suggestionBox').style.display = 'flex';
+                document.getElementById('suggestionText').textContent = 
+                    `Suggestion : ${freeDays.slice(0, 3).join(', ')} (pas de séance fixe)`;
+            } else {
+                document.getElementById('suggestionBox').style.display = 'none';
+            }
         }
         
         function setupDayPicker() {
@@ -1250,27 +1573,42 @@
         
         function saveSession() {
             const name = document.getElementById('sessionName').value.trim();
-            const days = getSelectedDays();
             const emoji = document.querySelector('#sessionEmojis .emoji-option.selected')?.textContent || '🏋️';
             
             if (!name) { alert('Entre un nom !'); return; }
-            if (days.length === 0) { alert('Choisis au moins un jour !'); return; }
             
             const sessions = getSessions();
             
-            sessions.push({
-                id: 'sess_' + Date.now(),
-                objectiveId: currentObjectiveId,
-                name,
-                days, // Array of day indices
-                emoji,
-                program: '',
-                createdAt: new Date().toISOString()
-            });
+            if (currentSessionType === 'fixed') {
+                const days = getSelectedDays();
+                if (days.length === 0) { alert('Choisis au moins un jour !'); return; }
+                
+                sessions.push({
+                    id: 'sess_' + Date.now(),
+                    objectiveId: currentObjectiveId,
+                    type: 'fixed',
+                    name,
+                    days,
+                    emoji,
+                    program: '',
+                    createdAt: new Date().toISOString()
+                });
+            } else {
+                const frequency = getSelectedFreq();
+                
+                sessions.push({
+                    id: 'sess_' + Date.now(),
+                    objectiveId: currentObjectiveId,
+                    type: 'flexible',
+                    name,
+                    frequency, // times per week
+                    emoji,
+                    program: '',
+                    createdAt: new Date().toISOString()
+                });
+            }
             
             saveSessions(sessions);
-            
-            // Update week days
             updateWeekDaysFromSessions();
             
             closeModal('session');
