@@ -238,6 +238,7 @@
             color: rgba(0,0,0,0.4);
             cursor: pointer;
             transition: all 0.2s;
+            position: relative;
         }
         
         .week-day.active {
@@ -246,11 +247,134 @@
             color: white;
         }
         
+        .week-day.today {
+            border: 3px solid #FF9800;
+            box-shadow: 0 0 10px rgba(255, 152, 0, 0.4);
+        }
+        
+        .week-day.today::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            width: 6px;
+            height: 6px;
+            background: #FF9800;
+            border-radius: 50%;
+        }
+        
+        .week-day .done-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 14px;
+            height: 14px;
+            background: #4CAF50;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            color: white;
+            border: 2px solid white;
+        }
+        
         .week-info {
             text-align: center;
-            margin-top: 10px;
+            margin-top: 14px;
             font-size: 11px;
             color: rgba(0,0,0,0.5);
+        }
+        
+        .today-alert {
+            background: linear-gradient(135deg, rgba(255, 152, 0, 0.15), rgba(255, 193, 7, 0.15));
+            border: 1px solid rgba(255, 152, 0, 0.3);
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-top: 10px;
+            font-size: 11px;
+            color: #e65100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .today-alert-icon {
+            font-size: 16px;
+        }
+        
+        /* Today Quick Actions */
+        .today-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .today-card {
+            background: rgba(255,255,255,0.6);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255,255,255,0.7);
+            border-radius: 14px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .today-card.done {
+            opacity: 0.6;
+            background: rgba(76, 175, 80, 0.1);
+            border-color: rgba(76, 175, 80, 0.3);
+        }
+        
+        .today-card-emoji {
+            font-size: 28px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.5);
+            border-radius: 12px;
+        }
+        
+        .today-card-info {
+            flex: 1;
+        }
+        
+        .today-card-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .today-card-desc {
+            font-size: 11px;
+            color: rgba(0,0,0,0.5);
+            margin-top: 2px;
+        }
+        
+        .today-card-done {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid rgba(76, 175, 80, 0.5);
+            background: rgba(255,255,255,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .today-card-done:active {
+            transform: scale(0.95);
+        }
+        
+        .today-card-done.checked {
+            background: #4CAF50;
+            border-color: #4CAF50;
+            color: white;
         }
         
         /* Session cards */
@@ -282,6 +406,26 @@
         .session-delete:active {
             opacity: 1;
             background: rgba(244, 67, 54, 0.3);
+        }
+        
+        .session-edit {
+            position: absolute;
+            top: 10px; right: 42px;
+            width: 26px; height: 26px;
+            background: rgba(107, 78, 155, 0.1);
+            border: none;
+            border-radius: 50%;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.6;
+        }
+        
+        .session-edit:active {
+            opacity: 1;
+            background: rgba(107, 78, 155, 0.3);
         }
         
         .session-header {
@@ -898,6 +1042,14 @@
                 <div class="progress-text" id="progressText">35% du temps écoulé</div>
             </div>
             
+            <!-- Aujourd'hui - Quick Actions -->
+            <div class="section" id="todaySection" style="display: none;">
+                <div class="section-header">
+                    <div class="section-title">⚡ Aujourd'hui</div>
+                </div>
+                <div class="today-cards" id="todayContainer"></div>
+            </div>
+            
             <!-- Séances de la semaine -->
             <div class="section">
                 <div class="section-header">
@@ -1285,6 +1437,7 @@
             loadObjective();
             updateDomainLabels();
             renderProgress();
+            renderToday();
             renderWeekDays();
             renderSessions();
             renderHistory();
@@ -1296,8 +1449,108 @@
             const config = getDomainConfig();
             
             // Update section titles
-            document.querySelector('.section-title').textContent = `📅 ${config.sessionLabelPlural} de la semaine`;
-            document.querySelectorAll('.section-title')[1].innerHTML = `${config.sessionIcon} Mes ${config.sessionLabelPlural.toLowerCase()}`;
+            document.querySelector('.section-title').textContent = `⚡ Aujourd'hui`;
+            document.querySelectorAll('.section-title')[1].textContent = `📅 ${config.sessionLabelPlural} de la semaine`;
+            document.querySelectorAll('.section-title')[2].innerHTML = `${config.sessionIcon} Mes ${config.sessionLabelPlural.toLowerCase()}`;
+        }
+        
+        function renderToday() {
+            const todaySessions = getTodaySessions();
+            const flexibleSessions = getSessions().filter(s => s.type === 'flexible');
+            const completedToday = getCompletedSessionsToday();
+            const config = getDomainConfig();
+            
+            // Combine fixed sessions for today + flexible sessions not yet completed this week
+            const allTodayItems = [];
+            
+            // Add fixed sessions for today
+            todaySessions.forEach(s => {
+                const isDone = completedToday.includes(s.id);
+                allTodayItems.push({
+                    ...s,
+                    isDone,
+                    desc: 'Prévu aujourd\'hui'
+                });
+            });
+            
+            // Add flexible sessions not yet at goal
+            flexibleSessions.forEach(s => {
+                const weekProgress = getWeeklyProgress(s.id, s.frequency);
+                if (weekProgress.done < weekProgress.target) {
+                    const isDone = completedToday.includes(s.id);
+                    allTodayItems.push({
+                        ...s,
+                        isDone,
+                        desc: `${weekProgress.done}/${weekProgress.target} cette semaine`
+                    });
+                }
+            });
+            
+            const container = document.getElementById('todayContainer');
+            const section = document.getElementById('todaySection');
+            
+            if (allTodayItems.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            
+            section.style.display = 'block';
+            
+            container.innerHTML = allTodayItems.map(item => `
+                <div class="today-card ${item.isDone ? 'done' : ''}" data-session-id="${item.id}">
+                    <div class="today-card-emoji">${item.emoji}</div>
+                    <div class="today-card-info">
+                        <div class="today-card-name">${item.name}</div>
+                        <div class="today-card-desc">${item.desc}</div>
+                    </div>
+                    <div class="today-card-done ${item.isDone ? 'checked' : ''}" onclick="quickValidateSession('${item.id}')">
+                        ${item.isDone ? '✓' : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function getCompletedSessionsToday() {
+            const history = getHistory();
+            const today = new Date().toISOString().split('T')[0];
+            
+            return history
+                .filter(log => log.date === today)
+                .map(log => log.sessionId);
+        }
+        
+        function quickValidateSession(sessionId) {
+            const completedToday = getCompletedSessionsToday();
+            
+            if (completedToday.includes(sessionId)) {
+                // Already done - maybe allow undoing?
+                return;
+            }
+            
+            // Quick log without full modal
+            const sessions = getSessions();
+            const session = sessions.find(s => s.id === sessionId);
+            if (!session) return;
+            
+            const history = getHistory();
+            history.push({
+                id: 'log_' + Date.now(),
+                objectiveId: currentObjectiveId,
+                sessionId: sessionId,
+                date: new Date().toISOString().split('T')[0],
+                exercises: session.program || '',
+                notes: '',
+                rpe: 5,
+                energy: 3,
+                mood: 3,
+                createdAt: new Date().toISOString()
+            });
+            
+            saveHistory(history);
+            renderToday();
+            renderWeekDays();
+            renderHistory();
+            renderSessions();
         }
         
         function loadObjective() {
@@ -1345,9 +1598,22 @@
             const selectedDays = objective.weekDays || [];
             const config = getDomainConfig();
             
-            document.getElementById('weekDays').innerHTML = DAYS_SHORT.map((day, i) => `
-                <div class="week-day ${selectedDays.includes(i) ? 'active' : ''}" onclick="toggleWeekDay(${i})">${day}</div>
-            `).join('');
+            // Get today's index (0 = Monday, 6 = Sunday)
+            const today = new Date().getDay();
+            const todayIndex = today === 0 ? 6 : today - 1;
+            
+            // Get completed days this week
+            const completedDays = getCompletedDaysThisWeek();
+            
+            document.getElementById('weekDays').innerHTML = DAYS_SHORT.map((day, i) => {
+                let classes = 'week-day';
+                if (selectedDays.includes(i)) classes += ' active';
+                if (i === todayIndex) classes += ' today';
+                
+                const doneBadge = completedDays.includes(i) ? '<span class="done-badge">✓</span>' : '';
+                
+                return `<div class="${classes}" onclick="toggleWeekDay(${i})">${day}${doneBadge}</div>`;
+            }).join('');
             
             // Count sessions
             const sessions = getSessions();
@@ -1368,7 +1634,57 @@
                 infoText = `Ajoute des ${config.sessionLabelPlural.toLowerCase()} ci-dessous`;
             }
             
-            document.getElementById('weekInfo').textContent = infoText;
+            document.getElementById('weekInfo').innerHTML = infoText;
+            
+            // Show today's alert if there's a session today
+            const todaySessions = getTodaySessions();
+            const weekSelectorEl = document.querySelector('.week-selector');
+            const existingAlert = weekSelectorEl.querySelector('.today-alert');
+            if (existingAlert) existingAlert.remove();
+            
+            if (todaySessions.length > 0 && !completedDays.includes(todayIndex)) {
+                const alertHtml = `
+                    <div class="today-alert">
+                        <span class="today-alert-icon">🔔</span>
+                        <span>Aujourd'hui : ${todaySessions.map(s => s.emoji + ' ' + s.name).join(', ')}</span>
+                    </div>
+                `;
+                weekSelectorEl.insertAdjacentHTML('beforeend', alertHtml);
+            }
+        }
+        
+        function getCompletedDaysThisWeek() {
+            const history = getHistory();
+            const today = new Date();
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - ((today.getDay() + 6) % 7)); // Monday
+            startOfWeek.setHours(0, 0, 0, 0);
+            
+            const completedDays = [];
+            
+            history.forEach(log => {
+                const logDate = new Date(log.date);
+                if (logDate >= startOfWeek) {
+                    const dayIndex = logDate.getDay() === 0 ? 6 : logDate.getDay() - 1;
+                    if (!completedDays.includes(dayIndex)) {
+                        completedDays.push(dayIndex);
+                    }
+                }
+            });
+            
+            return completedDays;
+        }
+        
+        function getTodaySessions() {
+            const sessions = getSessions();
+            const today = new Date().getDay();
+            const todayIndex = today === 0 ? 6 : today - 1;
+            
+            return sessions.filter(s => {
+                if (s.type === 'flexible') return false;
+                const days = s.days || [s.dayIndex];
+                return days.includes(todayIndex);
+            });
         }
         
         function toggleWeekDay(dayIndex) {
@@ -1423,6 +1739,7 @@
                     
                     return `
                         <div class="session-card">
+                            <button class="session-edit" onclick="editSession('${session.id}')" title="Modifier">✏️</button>
                             <button class="session-delete" onclick="deleteSession('${session.id}')" title="Supprimer">🗑️</button>
                             <div class="session-header">
                                 <div class="session-emoji">${session.emoji}</div>
@@ -1458,6 +1775,7 @@
                     
                     return `
                         <div class="session-card">
+                            <button class="session-edit" onclick="editSession('${session.id}')" title="Modifier">✏️</button>
                             <button class="session-delete" onclick="deleteSession('${session.id}')" title="Supprimer">🗑️</button>
                             <div class="session-header">
                                 <div class="session-emoji">${session.emoji}</div>
@@ -1567,23 +1885,61 @@
             renderWeekDays();
         }
         
-        function openSessionModal() {
+        let editingSessionId = null;
+        
+        function openSessionModal(sessionIdToEdit = null) {
             const config = getDomainConfig();
+            editingSessionId = sessionIdToEdit;
             
-            // Update modal title
-            document.querySelector('#sessionModal .modal-title').textContent = `${config.sessionIcon} ${config.addLabel}`;
+            if (sessionIdToEdit) {
+                // Edit mode
+                const sessions = getSessions();
+                const session = sessions.find(s => s.id === sessionIdToEdit);
+                if (!session) return;
+                
+                document.querySelector('#sessionModal .modal-title').textContent = `✏️ Modifier la ${config.sessionLabel.toLowerCase()}`;
+                document.getElementById('sessionName').value = session.name;
+                
+                // Set type
+                currentSessionType = session.type || 'fixed';
+                setSessionType(currentSessionType);
+                
+                if (session.type === 'flexible') {
+                    // Select frequency
+                    document.querySelectorAll('.freq-option').forEach(o => {
+                        o.classList.toggle('selected', parseInt(o.dataset.freq) === session.frequency);
+                    });
+                } else {
+                    // Select days
+                    setupDayPicker(session.days || []);
+                }
+                
+                // Select emoji
+                setupSessionEmojis(session.emoji);
+                
+                // Update button text
+                document.querySelector('#sessionModal .btn-primary').textContent = 'Enregistrer';
+            } else {
+                // Create mode
+                document.querySelector('#sessionModal .modal-title').textContent = `${config.sessionIcon} ${config.addLabel}`;
+                const placeholder = config.suggestions.slice(0, 3).join(', ') + '...';
+                document.getElementById('sessionName').placeholder = `Ex: ${placeholder}`;
+                document.getElementById('sessionName').value = '';
+                currentSessionType = 'fixed';
+                setupDayPicker([]);
+                setupFreqPicker();
+                setupSessionEmojis();
+                setSessionType('fixed');
+                
+                // Update button text
+                document.querySelector('#sessionModal .btn-primary').textContent = 'Créer';
+            }
             
-            // Update placeholder with suggestions
-            const placeholder = config.suggestions.slice(0, 3).join(', ') + '...';
-            document.getElementById('sessionName').placeholder = `Ex: ${placeholder}`;
-            
-            document.getElementById('sessionName').value = '';
-            currentSessionType = 'fixed';
-            setupDayPicker();
-            setupFreqPicker();
-            setupSessionEmojis();
-            setSessionType('fixed');
             openModal('session');
+        }
+        
+        function editSession(sessionId) {
+            openSessionModal(sessionId);
         }
         
         function setSessionType(type) {
@@ -1643,16 +1999,17 @@
             }
         }
         
-        function setupSessionEmojis() {
+        function setupSessionEmojis(selectedEmoji = null) {
             const config = getDomainConfig();
-            document.getElementById('sessionEmojis').innerHTML = config.emojis.map((e, i) => 
-                `<div class="emoji-option ${i === 0 ? 'selected' : ''}" onclick="selectEmoji(this)">${e}</div>`
-            ).join('');
+            document.getElementById('sessionEmojis').innerHTML = config.emojis.map((e, i) => {
+                const isSelected = selectedEmoji ? e === selectedEmoji : i === 0;
+                return `<div class="emoji-option ${isSelected ? 'selected' : ''}" onclick="selectEmoji(this)">${e}</div>`;
+            }).join('');
         }
         
-        function setupDayPicker() {
+        function setupDayPicker(selectedDays = []) {
             document.getElementById('dayPicker').innerHTML = DAYS.map((day, i) => `
-                <div class="day-option" onclick="toggleDay(this, ${i})" data-day="${i}">${day}</div>
+                <div class="day-option ${selectedDays.includes(i) ? 'selected' : ''}" onclick="toggleDay(this, ${i})" data-day="${i}">${day}</div>
             `).join('');
         }
         
@@ -1671,35 +2028,69 @@
             
             if (!name) { alert('Entre un nom !'); return; }
             
-            const sessions = getSessions();
+            let sessions = getSessions();
             
-            if (currentSessionType === 'fixed') {
-                const days = getSelectedDays();
-                if (days.length === 0) { alert('Choisis au moins un jour !'); return; }
+            if (editingSessionId) {
+                // Edit mode - update existing session
+                const index = sessions.findIndex(s => s.id === editingSessionId);
+                if (index === -1) return;
                 
-                sessions.push({
-                    id: 'sess_' + Date.now(),
-                    objectiveId: currentObjectiveId,
-                    type: 'fixed',
-                    name,
-                    days,
-                    emoji,
-                    program: '',
-                    createdAt: new Date().toISOString()
-                });
+                if (currentSessionType === 'fixed') {
+                    const days = getSelectedDays();
+                    if (days.length === 0) { alert('Choisis au moins un jour !'); return; }
+                    
+                    sessions[index] = {
+                        ...sessions[index],
+                        type: 'fixed',
+                        name,
+                        days,
+                        emoji,
+                        frequency: undefined
+                    };
+                } else {
+                    const frequency = getSelectedFreq();
+                    
+                    sessions[index] = {
+                        ...sessions[index],
+                        type: 'flexible',
+                        name,
+                        frequency,
+                        emoji,
+                        days: undefined
+                    };
+                }
+                
+                editingSessionId = null;
             } else {
-                const frequency = getSelectedFreq();
-                
-                sessions.push({
-                    id: 'sess_' + Date.now(),
-                    objectiveId: currentObjectiveId,
-                    type: 'flexible',
-                    name,
-                    frequency, // times per week
-                    emoji,
-                    program: '',
-                    createdAt: new Date().toISOString()
-                });
+                // Create mode
+                if (currentSessionType === 'fixed') {
+                    const days = getSelectedDays();
+                    if (days.length === 0) { alert('Choisis au moins un jour !'); return; }
+                    
+                    sessions.push({
+                        id: 'sess_' + Date.now(),
+                        objectiveId: currentObjectiveId,
+                        type: 'fixed',
+                        name,
+                        days,
+                        emoji,
+                        program: '',
+                        createdAt: new Date().toISOString()
+                    });
+                } else {
+                    const frequency = getSelectedFreq();
+                    
+                    sessions.push({
+                        id: 'sess_' + Date.now(),
+                        objectiveId: currentObjectiveId,
+                        type: 'flexible',
+                        name,
+                        frequency,
+                        emoji,
+                        program: '',
+                        createdAt: new Date().toISOString()
+                    });
+                }
             }
             
             saveSessions(sessions);
@@ -1707,6 +2098,7 @@
             
             closeModal('session');
             renderSessions();
+            renderWeekDays();
         }
         
         function editSessionProgram(sessionId) {
