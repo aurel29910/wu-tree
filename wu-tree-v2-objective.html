@@ -261,12 +261,27 @@
             border-radius: 16px;
             padding: 14px;
             margin-bottom: 10px;
-            cursor: pointer;
-            transition: transform 0.2s;
+            position: relative;
         }
         
-        .session-card:active {
-            transform: scale(0.98);
+        .session-delete {
+            position: absolute;
+            top: 10px; right: 10px;
+            width: 26px; height: 26px;
+            background: rgba(244, 67, 54, 0.1);
+            border: none;
+            border-radius: 50%;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.6;
+        }
+        
+        .session-delete:active {
+            opacity: 1;
+            background: rgba(244, 67, 54, 0.3);
         }
         
         .session-header {
@@ -274,6 +289,7 @@
             align-items: center;
             gap: 10px;
             margin-bottom: 8px;
+            padding-right: 30px;
         }
         
         .session-emoji {
@@ -290,9 +306,19 @@
             color: #333;
         }
         
-        .session-day {
-            font-size: 10px;
-            color: #6B4E9B;
+        .session-days {
+            display: flex;
+            gap: 4px;
+            margin-top: 4px;
+            flex-wrap: wrap;
+        }
+        
+        .session-day-tag {
+            font-size: 9px;
+            padding: 2px 8px;
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            color: white;
+            border-radius: 10px;
             font-weight: 600;
         }
         
@@ -313,23 +339,23 @@
         
         .session-actions {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             margin-top: 10px;
         }
         
         .session-btn {
             flex: 1;
-            padding: 10px;
+            padding: 10px 8px;
             border: none;
             border-radius: 10px;
             font-family: 'Comfortaa', sans-serif;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 5px;
+            gap: 4px;
         }
         
         .session-btn.primary {
@@ -355,14 +381,14 @@
             margin-bottom: 8px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
         
         .history-date {
-            font-size: 10px;
+            font-size: 9px;
             font-weight: 600;
             color: #333;
-            min-width: 60px;
+            min-width: 55px;
         }
         
         .history-content {
@@ -383,6 +409,25 @@
             color: rgba(0,0,0,0.5);
             font-style: italic;
             margin-top: 2px;
+        }
+        
+        .history-metrics {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            font-size: 14px;
+        }
+        
+        .history-rpe {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: white;
         }
         
         .history-rating {
@@ -484,7 +529,7 @@
         
         .modal {
             width: 90%;
-            max-height: 85%;
+            max-height: 90%;
             background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
             border-radius: 24px;
             overflow: hidden;
@@ -505,7 +550,7 @@
         .modal-content {
             padding: 20px;
             overflow-y: auto;
-            max-height: 60vh;
+            max-height: 65vh;
         }
         
         .input-group { margin-bottom: 16px; }
@@ -533,8 +578,116 @@
         .emoji-option.selected { border-color: #6B4E9B; background: rgba(255,255,255,0.7); }
         
         .day-picker { display: flex; flex-wrap: wrap; gap: 8px; }
-        .day-option { padding: 10px 14px; background: rgba(255,255,255,0.4); border: 2px solid transparent; border-radius: 10px; font-size: 12px; cursor: pointer; font-weight: 600; }
-        .day-option.selected { border-color: #6B4E9B; background: rgba(255,255,255,0.7); color: #6B4E9B; }
+        .day-option { 
+            padding: 10px 14px; 
+            background: rgba(255,255,255,0.4); 
+            border: 2px solid transparent; 
+            border-radius: 10px; 
+            font-size: 12px; 
+            cursor: pointer; 
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .day-option.selected { 
+            border-color: #6B4E9B; 
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B); 
+            color: white; 
+        }
+        
+        .day-picker-hint {
+            font-size: 10px;
+            color: rgba(0,0,0,0.4);
+            margin-top: 6px;
+        }
+        
+        /* Evaluation styles (Garmin-like) */
+        .eval-section {
+            margin-bottom: 18px;
+        }
+        
+        .eval-label {
+            font-size: 11px;
+            color: rgba(0,0,0,0.6);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .eval-scale {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .eval-option {
+            flex: 1;
+            padding: 12px 6px;
+            background: rgba(255,255,255,0.4);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .eval-option.selected {
+            border-color: #6B4E9B;
+            background: rgba(107, 78, 155, 0.2);
+        }
+        
+        .eval-option-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        .eval-option-label {
+            font-size: 8px;
+            color: rgba(0,0,0,0.6);
+            font-weight: 600;
+        }
+        
+        /* RPE Scale (1-10) */
+        .rpe-scale {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .rpe-option {
+            flex: 1;
+            height: 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            opacity: 0.4;
+            transition: all 0.2s;
+            color: white;
+        }
+        
+        .rpe-option.selected {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        
+        .rpe-option:nth-child(1) { background: #4CAF50; }
+        .rpe-option:nth-child(2) { background: #8BC34A; }
+        .rpe-option:nth-child(3) { background: #CDDC39; }
+        .rpe-option:nth-child(4) { background: #FFEB3B; }
+        .rpe-option:nth-child(5) { background: #FFC107; }
+        .rpe-option:nth-child(6) { background: #FF9800; }
+        .rpe-option:nth-child(7) { background: #FF5722; }
+        .rpe-option:nth-child(8) { background: #f44336; }
+        .rpe-option:nth-child(9) { background: #E91E63; }
+        .rpe-option:nth-child(10) { background: #9C27B0; }
+        
+        .rpe-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 6px;
+            font-size: 9px;
+            color: rgba(0,0,0,0.4);
+        }
         
         .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
         .btn { flex: 1; padding: 14px; border: none; border-radius: 14px; font-family: 'Comfortaa', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; }
@@ -720,8 +873,9 @@
                         <input type="text" class="input-field" id="sessionName" placeholder="Ex: Séance haut du corps">
                     </div>
                     <div class="input-group">
-                        <label class="input-label">Jour de la semaine</label>
+                        <label class="input-label">Jour(s) de la semaine</label>
                         <div class="day-picker" id="dayPicker"></div>
+                        <div class="day-picker-hint">Tu peux sélectionner plusieurs jours</div>
                     </div>
                     <div class="input-group">
                         <label class="input-label">Emoji</label>
@@ -762,11 +916,11 @@
             </div>
         </div>
         
-        <!-- Modal Log Séance -->
+        <!-- Modal Log Séance (Garmin-style) -->
         <div class="modal-overlay" id="logModal">
             <div class="modal">
                 <div class="modal-header">
-                    <div class="modal-title">📝 Enregistrer une séance</div>
+                    <div class="modal-title">📝 Évaluation de la séance</div>
                     <button class="modal-close" onclick="closeModal('log')">×</button>
                 </div>
                 <div class="modal-content">
@@ -774,29 +928,91 @@
                         <label class="input-label">Date</label>
                         <input type="date" class="input-field" id="logDate">
                     </div>
+                    
                     <div class="input-group">
                         <label class="input-label">Séance</label>
                         <select class="input-field" id="logSession"></select>
                     </div>
+                    
+                    <!-- RPE - Effort perçu -->
+                    <div class="eval-section">
+                        <label class="eval-label">💪 Effort perçu (RPE)</label>
+                        <div class="rpe-scale" id="rpeScale"></div>
+                        <div class="rpe-labels">
+                            <span>Facile</span>
+                            <span>Modéré</span>
+                            <span>Difficile</span>
+                            <span>Max</span>
+                        </div>
+                        <input type="hidden" id="logRpe" value="5">
+                    </div>
+                    
+                    <!-- Niveau d'énergie -->
+                    <div class="eval-section">
+                        <label class="eval-label">⚡ Niveau d'énergie</label>
+                        <div class="eval-scale" id="energyScale">
+                            <div class="eval-option" data-value="1" onclick="setEnergy(1)">
+                                <div class="eval-option-icon">😴</div>
+                                <div class="eval-option-label">Épuisé</div>
+                            </div>
+                            <div class="eval-option" data-value="2" onclick="setEnergy(2)">
+                                <div class="eval-option-icon">😔</div>
+                                <div class="eval-option-label">Fatigué</div>
+                            </div>
+                            <div class="eval-option" data-value="3" onclick="setEnergy(3)">
+                                <div class="eval-option-icon">😐</div>
+                                <div class="eval-option-label">Normal</div>
+                            </div>
+                            <div class="eval-option selected" data-value="4" onclick="setEnergy(4)">
+                                <div class="eval-option-icon">😊</div>
+                                <div class="eval-option-label">Bien</div>
+                            </div>
+                            <div class="eval-option" data-value="5" onclick="setEnergy(5)">
+                                <div class="eval-option-icon">🔥</div>
+                                <div class="eval-option-label">Plein</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="logEnergy" value="4">
+                    </div>
+                    
+                    <!-- Humeur -->
+                    <div class="eval-section">
+                        <label class="eval-label">😊 Humeur après la séance</label>
+                        <div class="eval-scale" id="moodScale">
+                            <div class="eval-option" data-value="1" onclick="setMood(1)">
+                                <div class="eval-option-icon">😤</div>
+                                <div class="eval-option-label">Frustré</div>
+                            </div>
+                            <div class="eval-option" data-value="2" onclick="setMood(2)">
+                                <div class="eval-option-icon">😕</div>
+                                <div class="eval-option-label">Mitigé</div>
+                            </div>
+                            <div class="eval-option" data-value="3" onclick="setMood(3)">
+                                <div class="eval-option-icon">😌</div>
+                                <div class="eval-option-label">Content</div>
+                            </div>
+                            <div class="eval-option selected" data-value="4" onclick="setMood(4)">
+                                <div class="eval-option-icon">😄</div>
+                                <div class="eval-option-label">Satisfait</div>
+                            </div>
+                            <div class="eval-option" data-value="5" onclick="setMood(5)">
+                                <div class="eval-option-icon">🤩</div>
+                                <div class="eval-option-label">Euphorique</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="logMood" value="4">
+                    </div>
+                    
                     <div class="input-group">
                         <label class="input-label">Exercices réalisés</label>
                         <textarea class="input-textarea" id="logExercises" placeholder="Ce que tu as fait..."></textarea>
                     </div>
-                    <div class="input-group">
-                        <label class="input-label">Comment ça s'est passé ?</label>
-                        <input type="hidden" id="logRating" value="3">
-                        <div class="rating-container">
-                            <span class="rating-star active" onclick="setRating(1)">⭐</span>
-                            <span class="rating-star active" onclick="setRating(2)">⭐</span>
-                            <span class="rating-star active" onclick="setRating(3)">⭐</span>
-                            <span class="rating-star" onclick="setRating(4)">⭐</span>
-                            <span class="rating-star" onclick="setRating(5)">⭐</span>
-                        </div>
-                    </div>
+                    
                     <div class="input-group">
                         <label class="input-label">Notes (optionnel)</label>
-                        <textarea class="input-textarea" id="logNotes" placeholder="Ressenti, difficultés..."></textarea>
+                        <textarea class="input-textarea" id="logNotes" placeholder="Ressenti, difficultés, progrès..."></textarea>
                     </div>
+                    
                     <div class="modal-actions">
                         <button class="btn btn-secondary" onclick="closeModal('log')">Annuler</button>
                         <button class="btn btn-primary" onclick="saveLog()">Enregistrer</button>
@@ -947,25 +1163,61 @@
                 return;
             }
             
-            container.innerHTML = sessions.map(session => `
-                <div class="session-card">
-                    <div class="session-header">
-                        <div class="session-emoji">${session.emoji}</div>
-                        <div class="session-info">
-                            <div class="session-name">${session.name}</div>
-                            <div class="session-day">${DAYS[session.dayIndex]}</div>
+            container.innerHTML = sessions.map(session => {
+                // Support both old single dayIndex and new days array
+                const days = session.days || [session.dayIndex];
+                const daysHtml = days.map(d => `<span class="session-day-tag">${DAYS[d]}</span>`).join('');
+                
+                return `
+                    <div class="session-card">
+                        <button class="session-delete" onclick="deleteSession('${session.id}')" title="Supprimer">🗑️</button>
+                        <div class="session-header">
+                            <div class="session-emoji">${session.emoji}</div>
+                            <div class="session-info">
+                                <div class="session-name">${session.name}</div>
+                                <div class="session-days">${daysHtml}</div>
+                            </div>
+                        </div>
+                        <div class="session-program ${!session.program ? 'empty' : ''}">
+                            ${session.program || 'Aucun programme défini'}
+                        </div>
+                        <div class="session-actions">
+                            <button class="session-btn secondary" onclick="editSessionProgram('${session.id}')">✏️ Programme</button>
+                            <button class="session-btn voice" onclick="voiceSessionProgram('${session.id}')">🎤 Vocal</button>
+                            <button class="session-btn primary" onclick="logSessionDone('${session.id}')">✓ Fait</button>
                         </div>
                     </div>
-                    <div class="session-program ${!session.program ? 'empty' : ''}">
-                        ${session.program || 'Aucun programme défini'}
-                    </div>
-                    <div class="session-actions">
-                        <button class="session-btn secondary" onclick="editSessionProgram('${session.id}')">✏️ Modifier</button>
-                        <button class="session-btn voice" onclick="voiceSessionProgram('${session.id}')">🎤 Vocal IA</button>
-                        <button class="session-btn primary" onclick="logSessionDone('${session.id}')">✓ Fait</button>
-                    </div>
+                `;
+            }).join('');
+            
+            // Add button at the end
+            container.innerHTML += `
+                <div class="add-card" onclick="openSessionModal()">
+                    <div class="add-card-icon">+</div>
+                    <div class="add-card-text">Ajouter une séance</div>
                 </div>
-            `).join('');
+            `;
+        }
+        
+        function deleteSession(sessionId) {
+            if (confirm('Supprimer cette séance ?')) {
+                let sessions = getSessions().filter(s => s.id !== sessionId);
+                saveSessions(sessions);
+                renderSessions();
+                updateWeekDaysFromSessions();
+            }
+        }
+        
+        function updateWeekDaysFromSessions() {
+            const sessions = getSessions();
+            const allDays = new Set();
+            sessions.forEach(s => {
+                const days = s.days || [s.dayIndex];
+                days.forEach(d => allDays.add(d));
+            });
+            objective.weekDays = Array.from(allDays).sort();
+            saveObjective();
+            renderWeekDays();
         }
         
         function openSessionModal() {
@@ -976,15 +1228,18 @@
         }
         
         function setupDayPicker() {
-            const selectedDays = objective?.weekDays || [];
             document.getElementById('dayPicker').innerHTML = DAYS.map((day, i) => `
-                <div class="day-option ${selectedDays.includes(i) ? 'selected' : ''}" onclick="selectDay(this, ${i})" data-day="${i}">${day}</div>
+                <div class="day-option" onclick="toggleDay(this, ${i})" data-day="${i}">${day}</div>
             `).join('');
         }
         
-        function selectDay(el, dayIndex) {
-            document.querySelectorAll('.day-option').forEach(d => d.classList.remove('selected'));
-            el.classList.add('selected');
+        function toggleDay(el, dayIndex) {
+            el.classList.toggle('selected');
+        }
+        
+        function getSelectedDays() {
+            const selected = document.querySelectorAll('.day-option.selected');
+            return Array.from(selected).map(el => parseInt(el.dataset.day));
         }
         
         function setupSessionEmojis() {
@@ -995,20 +1250,19 @@
         
         function saveSession() {
             const name = document.getElementById('sessionName').value.trim();
-            const dayEl = document.querySelector('.day-option.selected');
+            const days = getSelectedDays();
             const emoji = document.querySelector('#sessionEmojis .emoji-option.selected')?.textContent || '🏋️';
             
             if (!name) { alert('Entre un nom !'); return; }
-            if (!dayEl) { alert('Choisis un jour !'); return; }
+            if (days.length === 0) { alert('Choisis au moins un jour !'); return; }
             
-            const dayIndex = parseInt(dayEl.dataset.day);
             const sessions = getSessions();
             
             sessions.push({
                 id: 'sess_' + Date.now(),
                 objectiveId: currentObjectiveId,
                 name,
-                dayIndex,
+                days, // Array of day indices
                 emoji,
                 program: '',
                 createdAt: new Date().toISOString()
@@ -1016,16 +1270,10 @@
             
             saveSessions(sessions);
             
-            // Add day to week if not already
-            if (!objective.weekDays) objective.weekDays = [];
-            if (!objective.weekDays.includes(dayIndex)) {
-                objective.weekDays.push(dayIndex);
-                objective.weekDays.sort();
-                saveObjective();
-            }
+            // Update week days
+            updateWeekDaysFromSessions();
             
             closeModal('session');
-            renderWeekDays();
             renderSessions();
         }
         
@@ -1129,24 +1377,47 @@
                 return;
             }
             
-            container.innerHTML = history.slice(0, 5).map(log => `
-                <div class="history-item">
-                    <div class="history-date">${new Date(log.date).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' })}</div>
-                    <div class="history-content">
-                        ${log.exercises ? `<div class="history-exercises">${log.exercises}</div>` : ''}
-                        ${log.notes ? `<div class="history-notes">"${log.notes}"</div>` : ''}
+            const energyEmojis = ['', '😴', '😔', '😐', '😊', '🔥'];
+            const moodEmojis = ['', '😤', '😕', '😌', '😄', '🤩'];
+            
+            container.innerHTML = history.slice(0, 5).map(log => {
+                const rpeColor = getRpeColor(log.rpe || 5);
+                const energyEmoji = energyEmojis[log.energy || 4];
+                const moodEmoji = moodEmojis[log.mood || 4];
+                
+                return `
+                    <div class="history-item">
+                        <div class="history-date">${new Date(log.date).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' })}</div>
+                        <div class="history-content">
+                            ${log.exercises ? `<div class="history-exercises">${log.exercises.substring(0, 50)}${log.exercises.length > 50 ? '...' : ''}</div>` : ''}
+                            ${log.notes ? `<div class="history-notes">"${log.notes.substring(0, 40)}${log.notes.length > 40 ? '...' : ''}"</div>` : ''}
+                        </div>
+                        <div class="history-metrics">
+                            <span class="history-rpe" style="background: ${rpeColor}">${log.rpe || 5}</span>
+                            <span>${energyEmoji}</span>
+                            <span>${moodEmoji}</span>
+                        </div>
                     </div>
-                    <div class="history-rating">${'⭐'.repeat(log.rating || 3)}</div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
+        }
+        
+        function getRpeColor(rpe) {
+            const colors = ['', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722', '#f44336', '#E91E63', '#9C27B0'];
+            return colors[rpe] || '#FFC107';
         }
         
         function openLogModal(sessionId) {
             document.getElementById('logDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('logExercises').value = '';
             document.getElementById('logNotes').value = '';
-            document.getElementById('logRating').value = '3';
-            document.querySelectorAll('.rating-star').forEach((s, i) => s.classList.toggle('active', i < 3));
+            
+            // Setup RPE scale
+            setupRpeScale();
+            
+            // Reset energy and mood
+            setEnergy(4);
+            setMood(4);
             
             // Fill session selector
             const sessions = getSessions();
@@ -1167,13 +1438,46 @@
             openModal('log');
         }
         
+        function setupRpeScale() {
+            const container = document.getElementById('rpeScale');
+            container.innerHTML = '';
+            for (let i = 1; i <= 10; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'rpe-option' + (i === 5 ? ' selected' : '');
+                btn.textContent = i;
+                btn.onclick = () => setRpe(i);
+                container.appendChild(btn);
+            }
+            document.getElementById('logRpe').value = 5;
+        }
+        
+        function setRpe(value) {
+            document.getElementById('logRpe').value = value;
+            document.querySelectorAll('.rpe-option').forEach((btn, i) => {
+                btn.classList.toggle('selected', i + 1 === value);
+            });
+        }
+        
+        function setEnergy(value) {
+            document.getElementById('logEnergy').value = value;
+            document.querySelectorAll('#energyScale .eval-option').forEach(opt => {
+                opt.classList.toggle('selected', parseInt(opt.dataset.value) === value);
+            });
+        }
+        
+        function setMood(value) {
+            document.getElementById('logMood').value = value;
+            document.querySelectorAll('#moodScale .eval-option').forEach(opt => {
+                opt.classList.toggle('selected', parseInt(opt.dataset.value) === value);
+            });
+        }
+        
         function logSessionDone(sessionId) {
             openLogModal(sessionId);
         }
         
         function setRating(rating) {
-            document.getElementById('logRating').value = rating;
-            document.querySelectorAll('.rating-star').forEach((s, i) => s.classList.toggle('active', i < rating));
+            // Legacy function, keep for compatibility
         }
         
         function saveLog() {
@@ -1181,7 +1485,9 @@
             const sessionId = document.getElementById('logSession').value;
             const exercises = document.getElementById('logExercises').value.trim();
             const notes = document.getElementById('logNotes').value.trim();
-            const rating = parseInt(document.getElementById('logRating').value) || 3;
+            const rpe = parseInt(document.getElementById('logRpe').value) || 5;
+            const energy = parseInt(document.getElementById('logEnergy').value) || 4;
+            const mood = parseInt(document.getElementById('logMood').value) || 4;
             
             if (!date) { alert('Choisis une date !'); return; }
             
@@ -1193,7 +1499,9 @@
                 date,
                 exercises,
                 notes,
-                rating,
+                rpe,
+                energy,
+                mood,
                 createdAt: new Date().toISOString()
             });
             
