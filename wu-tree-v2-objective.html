@@ -1202,20 +1202,102 @@
         
         const DAYS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
         const DAYS_SHORT = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
-        const EMOJIS = ['🎯', '💪', '🏋️', '🏃', '🧘', '🚴', '🏊', '⚽', '🎾', '🥊', '⭐', '🔥'];
+        
+        // Domain-specific configuration
+        const DOMAIN_CONFIG = {
+            sante: {
+                sessionLabel: 'Séance',
+                sessionLabelPlural: 'Séances',
+                sessionIcon: '🏋️',
+                addLabel: 'Nouvelle séance',
+                emojis: ['🏋️', '🏃', '🧘', '🚴', '🏊', '⚽', '🥊', '🤸', '💪', '🧗', '🎾', '🥋'],
+                suggestions: ['Musculation', 'Cardio', 'Yoga', 'HIIT', 'Étirements', 'Course', 'Natation'],
+                evalLabel: 'Évaluation de la séance'
+            },
+            business: {
+                sessionLabel: 'Session',
+                sessionLabelPlural: 'Sessions',
+                sessionIcon: '💼',
+                addLabel: 'Nouvelle session',
+                emojis: ['💼', '💻', '📊', '📈', '🎯', '💡', '📱', '🤝', '📝', '💰', '📧', '🎤'],
+                suggestions: ['Trading', 'Prospection', 'Création contenu', 'Analyse', 'Formation', 'Networking'],
+                evalLabel: 'Bilan de la session'
+            },
+            relations: {
+                sessionLabel: 'Moment',
+                sessionLabelPlural: 'Moments',
+                sessionIcon: '👥',
+                addLabel: 'Nouveau moment',
+                emojis: ['👥', '💬', '☕', '🍽️', '📞', '💑', '👨‍👩‍👧', '🤝', '🎁', '❤️', '🫂', '🎉'],
+                suggestions: ['Appel famille', 'Sortie amis', 'Date', 'Retrouvailles', 'Activité groupe'],
+                evalLabel: 'Comment c\'était ?'
+            },
+            connaissance: {
+                sessionLabel: 'Session',
+                sessionLabelPlural: 'Sessions',
+                sessionIcon: '📚',
+                addLabel: 'Nouvelle session',
+                emojis: ['📖', '✍️', '🎓', '💻', '🎧', '📚', '🧠', '🔬', '🌍', '🎨', '🎵', '🗣️'],
+                suggestions: ['Lecture', 'Cours en ligne', 'Pratique langue', 'Écriture', 'Projet perso', 'Recherche'],
+                evalLabel: 'Bilan d\'apprentissage'
+            },
+            loisirs: {
+                sessionLabel: 'Moment',
+                sessionLabelPlural: 'Moments',
+                sessionIcon: '🎮',
+                addLabel: 'Nouveau moment',
+                emojis: ['🎮', '🎬', '🎵', '📚', '🎨', '📷', '🎸', '🎭', '🧩', '🎯', '🎲', '🎪'],
+                suggestions: ['Gaming', 'Film/Série', 'Musique', 'Dessin', 'Photo', 'Lecture plaisir'],
+                evalLabel: 'Comment c\'était ?'
+            },
+            maison: {
+                sessionLabel: 'Session',
+                sessionLabelPlural: 'Sessions',
+                sessionIcon: '🏠',
+                addLabel: 'Nouvelle session',
+                emojis: ['🧹', '🛠️', '🌱', '🍳', '🧺', '📦', '🔧', '🪴', '✨', '🛋️', '🪑', '🏠'],
+                suggestions: ['Ménage', 'Bricolage', 'Jardinage', 'Cuisine', 'Rangement', 'Décoration'],
+                evalLabel: 'Bilan'
+            },
+            voyages: {
+                sessionLabel: 'Sortie',
+                sessionLabelPlural: 'Sorties',
+                sessionIcon: '✈️',
+                addLabel: 'Nouvelle sortie',
+                emojis: ['✈️', '🏖️', '⛺', '🗺️', '🎒', '🚗', '🏔️', '🌴', '📸', '🧳', '🚂', '🛳️'],
+                suggestions: ['Excursion', 'Randonnée', 'Visite', 'Road trip', 'Découverte', 'Aventure'],
+                evalLabel: 'Comment c\'était ?'
+            }
+        };
+        
+        // Get config for current domain
+        function getDomainConfig() {
+            return DOMAIN_CONFIG[currentDomainId] || DOMAIN_CONFIG.sante;
+        }
+        
         const HABIT_EMOJIS = ['🥤', '🧘', '💧', '🍎', '😴', '📖', '🚿', '💊', '🧠', '✨'];
         
         let currentSessionIdForProgram = null;
+        let currentSessionType = 'fixed';
         let objective = null;
         
         function init() {
             loadObjective();
+            updateDomainLabels();
             renderProgress();
             renderWeekDays();
             renderSessions();
             renderHistory();
             renderHabits();
             setupPickers();
+        }
+        
+        function updateDomainLabels() {
+            const config = getDomainConfig();
+            
+            // Update section titles
+            document.querySelector('.section-title').textContent = `📅 ${config.sessionLabelPlural} de la semaine`;
+            document.querySelectorAll('.section-title')[1].innerHTML = `${config.sessionIcon} Mes ${config.sessionLabelPlural.toLowerCase()}`;
         }
         
         function loadObjective() {
@@ -1261,6 +1343,7 @@
         function renderWeekDays() {
             if (!objective) return;
             const selectedDays = objective.weekDays || [];
+            const config = getDomainConfig();
             
             document.getElementById('weekDays').innerHTML = DAYS_SHORT.map((day, i) => `
                 <div class="week-day ${selectedDays.includes(i) ? 'active' : ''}" onclick="toggleWeekDay(${i})">${day}</div>
@@ -1282,7 +1365,7 @@
                 }
                 infoText = parts.join(' + ');
             } else {
-                infoText = 'Ajoute des séances ci-dessous';
+                infoText = `Ajoute des ${config.sessionLabelPlural.toLowerCase()} ci-dessous`;
             }
             
             document.getElementById('weekInfo').textContent = infoText;
@@ -1317,12 +1400,13 @@
         function renderSessions() {
             const container = document.getElementById('sessionsContainer');
             const sessions = getSessions();
+            const config = getDomainConfig();
             
             if (sessions.length === 0) {
                 container.innerHTML = `
                     <div class="add-card" onclick="openSessionModal()">
                         <div class="add-card-icon">+</div>
-                        <div class="add-card-text">Créer ta première séance</div>
+                        <div class="add-card-text">Créer ta première ${config.sessionLabel.toLowerCase()}</div>
                     </div>
                 `;
                 return;
@@ -1399,7 +1483,7 @@
             container.innerHTML += `
                 <div class="add-card" onclick="openSessionModal()">
                     <div class="add-card-icon">+</div>
-                    <div class="add-card-text">Ajouter une séance</div>
+                    <div class="add-card-text">Ajouter une ${config.sessionLabel.toLowerCase()}</div>
                 </div>
             `;
         }
@@ -1427,6 +1511,7 @@
             // Find days without fixed sessions this week
             const sessions = getSessions();
             const fixedDays = new Set();
+            const config = getDomainConfig();
             
             sessions.forEach(s => {
                 if (s.type !== 'flexible' && s.days) {
@@ -1485,6 +1570,15 @@
         let currentSessionType = 'fixed';
         
         function openSessionModal() {
+            const config = getDomainConfig();
+            
+            // Update modal title
+            document.querySelector('#sessionModal .modal-title').textContent = `${config.sessionIcon} ${config.addLabel}`;
+            
+            // Update placeholder with suggestions
+            const placeholder = config.suggestions.slice(0, 3).join(', ') + '...';
+            document.getElementById('sessionName').placeholder = `Ex: ${placeholder}`;
+            
             document.getElementById('sessionName').value = '';
             currentSessionType = 'fixed';
             setupDayPicker();
@@ -1540,14 +1634,22 @@
             });
             
             const freeDays = DAYS.filter((_, i) => !fixedDays.has(i));
+            const config = getDomainConfig();
             
             if (freeDays.length > 0) {
                 document.getElementById('suggestionBox').style.display = 'flex';
                 document.getElementById('suggestionText').textContent = 
-                    `Suggestion : ${freeDays.slice(0, 3).join(', ')} (pas de séance fixe)`;
+                    `Suggestion : ${freeDays.slice(0, 3).join(', ')} (pas de ${config.sessionLabel.toLowerCase()} fixe)`;
             } else {
                 document.getElementById('suggestionBox').style.display = 'none';
             }
+        }
+        
+        function setupSessionEmojis() {
+            const config = getDomainConfig();
+            document.getElementById('sessionEmojis').innerHTML = config.emojis.map((e, i) => 
+                `<div class="emoji-option ${i === 0 ? 'selected' : ''}" onclick="selectEmoji(this)">${e}</div>`
+            ).join('');
         }
         
         function setupDayPicker() {
@@ -1563,12 +1665,6 @@
         function getSelectedDays() {
             const selected = document.querySelectorAll('.day-option.selected');
             return Array.from(selected).map(el => parseInt(el.dataset.day));
-        }
-        
-        function setupSessionEmojis() {
-            document.getElementById('sessionEmojis').innerHTML = EMOJIS.map((e, i) => 
-                `<div class="emoji-option ${i === 2 ? 'selected' : ''}" onclick="selectEmoji(this)">${e}</div>`
-            ).join('');
         }
         
         function saveSession() {
@@ -1746,6 +1842,11 @@
         }
         
         function openLogModal(sessionId) {
+            const config = getDomainConfig();
+            
+            // Update modal title
+            document.querySelector('#logModal .modal-title').textContent = `📝 ${config.evalLabel}`;
+            
             document.getElementById('logDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('logExercises').value = '';
             document.getElementById('logNotes').value = '';
@@ -1762,7 +1863,7 @@
             const select = document.getElementById('logSession');
             select.innerHTML = sessions.map(s => `<option value="${s.id}">${s.emoji} ${s.name}</option>`).join('');
             if (sessions.length === 0) {
-                select.innerHTML = '<option value="">Aucune séance</option>';
+                select.innerHTML = `<option value="">Aucune ${config.sessionLabel.toLowerCase()}</option>`;
             }
             if (sessionId) {
                 select.value = sessionId;
@@ -1932,7 +2033,8 @@
         
         // ========== EDIT OBJECTIVE ==========
         function setupPickers() {
-            document.getElementById('editEmojis').innerHTML = EMOJIS.map((e, i) => 
+            const config = getDomainConfig();
+            document.getElementById('editEmojis').innerHTML = config.emojis.map((e, i) => 
                 `<div class="emoji-option ${objective?.emoji === e ? 'selected' : (i === 0 && !objective ? 'selected' : '')}" onclick="selectEmoji(this)">${e}</div>`
             ).join('');
         }
