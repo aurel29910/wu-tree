@@ -377,6 +377,60 @@
             color: white;
         }
         
+        /* Quick Eval Modal */
+        .quick-eval-field {
+            margin-bottom: 16px;
+        }
+        
+        .quick-eval-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .quick-eval-emojis {
+            display: flex;
+            gap: 8px;
+            justify-content: space-between;
+        }
+        
+        .eval-emoji {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            background: rgba(255,255,255,0.5);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .eval-emoji.selected {
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            border-color: #6B4E9B;
+            transform: scale(1.1);
+        }
+        
+        .quick-eval-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.5);
+            font-size: 13px;
+            font-family: 'Comfortaa', sans-serif;
+            box-sizing: border-box;
+        }
+        
+        .quick-eval-input:focus {
+            outline: none;
+            border-color: #6B4E9B;
+        }
+        
         /* Session cards */
         .session-card {
             background: rgba(255,255,255,0.5);
@@ -1345,6 +1399,24 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Modal Quick Eval -->
+        <div class="modal-overlay" id="quickEvalModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title" id="quickEvalTitle">⚡ Bilan rapide</div>
+                    <button class="modal-close" onclick="closeModal('quickEval')">×</button>
+                </div>
+                <div class="modal-content">
+                    <div id="quickEvalFields"></div>
+                    
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="closeModal('quickEval')">Annuler</button>
+                        <button class="btn btn-primary" onclick="saveQuickEval()">✓ Valider</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <script>
@@ -1519,34 +1591,140 @@
                 .map(log => log.sessionId);
         }
         
+        let quickValidateSessionId = null;
+        
         function quickValidateSession(sessionId) {
             const completedToday = getCompletedSessionsToday();
             
             if (completedToday.includes(sessionId)) {
-                // Already done - maybe allow undoing?
+                // Already done today - cannot validate twice
                 return;
             }
             
-            // Quick log without full modal
+            // Show quick eval modal
+            quickValidateSessionId = sessionId;
             const sessions = getSessions();
             const session = sessions.find(s => s.id === sessionId);
             if (!session) return;
             
-            const history = getHistory();
-            history.push({
-                id: 'log_' + Date.now(),
-                objectiveId: currentObjectiveId,
-                sessionId: sessionId,
-                date: new Date().toISOString().split('T')[0],
-                exercises: session.program || '',
-                notes: '',
-                rpe: 5,
-                energy: 3,
-                mood: 3,
-                createdAt: new Date().toISOString()
+            document.getElementById('quickEvalTitle').textContent = `${session.emoji} ${session.name}`;
+            
+            // Adapt eval based on domain
+            renderQuickEvalFields();
+            
+            openModal('quickEval');
+        }
+        
+        function renderQuickEvalFields() {
+            const config = getDomainConfig();
+            const container = document.getElementById('quickEvalFields');
+            
+            // Different eval fields per domain type
+            const evalTypes = {
+                sante: [
+                    { id: 'effort', label: '💪 Effort', emojis: ['😴', '😌', '💪', '🔥', '🏆'] },
+                    { id: 'energy', label: '⚡ Énergie après', emojis: ['😫', '😔', '😐', '😊', '🚀'] }
+                ],
+                business: [
+                    { id: 'productivity', label: '📊 Productivité', emojis: ['😞', '😕', '😐', '👍', '🎯'] },
+                    { id: 'focus', label: '🎯 Focus', emojis: ['🌀', '😵', '😐', '🧘', '💎'] }
+                ],
+                connaissance: [
+                    { id: 'comprehension', label: '🧠 Compréhension', emojis: ['😕', '🤔', '😐', '💡', '🎓'] },
+                    { id: 'progress', label: '📈 Progression', emojis: ['📉', '➖', '📊', '📈', '🚀'] }
+                ],
+                relations: [
+                    { id: 'quality', label: '💝 Qualité', emojis: ['😞', '😕', '😊', '💖', '✨'] },
+                    { id: 'connection', label: '🤝 Connexion', emojis: ['😶', '🙂', '😊', '🫂', '💞'] }
+                ],
+                loisirs: [
+                    { id: 'enjoyment', label: '😄 Plaisir', emojis: ['😐', '🙂', '😊', '😄', '🤩'] },
+                    { id: 'relaxation', label: '🧘 Détente', emojis: ['😫', '😕', '😌', '😊', '🧘'] }
+                ],
+                maison: [
+                    { id: 'satisfaction', label: '✨ Satisfaction', emojis: ['😞', '😕', '😐', '😊', '✨'] },
+                    { id: 'efficiency', label: '⚡ Efficacité', emojis: ['🐌', '🚶', '🏃', '⚡', '🚀'] }
+                ],
+                voyages: [
+                    { id: 'discovery', label: '🌟 Découverte', emojis: ['😐', '🙂', '😊', '🤩', '🌟'] },
+                    { id: 'memorable', label: '📸 Mémorable', emojis: ['😶', '🙂', '😊', '😍', '💫'] }
+                ]
+            };
+            
+            const fields = evalTypes[currentDomainId] || evalTypes.sante;
+            
+            container.innerHTML = fields.map(field => `
+                <div class="quick-eval-field">
+                    <div class="quick-eval-label">${field.label}</div>
+                    <div class="quick-eval-emojis" data-field="${field.id}">
+                        ${field.emojis.map((e, i) => `
+                            <div class="eval-emoji ${i === 2 ? 'selected' : ''}" onclick="selectQuickEval(this, '${field.id}', ${i + 1})" data-value="${i + 1}">${e}</div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('') + `
+                <div class="quick-eval-field">
+                    <div class="quick-eval-label">📝 Note rapide (optionnel)</div>
+                    <input type="text" class="quick-eval-input" id="quickEvalNote" placeholder="Comment ça s'est passé ?">
+                </div>
+            `;
+        }
+        
+        function selectQuickEval(el, fieldId, value) {
+            const container = el.closest('.quick-eval-emojis');
+            container.querySelectorAll('.eval-emoji').forEach(e => e.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+        
+        function saveQuickEval() {
+            if (!quickValidateSessionId) return;
+            
+            const sessions = getSessions();
+            const session = sessions.find(s => s.id === quickValidateSessionId);
+            if (!session) return;
+            
+            // Collect eval data
+            const evalData = {};
+            document.querySelectorAll('.quick-eval-emojis').forEach(container => {
+                const fieldId = container.dataset.field;
+                const selected = container.querySelector('.eval-emoji.selected');
+                evalData[fieldId] = selected ? parseInt(selected.dataset.value) : 3;
             });
             
+            const note = document.getElementById('quickEvalNote').value.trim();
+            const today = new Date().toISOString().split('T')[0];
+            
+            // Check for duplicate - same session same day
+            let history = getHistory();
+            const existingIndex = history.findIndex(h => h.sessionId === quickValidateSessionId && h.date === today);
+            
+            if (existingIndex >= 0) {
+                // Update existing
+                history[existingIndex] = {
+                    ...history[existingIndex],
+                    ...evalData,
+                    notes: note,
+                    updatedAt: new Date().toISOString()
+                };
+            } else {
+                // Add new
+                history.push({
+                    id: 'log_' + Date.now(),
+                    objectiveId: currentObjectiveId,
+                    sessionId: quickValidateSessionId,
+                    date: today,
+                    exercises: session.program || '',
+                    notes: note,
+                    ...evalData,
+                    createdAt: new Date().toISOString()
+                });
+            }
+            
             saveHistory(history);
+            
+            quickValidateSessionId = null;
+            closeModal('quickEval');
+            
             renderToday();
             renderWeekDays();
             renderHistory();
