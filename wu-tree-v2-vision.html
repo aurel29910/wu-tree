@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Wu Tree - Ma Vision</title>
+    <title>Wu Tree - Visualisation</title>
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -79,7 +79,7 @@
         }
         
         .header {
-            padding: 10px 20px 15px;
+            padding: 10px 20px 20px;
             display: flex;
             align-items: center;
             gap: 15px;
@@ -102,181 +102,189 @@
         }
         
         .header-title {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 700;
             color: #333;
         }
         
+        /* Content */
         .content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: calc(100% - 200px);
             position: relative;
             z-index: 50;
-            padding: 0 20px;
-            height: calc(100% - 130px);
-            overflow-y: auto;
+        }
+        
+        .bubbles-container {
             display: flex;
-            flex-direction: column;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 0 30px;
         }
         
-        /* ========== ÉCRAN ÉCRITURE ========== */
-        .write-screen {
-            display: none;
-            flex-direction: column;
-            height: 100%;
-        }
-        
-        .write-screen.active {
-            display: flex;
-        }
-        
-        .write-intro {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        .write-emoji {
-            font-size: 45px;
-            margin-bottom: 10px;
-        }
-        
-        .write-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
-        }
-        
-        .write-hint {
-            font-size: 11px;
-            color: rgba(0,0,0,0.5);
-            line-height: 1.5;
-        }
-        
-        .vision-textarea {
-            flex: 1;
-            min-height: 280px;
-            background: rgba(255,255,255,0.6);
-            border: 2px solid rgba(255,255,255,0.8);
-            border-radius: 20px;
-            padding: 20px;
-            font-family: 'Comfortaa', sans-serif;
-            font-size: 14px;
-            color: #333;
-            line-height: 1.7;
-            resize: none;
-            outline: none;
-        }
-        
-        .vision-textarea::placeholder {
-            color: rgba(0,0,0,0.35);
-        }
-        
-        .vision-textarea:focus {
-            border-color: #6B4E9B;
-        }
-        
-        .write-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            padding-bottom: 15px;
-        }
-        
-        .action-btn {
-            flex: 1;
-            padding: 15px;
-            border-radius: 20px;
-            font-family: 'Comfortaa', sans-serif;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: none;
-        }
-        
-        .action-btn.secondary {
-            background: rgba(255,255,255,0.5);
-            color: #333;
-        }
-        
-        .action-btn.primary {
-            background: linear-gradient(135deg, #6B4E9B 0%, #9B6B9B 100%);
-            color: white;
-        }
-        
-        .action-btn:active {
-            transform: scale(0.97);
-        }
-        
-        /* ========== ÉCRAN VISION EXISTANTE ========== */
-        .view-screen {
-            display: none;
-            flex-direction: column;
-            height: 100%;
-        }
-        
-        .view-screen.active {
-            display: flex;
-        }
-        
-        .vision-card {
-            background: rgba(255,255,255,0.5);
+        /* Bulles flottantes */
+        .bubble {
+            width: 110px; height: 110px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
             backdrop-filter: blur(15px);
-            border: 2px solid rgba(255,255,255,0.6);
-            border-radius: 24px;
-            padding: 20px;
-            margin-bottom: 15px;
-            flex: 1;
-            overflow-y: auto;
-        }
-        
-        .vision-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        
-        .vision-card-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .vision-card-date {
-            font-size: 10px;
-            color: rgba(0,0,0,0.4);
-        }
-        
-        .vision-card-text {
-            font-size: 14px;
-            color: #333;
-            line-height: 1.8;
-            white-space: pre-wrap;
-        }
-        
-        .view-actions {
+            border: 3px solid rgba(255, 255, 255, 0.6);
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            padding: 15px 0;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 
+                0 8px 32px rgba(0,0,0,0.1),
+                inset 0 2px 10px rgba(255,255,255,0.4);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
         }
         
-        .view-actions .action-btn {
+        .bubble:hover {
+            box-shadow: 
+                0 15px 40px rgba(0,0,0,0.15),
+                inset 0 2px 10px rgba(255,255,255,0.4);
+        }
+        
+        .bubble:active {
+            transform: scale(0.95) !important;
+        }
+        
+        /* Animation flottante organique */
+        .bubble-1 {
+            animation: float1 6s ease-in-out infinite;
+        }
+        
+        .bubble-2 {
+            animation: float2 7s ease-in-out infinite;
+            animation-delay: -2s;
+        }
+        
+        .bubble-3 {
+            animation: float3 5.5s ease-in-out infinite;
+            animation-delay: -1s;
+        }
+        
+        @keyframes float1 {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(8px, -12px) rotate(2deg); }
+            50% { transform: translate(-5px, -8px) rotate(-1deg); }
+            75% { transform: translate(10px, -15px) rotate(1deg); }
+        }
+        
+        @keyframes float2 {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(-10px, -10px) rotate(-2deg); }
+            50% { transform: translate(6px, -18px) rotate(1deg); }
+            75% { transform: translate(-8px, -6px) rotate(-1deg); }
+        }
+        
+        @keyframes float3 {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(6px, -8px) rotate(1deg); }
+            50% { transform: translate(-8px, -14px) rotate(-2deg); }
+            75% { transform: translate(4px, -6px) rotate(0deg); }
+        }
+        
+        .bubble-emoji {
+            font-size: 38px;
+            margin-bottom: 6px;
+        }
+        
+        .bubble-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+            line-height: 1.3;
+        }
+        
+        /* Effet de brillance */
+        .bubble::before {
+            content: '';
+            position: absolute;
+            top: 10%; left: 15%;
+            width: 30%; height: 20%;
+            background: rgba(255,255,255,0.5);
+            border-radius: 50%;
+            filter: blur(5px);
+        }
+        
+        /* Indicateur sur bulle Vision */
+        .bubble-indicator {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 20px;
+            height: 20px;
+            background: #6B4E9B;
+            border-radius: 50%;
+            border: 2px solid white;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            font-size: 10px;
+            color: white;
+        }
+        
+        .bubble-indicator.empty {
+            background: rgba(200, 100, 100, 0.8);
+        }
+        
+        .bubble-indicator.done {
+            background: #4CAF50;
         }
         
         /* Quote */
-        .quote-hint {
+        .quote-container {
+            position: absolute;
+            bottom: 100px;
+            left: 30px;
+            right: 30px;
             text-align: center;
-            font-size: 11px;
+            z-index: 50;
+        }
+        
+        .quote-text {
+            font-size: 12px;
             color: rgba(0,0,0,0.4);
             font-style: italic;
-            margin-top: 10px;
             line-height: 1.5;
         }
+        
+        /* Connexion visuelle entre bulles */
+        .connection-hint {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 11px;
+            color: rgba(0,0,0,0.4);
+            padding: 0 40px;
+            line-height: 1.5;
+        }
+        
+        /* Bottom menu */
+        .bottom-menu {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.4);
+            z-index: 90;
+        }
+        
+        .menu-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 8px 16px; border-radius: 16px; }
+        .menu-item.active { background: rgba(255, 255, 255, 0.6); }
+        .menu-icon { font-size: 24px; }
+        .menu-label { font-size: 10px; color: rgba(0,0,0,0.6); font-weight: 500; }
     </style>
 </head>
 <body>
@@ -291,131 +299,96 @@
         
         <div class="header">
             <button class="back-btn" onclick="goBack()">←</button>
-            <div class="header-title">🔮 Ma Vision</div>
+            <div class="header-title">✨ Visualisation</div>
         </div>
         
         <div class="content">
-            <!-- Écran écriture -->
-            <div class="write-screen" id="writeScreen">
-                <div class="write-intro">
-                    <div class="write-emoji">🔮</div>
-                    <div class="write-title">Décris ta vie idéale</div>
-                    <div class="write-hint">
-                        Écris au présent, comme si tu y étais déjà.<br>
-                        Ce que tu ressens, ce que tu fais, où tu es.
-                    </div>
+            <div class="bubbles-container">
+                <div class="bubble bubble-1" onclick="goTo('vision')">
+                    <div class="bubble-indicator" id="visionIndicator">!</div>
+                    <div class="bubble-emoji">🔮</div>
+                    <div class="bubble-label">Ma Vision</div>
                 </div>
                 
-                <textarea class="vision-textarea" id="visionTextarea" placeholder="Je me réveille dans mon appartement à Chiang Mai. La lumière du matin passe à travers les rideaux. Je me sens calme, libre, vivant.
-
-Après mon café, j'ouvre mes charts et je prends mes positions du jour. Aucun stress, juste de la clarté.
-
-Puis direction le gym pour ma session de Muay Thai..."></textarea>
-                
-                <div class="quote-hint">
-                    « Vis depuis la fin, comme si c'était déjà fait. »
+                <div class="bubble bubble-2" onclick="goTo('session')">
+                    <div class="bubble-emoji">✨</div>
+                    <div class="bubble-label">Session</div>
                 </div>
                 
-                <div class="write-actions">
-                    <button class="action-btn secondary" onclick="cancelWriting()">Annuler</button>
-                    <button class="action-btn primary" onclick="saveVision()">Enregistrer</button>
+                <div class="bubble bubble-3" onclick="goTo('progress')">
+                    <div class="bubble-emoji">📊</div>
+                    <div class="bubble-label">Progression</div>
                 </div>
             </div>
             
-            <!-- Écran vision existante -->
-            <div class="view-screen" id="viewScreen">
-                <div class="vision-card">
-                    <div class="vision-card-header">
-                        <div class="vision-card-title">✨ Ma vision</div>
-                        <div class="vision-card-date" id="visionDate"></div>
-                    </div>
-                    <div class="vision-card-text" id="visionText"></div>
-                </div>
-                
-                <div class="view-actions">
-                    <button class="action-btn secondary" onclick="editVision()">✏️ Modifier</button>
-                    <button class="action-btn primary" onclick="goToSession()">✨ Commencer une session</button>
-                </div>
+            <div class="connection-hint">
+                Écris ta vision → Visualise-la chaque jour → Suis ta progression
+            </div>
+        </div>
+        
+        <div class="quote-container">
+            <div class="quote-text">
+                « Vis depuis la fin,<br>comme si c'était déjà fait. »
+            </div>
+        </div>
+        
+        <div class="bottom-menu">
+            <div class="menu-item active">
+                <div class="menu-icon">🔮</div>
+                <div class="menu-label">Vision</div>
+            </div>
+            <div class="menu-item" onclick="goBack()">
+                <div class="menu-icon">🌳</div>
+                <div class="menu-label">Arbre</div>
+            </div>
+            <div class="menu-item" onclick="goToTasks()">
+                <div class="menu-icon">📋</div>
+                <div class="menu-label">Aujourd'hui</div>
             </div>
         </div>
     </div>
     
     <script>
-        // ========== STATE ==========
-        let visionData = JSON.parse(localStorage.getItem('wutree_vision') || 'null');
-        
-        // ========== INIT ==========
-        function init() {
-            if (visionData && visionData.text) {
-                showViewScreen();
+        // Check vision status
+        function updateVisionIndicator() {
+            const vision = JSON.parse(localStorage.getItem('wutree_vision') || 'null');
+            const indicator = document.getElementById('visionIndicator');
+            
+            if (vision && vision.text) {
+                indicator.classList.remove('empty');
+                indicator.classList.add('done');
+                indicator.textContent = '✓';
             } else {
-                showWriteScreen();
+                indicator.classList.add('empty');
+                indicator.classList.remove('done');
+                indicator.textContent = '!';
             }
         }
         
-        // ========== SCREENS ==========
-        function showWriteScreen() {
-            document.getElementById('writeScreen').classList.add('active');
-            document.getElementById('viewScreen').classList.remove('active');
-            document.getElementById('visionTextarea').value = visionData?.text || '';
-        }
-        
-        function showViewScreen() {
-            document.getElementById('writeScreen').classList.remove('active');
-            document.getElementById('viewScreen').classList.add('active');
-            renderVision();
-        }
-        
-        // ========== ACTIONS ==========
-        function cancelWriting() {
-            if (visionData && visionData.text) {
-                showViewScreen();
-            } else {
-                goBack();
+        function goTo(page) {
+            switch(page) {
+                case 'vision':
+                    window.location.href = 'wu-tree-v2-vision.html';
+                    break;
+                case 'session':
+                    window.location.href = 'wu-tree-v2-session.html';
+                    break;
+                case 'progress':
+                    window.location.href = 'wu-tree-v2-progress.html';
+                    break;
             }
         }
         
-        function saveVision() {
-            const text = document.getElementById('visionTextarea').value.trim();
-            if (!text) {
-                alert('Écris ta vision avant d\'enregistrer');
-                return;
-            }
-            
-            visionData = {
-                text: text,
-                createdAt: visionData?.createdAt || new Date().toISOString(),
-                updatedAt: new Date().toISOString()
-            };
-            
-            localStorage.setItem('wutree_vision', JSON.stringify(visionData));
-            showViewScreen();
-        }
-        
-        function editVision() {
-            showWriteScreen();
-        }
-        
-        function renderVision() {
-            if (!visionData) return;
-            
-            document.getElementById('visionText').textContent = visionData.text;
-            
-            const date = new Date(visionData.updatedAt || visionData.createdAt);
-            document.getElementById('visionDate').textContent = date.toLocaleDateString('fr-FR');
-        }
-        
-        // ========== NAVIGATION ==========
         function goBack() {
-            window.location.href = 'wu-tree-v2-visualization.html';
+            window.location.href = 'wu-tree-v2-home.html';
         }
         
-        function goToSession() {
-            window.location.href = 'wu-tree-v2-session.html';
+        function goToTasks() {
+            window.location.href = 'wu-tree-v2-tasks.html';
         }
         
-        // ========== START ==========
-        init();
+        // Init
+        updateVisionIndicator();
     </script>
 </body>
 </html>
