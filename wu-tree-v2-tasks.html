@@ -216,6 +216,13 @@
             gap: 8px;
         }
         
+        .journal-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        
         .journal-save {
             padding: 6px 14px;
             background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
@@ -230,6 +237,139 @@
         
         .journal-save:disabled {
             opacity: 0.5;
+        }
+        
+        .voice-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            border: 2px solid rgba(107, 78, 155, 0.3);
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .voice-btn.recording {
+            background: #ff4444;
+            border-color: #ff4444;
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .section-add {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Manual task card */
+        .manual-task-card {
+            background: rgba(255,255,255,0.5);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .manual-task-emoji {
+            font-size: 20px;
+        }
+        
+        .manual-task-info {
+            flex: 1;
+        }
+        
+        .manual-task-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .manual-task-time {
+            font-size: 10px;
+            color: rgba(0,0,0,0.4);
+        }
+        
+        .manual-task-delete {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(244, 67, 54, 0.1);
+            border: none;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        /* Input styles for modal */
+        .input-group {
+            margin-bottom: 16px;
+        }
+        
+        .input-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.5);
+            font-size: 14px;
+            font-family: 'Comfortaa', cursive;
+            box-sizing: border-box;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #6B4E9B;
+        }
+        
+        .emoji-picker {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .emoji-option {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            background: rgba(255,255,255,0.5);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        
+        .emoji-option.selected {
+            border-color: #6B4E9B;
+            background: rgba(107, 78, 155, 0.2);
         }
         
         .journal-textarea {
@@ -442,16 +582,34 @@
                 </div>
             </div>
             
-            <!-- Events du jour -->
-            <div class="section">
+            <!-- Événements du jour (fixes) -->
+            <div class="section" id="dailySection">
                 <div class="section-header">
-                    <div class="section-title">📅 Événements du jour</div>
-                    <div class="section-badge" id="eventsBadge">0 prévus</div>
+                    <div class="section-title">📅 Aujourd'hui</div>
+                    <div class="section-badge" id="dailyBadge">0</div>
                 </div>
-                <div id="eventsContainer"></div>
+                <div id="dailyContainer"></div>
             </div>
             
-            <!-- Journal -->
+            <!-- Événements de la semaine (flexibles) -->
+            <div class="section" id="weeklySection">
+                <div class="section-header">
+                    <div class="section-title">🌊 Cette semaine</div>
+                    <div class="section-badge" id="weeklyBadge">0</div>
+                </div>
+                <div id="weeklyContainer"></div>
+            </div>
+            
+            <!-- Tâches manuelles -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">✨ Bonus accomplis</div>
+                    <button class="section-add" onclick="openManualTaskModal()">+</button>
+                </div>
+                <div id="manualTasksContainer"></div>
+            </div>
+            
+            <!-- Journal avec vocal -->
             <div class="section">
                 <div class="section-header">
                     <div class="section-title">📝 Journal du jour</div>
@@ -459,10 +617,13 @@
                 <div class="journal-card">
                     <div class="journal-header">
                         <div class="journal-title">✍️ Notes personnelles</div>
-                        <button class="journal-save" id="journalSave" onclick="saveJournal()" disabled>Enregistrer</button>
+                        <button class="voice-btn" id="voiceBtn" onclick="toggleVoiceRecording()">🎤</button>
                     </div>
                     <textarea class="journal-textarea" id="journalText" placeholder="Comment s'est passée ta journée ? Réflexions, gratitudes, apprentissages..." oninput="onJournalInput()"></textarea>
-                    <div class="journal-saved" id="journalSaved"></div>
+                    <div class="journal-footer">
+                        <div class="journal-saved" id="journalSaved"></div>
+                        <button class="journal-save" id="journalSave" onclick="saveJournal()" disabled>Enregistrer</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -495,6 +656,30 @@
                     <div class="modal-actions">
                         <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
                         <button class="btn btn-primary" onclick="saveQuickEval()">✓ Valider</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal Manual Task -->
+        <div class="modal-overlay" id="manualTaskModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title">✨ Ajouter une action bonus</div>
+                    <button class="modal-close" onclick="closeManualTaskModal()">×</button>
+                </div>
+                <div class="modal-content">
+                    <div class="input-group">
+                        <label class="input-label">Qu'as-tu accompli ?</label>
+                        <input type="text" class="input-field" id="manualTaskName" placeholder="Ex: Méditation, appel important...">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Emoji</label>
+                        <div class="emoji-picker" id="manualTaskEmojis"></div>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="closeManualTaskModal()">Annuler</button>
+                        <button class="btn btn-primary" onclick="saveManualTask()">Ajouter</button>
                     </div>
                 </div>
             </div>
@@ -559,12 +744,18 @@
         const MONTHS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
         
         let currentEvent = null;
+        let isRecording = false;
+        let recognition = null;
+        
+        const MANUAL_TASK_EMOJIS = ['✨', '🎯', '💡', '🧘', '📞', '✍️', '🎨', '🏃', '📚', '💪', '🧹', '🎵'];
         
         function init() {
             updateHeaderDate();
             loadTodayEvents();
+            loadManualTasks();
             loadJournal();
             updateStats();
+            setupVoiceRecognition();
         }
         
         function updateHeaderDate() {
@@ -595,88 +786,118 @@
                     .map(h => h.sessionId)
             );
             
-            // Filter sessions for today
-            const todayEvents = [];
+            // Separate daily and weekly events
+            const dailyEvents = [];
+            const weeklyEvents = [];
             
             allSessions.forEach(session => {
                 const isForToday = session.type !== 'flexible' && 
                                    (session.days || []).includes(todayDayIndex);
                 const isFlexible = session.type === 'flexible';
                 
-                if (isForToday || isFlexible) {
-                    // Get objective info
-                    const objective = allObjectives.find(o => o.id === session.objectiveId);
-                    if (!objective) return;
+                // Get objective info
+                const objective = allObjectives.find(o => o.id === session.objectiveId);
+                if (!objective) return;
+                
+                const activity = allActivities.find(a => a.id === objective.activityId);
+                const domain = allDomains.find(d => d.id === (activity?.domainId || objective.domainId));
+                
+                // Check if already completed today
+                const isDone = completedToday.has(session.id);
+                
+                const eventData = {
+                    sessionId: session.id,
+                    objectiveId: objective.id,
+                    domainId: domain?.id || 'sante',
+                    domainName: domain?.name || 'Santé',
+                    domainEmoji: domain?.emoji || '💪',
+                    objectiveName: objective.name,
+                    sessionName: session.name,
+                    sessionEmoji: session.emoji,
+                    isDone
+                };
+                
+                if (isForToday) {
+                    eventData.desc = 'Prévu aujourd\'hui';
+                    dailyEvents.push(eventData);
+                } else if (isFlexible) {
+                    // Check weekly progress
+                    const weekStart = new Date(today);
+                    weekStart.setDate(today.getDate() - ((today.getDay() + 6) % 7));
+                    weekStart.setHours(0, 0, 0, 0);
                     
-                    const activity = allActivities.find(a => a.id === objective.activityId);
-                    const domain = allDomains.find(d => d.id === (activity?.domainId || objective.domainId));
-                    
-                    // Check if already completed today
-                    const isDone = completedToday.has(session.id);
-                    
-                    // For flexible sessions, check weekly progress
-                    let desc = '';
-                    if (isFlexible) {
-                        const weekStart = new Date(today);
-                        weekStart.setDate(today.getDate() - ((today.getDay() + 6) % 7));
-                        weekStart.setHours(0, 0, 0, 0);
-                        
-                        const weekLogs = allHistory.filter(h => {
-                            if (h.sessionId !== session.id) return false;
-                            return new Date(h.date) >= weekStart;
-                        });
-                        
-                        const done = weekLogs.length;
-                        const target = session.frequency || 1;
-                        
-                        if (done >= target) return; // Already reached weekly goal
-                        
-                        desc = `${done}/${target} cette semaine`;
-                    } else {
-                        desc = 'Prévu aujourd\'hui';
-                    }
-                    
-                    todayEvents.push({
-                        sessionId: session.id,
-                        objectiveId: objective.id,
-                        domainId: domain?.id || 'sante',
-                        domainName: domain?.name || 'Santé',
-                        domainEmoji: domain?.emoji || '💪',
-                        objectiveName: objective.name,
-                        sessionName: session.name,
-                        sessionEmoji: session.emoji,
-                        desc,
-                        isDone
+                    const weekLogs = allHistory.filter(h => {
+                        if (h.sessionId !== session.id) return false;
+                        return new Date(h.date) >= weekStart;
                     });
+                    
+                    const done = weekLogs.length;
+                    const target = session.frequency || 1;
+                    
+                    if (done < target) {
+                        eventData.desc = `${done}/${target} cette semaine`;
+                        weeklyEvents.push(eventData);
+                    }
                 }
             });
             
-            renderEvents(todayEvents);
+            renderDailyEvents(dailyEvents);
+            renderWeeklyEvents(weeklyEvents);
         }
         
-        function renderEvents(events) {
-            const container = document.getElementById('eventsContainer');
+        function renderDailyEvents(events) {
+            const container = document.getElementById('dailyContainer');
+            const section = document.getElementById('dailySection');
             
             // Update badge
             const remaining = events.filter(e => !e.isDone).length;
-            const total = events.length;
-            document.getElementById('eventsBadge').textContent = `${remaining} restant${remaining > 1 ? 's' : ''}`;
+            document.getElementById('dailyBadge').textContent = remaining > 0 ? remaining : '✓';
             
             if (events.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">🌿</div>
-                        <div class="empty-text">Aucun événement prévu aujourd'hui.<br>Profite de ce moment de calme !</div>
-                    </div>
-                `;
+                section.style.display = 'none';
                 return;
             }
+            
+            section.style.display = 'block';
             
             // Sort: not done first
             events.sort((a, b) => a.isDone - b.isDone);
             
             container.innerHTML = events.map(event => `
-                <div class="event-card ${event.isDone ? 'done' : ''}" data-session-id="${event.sessionId}" data-domain-id="${event.domainId}" data-objective-id="${event.objectiveId}">
+                <div class="event-card ${event.isDone ? 'done' : ''}" data-session-id="${event.sessionId}">
+                    <div class="event-emoji">${event.sessionEmoji}</div>
+                    <div class="event-info">
+                        <div class="event-domain">${event.domainEmoji} ${event.domainName}</div>
+                        <div class="event-name">${event.sessionName}</div>
+                        <div class="event-objective">${event.objectiveName}</div>
+                    </div>
+                    <div class="event-check ${event.isDone ? 'checked' : ''}" onclick="toggleEvent('${event.sessionId}', '${event.domainId}', '${event.objectiveId}')">
+                        ${event.isDone ? '✓' : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function renderWeeklyEvents(events) {
+            const container = document.getElementById('weeklyContainer');
+            const section = document.getElementById('weeklySection');
+            
+            // Update badge
+            const remaining = events.filter(e => !e.isDone).length;
+            document.getElementById('weeklyBadge').textContent = remaining > 0 ? remaining : '✓';
+            
+            if (events.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            
+            section.style.display = 'block';
+            
+            // Sort: not done first
+            events.sort((a, b) => a.isDone - b.isDone);
+            
+            container.innerHTML = events.map(event => `
+                <div class="event-card ${event.isDone ? 'done' : ''}" data-session-id="${event.sessionId}">
                     <div class="event-emoji">${event.sessionEmoji}</div>
                     <div class="event-info">
                         <div class="event-domain">${event.domainEmoji} ${event.domainName}</div>
@@ -896,6 +1117,160 @@
             const date = new Date(isoString);
             const time = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
             document.getElementById('journalSaved').textContent = `Enregistré à ${time}`;
+        }
+        
+        // ========== VOICE RECORDING ==========
+        function setupVoiceRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                recognition.lang = 'fr-FR';
+                
+                recognition.onresult = (event) => {
+                    let transcript = '';
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        transcript += event.results[i][0].transcript;
+                    }
+                    const journalText = document.getElementById('journalText');
+                    journalText.value = journalText.value + transcript;
+                    onJournalInput();
+                };
+                
+                recognition.onerror = (event) => {
+                    console.error('Speech recognition error:', event.error);
+                    stopRecording();
+                };
+                
+                recognition.onend = () => {
+                    if (isRecording) {
+                        recognition.start(); // Continue if still recording
+                    }
+                };
+            }
+        }
+        
+        function toggleVoiceRecording() {
+            if (!recognition) {
+                alert('La reconnaissance vocale n\'est pas supportée sur ce navigateur.');
+                return;
+            }
+            
+            if (isRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        }
+        
+        function startRecording() {
+            isRecording = true;
+            document.getElementById('voiceBtn').classList.add('recording');
+            document.getElementById('voiceBtn').textContent = '⏹️';
+            recognition.start();
+        }
+        
+        function stopRecording() {
+            isRecording = false;
+            document.getElementById('voiceBtn').classList.remove('recording');
+            document.getElementById('voiceBtn').textContent = '🎤';
+            if (recognition) recognition.stop();
+        }
+        
+        // ========== MANUAL TASKS ==========
+        function loadManualTasks() {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const allTasks = JSON.parse(localStorage.getItem('wutree_manual_tasks') || '[]');
+            const todayTasks = allTasks.filter(t => t.date === todayStr);
+            
+            renderManualTasks(todayTasks);
+        }
+        
+        function renderManualTasks(tasks) {
+            const container = document.getElementById('manualTasksContainer');
+            
+            if (tasks.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 15px; color: rgba(0,0,0,0.4); font-size: 12px;">
+                        Ajoute les petites victoires de ta journée ! ✨
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = tasks.map(task => `
+                <div class="manual-task-card">
+                    <div class="manual-task-emoji">${task.emoji}</div>
+                    <div class="manual-task-info">
+                        <div class="manual-task-name">${task.name}</div>
+                        <div class="manual-task-time">${formatTime(task.createdAt)}</div>
+                    </div>
+                    <button class="manual-task-delete" onclick="deleteManualTask('${task.id}')">🗑️</button>
+                </div>
+            `).join('');
+        }
+        
+        function formatTime(isoString) {
+            const date = new Date(isoString);
+            return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+        }
+        
+        function openManualTaskModal() {
+            document.getElementById('manualTaskName').value = '';
+            setupManualTaskEmojis();
+            document.getElementById('manualTaskModal').classList.add('show');
+        }
+        
+        function closeManualTaskModal() {
+            document.getElementById('manualTaskModal').classList.remove('show');
+        }
+        
+        function setupManualTaskEmojis() {
+            const container = document.getElementById('manualTaskEmojis');
+            container.innerHTML = MANUAL_TASK_EMOJIS.map((e, i) => 
+                `<div class="emoji-option ${i === 0 ? 'selected' : ''}" onclick="selectManualEmoji(this)">${e}</div>`
+            ).join('');
+        }
+        
+        function selectManualEmoji(el) {
+            document.querySelectorAll('#manualTaskEmojis .emoji-option').forEach(e => e.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+        
+        function saveManualTask() {
+            const name = document.getElementById('manualTaskName').value.trim();
+            const emoji = document.querySelector('#manualTaskEmojis .emoji-option.selected')?.textContent || '✨';
+            
+            if (!name) {
+                alert('Entre ce que tu as accompli !');
+                return;
+            }
+            
+            const todayStr = new Date().toISOString().split('T')[0];
+            const allTasks = JSON.parse(localStorage.getItem('wutree_manual_tasks') || '[]');
+            
+            allTasks.push({
+                id: 'manual_' + Date.now(),
+                name,
+                emoji,
+                date: todayStr,
+                createdAt: new Date().toISOString()
+            });
+            
+            localStorage.setItem('wutree_manual_tasks', JSON.stringify(allTasks));
+            
+            closeManualTaskModal();
+            loadManualTasks();
+            updateStats();
+        }
+        
+        function deleteManualTask(taskId) {
+            let allTasks = JSON.parse(localStorage.getItem('wutree_manual_tasks') || '[]');
+            allTasks = allTasks.filter(t => t.id !== taskId);
+            localStorage.setItem('wutree_manual_tasks', JSON.stringify(allTasks));
+            loadManualTasks();
+            updateStats();
         }
         
         // Navigation
