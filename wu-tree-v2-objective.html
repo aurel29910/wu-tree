@@ -571,6 +571,15 @@
             color: white;
         }
         
+        .section-title.clickable {
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        
+        .section-title.clickable:hover {
+            opacity: 0.7;
+        }
+        
         /* History items */
         .history-item {
             background: rgba(255,255,255,0.4);
@@ -580,6 +589,29 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            position: relative;
+        }
+        
+        .history-actions {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .history-action-btn {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255,255,255,0.6);
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .history-action-btn.delete {
+            background: rgba(244, 67, 54, 0.15);
         }
         
         .history-date {
@@ -1127,7 +1159,7 @@
             <!-- Historique -->
             <div class="section">
                 <div class="section-header">
-                    <div class="section-title">📝 Historique</div>
+                    <div class="section-title clickable" onclick="openHistoryModal()">📝 Historique <span style="font-size: 10px; opacity: 0.6;">▶</span></div>
                     <button class="section-add" onclick="openLogModal()">+</button>
                 </div>
                 <div id="historyContainer"></div>
@@ -1417,6 +1449,43 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Modal History Week -->
+        <div class="modal-overlay" id="historyModal">
+            <div class="modal" style="max-height: 85vh;">
+                <div class="modal-header">
+                    <div class="modal-title">📅 Historique de la semaine</div>
+                    <button class="modal-close" onclick="closeModal('history')">×</button>
+                </div>
+                <div class="modal-content" id="historyModalContent" style="max-height: 65vh; overflow-y: auto;">
+                    <!-- Filled by JS -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal Edit History -->
+        <div class="modal-overlay" id="editHistoryModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title">✏️ Modifier l'entrée</div>
+                    <button class="modal-close" onclick="closeModal('editHistory')">×</button>
+                </div>
+                <div class="modal-content">
+                    <div class="input-group">
+                        <label class="input-label">📋 Ce que tu as fait</label>
+                        <textarea class="input-field" id="editHistoryExercises" rows="2" placeholder="Exercices, activités..."></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">💭 Notes</label>
+                        <input type="text" class="input-field" id="editHistoryNotes" placeholder="Comment ça s'est passé ?">
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="closeModal('editHistory')">Annuler</button>
+                        <button class="btn btn-primary" onclick="saveEditHistory()">Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <script>
@@ -1472,6 +1541,15 @@
                 addLabel: 'Nouveau moment',
                 emojis: ['🎮', '🎬', '🎵', '📚', '🎨', '📷', '🎸', '🎭', '🧩', '🎯', '🎲', '🎪'],
                 suggestions: ['Gaming', 'Film/Série', 'Musique', 'Dessin', 'Photo', 'Lecture plaisir'],
+                evalLabel: 'Comment c\'était ?'
+            },
+            creativite: {
+                sessionLabel: 'Moment',
+                sessionLabelPlural: 'Moments',
+                sessionIcon: '🎨',
+                addLabel: 'Nouveau moment',
+                emojis: ['🎨', '✍️', '🎵', '📸', '🎬', '🖌️', '🎭', '🎸', '📝', '🎹', '🪡', '🎪'],
+                suggestions: ['Dessin', 'Écriture', 'Musique', 'Photo', 'Vidéo', 'Artisanat', 'DIY'],
                 evalLabel: 'Comment c\'était ?'
             },
             maison: {
@@ -2399,9 +2477,127 @@
                             <span>${energyEmoji}</span>
                             <span>${moodEmoji}</span>
                         </div>
+                        <div class="history-actions">
+                            <button class="history-action-btn" onclick="editHistoryItem('${log.id}')">✏️</button>
+                            <button class="history-action-btn delete" onclick="deleteHistoryItem('${log.id}')">🗑️</button>
+                        </div>
                     </div>
                 `;
             }).join('');
+        }
+        
+        let currentEditHistoryId = null;
+        
+        function openHistoryModal() {
+            const history = getHistory();
+            const container = document.getElementById('historyModalContent');
+            
+            if (history.length === 0) {
+                container.innerHTML = '<div class="empty-state">Aucune entrée cette semaine</div>';
+            } else {
+                const energyEmojis = ['', '😴', '😔', '😐', '😊', '🔥'];
+                const moodEmojis = ['', '😤', '😕', '😌', '😄', '🤩'];
+                
+                // Group by date
+                const byDate = {};
+                history.forEach(log => {
+                    const dateKey = log.date;
+                    if (!byDate[dateKey]) byDate[dateKey] = [];
+                    byDate[dateKey].push(log);
+                });
+                
+                container.innerHTML = Object.keys(byDate).sort().reverse().map(dateKey => {
+                    const logs = byDate[dateKey];
+                    const dateDisplay = new Date(dateKey).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+                    
+                    return `
+                        <div style="margin-bottom: 16px;">
+                            <div style="font-size: 12px; font-weight: 600; color: #6B4E9B; margin-bottom: 8px; text-transform: capitalize;">
+                                📅 ${dateDisplay}
+                            </div>
+                            ${logs.map(log => {
+                                const rpeColor = getRpeColor(log.rpe || 5);
+                                const energyEmoji = energyEmojis[log.energy || 4];
+                                const moodEmoji = moodEmojis[log.mood || 4];
+                                
+                                return `
+                                    <div class="history-item">
+                                        <div class="history-content" style="flex: 1;">
+                                            ${log.exercises ? `<div class="history-exercises">${log.exercises}</div>` : ''}
+                                            ${log.notes ? `<div class="history-notes">"${log.notes}"</div>` : ''}
+                                        </div>
+                                        <div class="history-metrics">
+                                            <span class="history-rpe" style="background: ${rpeColor}">${log.rpe || 5}</span>
+                                            <span>${energyEmoji}</span>
+                                            <span>${moodEmoji}</span>
+                                        </div>
+                                        <div class="history-actions">
+                                            <button class="history-action-btn" onclick="editHistoryItem('${log.id}')">✏️</button>
+                                            <button class="history-action-btn delete" onclick="deleteHistoryItem('${log.id}')">🗑️</button>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            openModal('history');
+        }
+        
+        function editHistoryItem(logId) {
+            currentEditHistoryId = logId;
+            const allLogs = JSON.parse(localStorage.getItem('wutree_objective_logs') || '[]');
+            const log = allLogs.find(l => l.id === logId);
+            
+            if (!log) return;
+            
+            document.getElementById('editHistoryExercises').value = log.exercises || '';
+            document.getElementById('editHistoryNotes').value = log.notes || '';
+            
+            openModal('editHistory');
+        }
+        
+        function saveEditHistory() {
+            if (!currentEditHistoryId) return;
+            
+            const allLogs = JSON.parse(localStorage.getItem('wutree_objective_logs') || '[]');
+            const logIndex = allLogs.findIndex(l => l.id === currentEditHistoryId);
+            
+            if (logIndex === -1) return;
+            
+            allLogs[logIndex].exercises = document.getElementById('editHistoryExercises').value.trim();
+            allLogs[logIndex].notes = document.getElementById('editHistoryNotes').value.trim();
+            allLogs[logIndex].updatedAt = new Date().toISOString();
+            
+            localStorage.setItem('wutree_objective_logs', JSON.stringify(allLogs));
+            
+            closeModal('editHistory');
+            renderHistory();
+            
+            // Refresh history modal if open
+            if (document.getElementById('historyModal').classList.contains('show')) {
+                openHistoryModal();
+            }
+            
+            currentEditHistoryId = null;
+        }
+        
+        function deleteHistoryItem(logId) {
+            if (!confirm('Supprimer cette entrée ?')) return;
+            
+            let allLogs = JSON.parse(localStorage.getItem('wutree_objective_logs') || '[]');
+            allLogs = allLogs.filter(l => l.id !== logId);
+            localStorage.setItem('wutree_objective_logs', JSON.stringify(allLogs));
+            
+            renderHistory();
+            updateStats();
+            
+            // Refresh history modal if open
+            if (document.getElementById('historyModal').classList.contains('show')) {
+                openHistoryModal();
+            }
         }
         
         function getRpeColor(rpe) {
