@@ -320,6 +320,160 @@
             color: white;
         }
         
+        .bubble-delete {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 24px;
+            height: 24px;
+            background: #ff4444;
+            border: 2px solid white;
+            border-radius: 50%;
+            font-size: 12px;
+            color: white;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        
+        .edit-mode .bubble-delete {
+            display: flex;
+        }
+        
+        .bubble.add-bubble {
+            border: 3px dashed rgba(107, 78, 155, 0.4);
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .bubble.add-bubble .bubble-emoji {
+            opacity: 0.6;
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-overlay.show { display: flex; }
+        
+        .modal {
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 340px;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .modal-close {
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        
+        .modal-content {
+            padding: 20px;
+        }
+        
+        .input-group {
+            margin-bottom: 16px;
+        }
+        
+        .input-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.5);
+            font-size: 14px;
+            font-family: 'Comfortaa', cursive;
+        }
+        
+        .emoji-picker {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .emoji-option {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            background: rgba(255,255,255,0.5);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 12px;
+            cursor: pointer;
+        }
+        
+        .emoji-option.selected {
+            border-color: #6B4E9B;
+            background: rgba(107, 78, 155, 0.2);
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Comfortaa', cursive;
+        }
+        
+        .btn-secondary {
+            background: rgba(255,255,255,0.5);
+            color: #333;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            color: white;
+        }
+        
         /* Quote */
         .quote-container {
             position: absolute;
@@ -412,7 +566,31 @@
             </div>
             <div class="menu-item" onclick="goToTasks()">
                 <div class="menu-icon">📋</div>
-                <div class="menu-label">Tâches</div>
+                <div class="menu-label">Aujourd'hui</div>
+            </div>
+        </div>
+        
+        <!-- Modal Ajouter Domaine -->
+        <div class="modal-overlay" id="domainModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title">➕ Nouveau domaine</div>
+                    <button class="modal-close" onclick="closeModal()">×</button>
+                </div>
+                <div class="modal-content">
+                    <div class="input-group">
+                        <label class="input-label">Nom du domaine</label>
+                        <input type="text" class="input-field" id="domainName" placeholder="Ex: Sport, Spiritualité...">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Emoji</label>
+                        <div class="emoji-picker" id="emojiPicker"></div>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+                        <button class="btn btn-primary" onclick="saveDomain()">Ajouter</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -427,7 +605,7 @@
             { id: 'business', emoji: '💰', name: 'Business & Finance', order: 1 },
             { id: 'relations', emoji: '❤️', name: 'Relations', order: 2 },
             { id: 'connaissance', emoji: '📚', name: 'Connaissance', order: 3 },
-            { id: 'loisirs', emoji: '🎨', name: 'Loisirs', order: 4 },
+            { id: 'creativite', emoji: '🎨', name: 'Créativité', order: 4 },
             { id: 'maison', emoji: '🏠', name: 'Maison', order: 5 },
             { id: 'voyages', emoji: '✈️', name: 'Voyages', order: 6 }
         ];
@@ -456,13 +634,14 @@
             const container = document.getElementById('bubblesContainer');
             const domains = loadDomains();
             
-            container.innerHTML = domains.map((domain, index) => {
+            let html = domains.map((domain, index) => {
                 const taskCount = getTaskCountForDomain(domain.id);
                 const badgeClass = taskCount === 0 ? 'bubble-badge empty' : 'bubble-badge';
                 const priorityClass = index < 3 ? 'bubble-priority' : 'bubble-priority hidden';
                 
                 return `
                     <div class="bubble" data-id="${domain.id}" data-order="${domain.order}" onclick="handleBubbleClick('${domain.id}')">
+                        <button class="bubble-delete" onclick="event.stopPropagation(); deleteDomain('${domain.id}')">×</button>
                         <div class="${priorityClass}">${index + 1}</div>
                         <div class="${badgeClass}">${taskCount}</div>
                         <div class="bubble-emoji">${domain.emoji}</div>
@@ -474,6 +653,16 @@
                     </div>
                 `;
             }).join('');
+            
+            // Add bubble for new domain
+            html += `
+                <div class="bubble add-bubble" onclick="openAddDomainModal()">
+                    <div class="bubble-emoji">➕</div>
+                    <div class="bubble-label">Ajouter</div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
         }
         
         function handleBubbleClick(domainId) {
@@ -519,6 +708,83 @@
             renderBubbles();
             
             // Re-apply edit mode class
+            if (isEditMode) {
+                document.getElementById('bubblesContainer').classList.add('edit-mode');
+            }
+        }
+        
+        // ========== ADD/DELETE DOMAINS ==========
+        const DOMAIN_EMOJIS = ['🎯', '🧘', '🏃', '🎵', '🎨', '💻', '📱', '🌱', '⭐', '🔥', '🎓', '🏆', '💎', '🌍', '🧠', '💡'];
+        
+        function openAddDomainModal() {
+            document.getElementById('domainName').value = '';
+            setupEmojiPicker();
+            document.getElementById('domainModal').classList.add('show');
+        }
+        
+        function closeModal() {
+            document.getElementById('domainModal').classList.remove('show');
+        }
+        
+        function setupEmojiPicker() {
+            const container = document.getElementById('emojiPicker');
+            container.innerHTML = DOMAIN_EMOJIS.map((e, i) => 
+                `<div class="emoji-option ${i === 0 ? 'selected' : ''}" onclick="selectEmoji(this)">${e}</div>`
+            ).join('');
+        }
+        
+        function selectEmoji(el) {
+            document.querySelectorAll('.emoji-option').forEach(e => e.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+        
+        function saveDomain() {
+            const name = document.getElementById('domainName').value.trim();
+            const emoji = document.querySelector('.emoji-option.selected')?.textContent || '🎯';
+            
+            if (!name) {
+                alert('Entre un nom pour le domaine !');
+                return;
+            }
+            
+            const domains = loadDomains();
+            const maxOrder = Math.max(...domains.map(d => d.order), -1);
+            
+            // Generate unique ID
+            const id = name.toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9]/g, '_')
+                .substring(0, 20) + '_' + Date.now();
+            
+            domains.push({
+                id,
+                emoji,
+                name,
+                order: maxOrder + 1
+            });
+            
+            saveDomains(domains);
+            closeModal();
+            renderBubbles();
+        }
+        
+        function deleteDomain(domainId) {
+            const domains = loadDomains();
+            const domain = domains.find(d => d.id === domainId);
+            
+            if (!confirm(`Supprimer le domaine "${domain?.name}" ?\n\nCela ne supprimera pas les activités et objectifs liés.`)) {
+                return;
+            }
+            
+            const filtered = domains.filter(d => d.id !== domainId);
+            
+            // Reorder
+            filtered.forEach((d, i) => d.order = i);
+            
+            saveDomains(filtered);
+            renderBubbles();
+            
+            // Re-apply edit mode
             if (isEditMode) {
                 document.getElementById('bubblesContainer').classList.add('edit-mode');
             }
