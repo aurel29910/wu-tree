@@ -1,1 +1,2689 @@
-
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Wu Tree - Objectif</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: 'Comfortaa', sans-serif;
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            padding: 20px;
+        }
+        
+        .phone-frame {
+            width: 100%; max-width: 390px;
+            height: 844px; max-height: 95vh;
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+            border-radius: 45px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.15);
+        }
+        
+        .petal {
+            position: absolute;
+            width: 10px; height: 10px;
+            background: linear-gradient(135deg, rgba(255, 182, 193, 0.8), rgba(255, 105, 180, 0.6));
+            border-radius: 50% 0 50% 0;
+            animation: fall linear infinite;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .petal:nth-child(1) { left: 10%; animation-duration: 12s; }
+        .petal:nth-child(2) { left: 30%; animation-duration: 14s; animation-delay: 2s; }
+        .petal:nth-child(3) { left: 70%; animation-duration: 13s; animation-delay: 1s; }
+        .petal:nth-child(4) { left: 90%; animation-duration: 15s; animation-delay: 3s; }
+        
+        @keyframes fall {
+            0% { transform: translateY(-50px) rotate(0deg); opacity: 0.8; }
+            100% { transform: translateY(900px) rotate(360deg); opacity: 0; }
+        }
+        
+        .status-bar {
+            height: 47px;
+            padding: 15px 25px 0;
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(0,0,0,0.6);
+            position: relative;
+            z-index: 100;
+        }
+        
+        .header {
+            padding: 10px 20px 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            z-index: 100;
+        }
+        
+        .back-btn {
+            width: 40px; height: 40px;
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 50%;
+            color: #333;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .header-content { flex: 1; min-width: 0; }
+        
+        .header-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .header-subtitle {
+            font-size: 11px;
+            color: rgba(0,0,0,0.5);
+            margin-top: 2px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .header-btn {
+            width: 36px; height: 36px;
+            background: rgba(255,255,255,0.5);
+            border: none;
+            border-radius: 50%;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .header-btn.delete {
+            background: rgba(244, 67, 54, 0.15);
+        }
+        
+        .content {
+            padding: 0 20px 100px;
+            height: calc(100% - 120px);
+            overflow-y: auto;
+            position: relative;
+            z-index: 50;
+        }
+        
+        /* Progress card */
+        .progress-card {
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .progress-deadline {
+            font-size: 12px;
+            color: #6B4E9B;
+            font-weight: 600;
+        }
+        
+        .progress-remaining {
+            font-size: 11px;
+            color: rgba(0,0,0,0.5);
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6B4E9B, #9B6B9B);
+            border-radius: 4px;
+            transition: width 0.5s;
+        }
+        
+        .progress-text {
+            font-size: 10px;
+            color: rgba(0,0,0,0.5);
+            margin-top: 6px;
+            text-align: center;
+        }
+        
+        /* Sections */
+        .section {
+            margin-bottom: 20px;
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .section-add {
+            width: 28px; height: 28px;
+            background: rgba(255,255,255,0.5);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 50%;
+            font-size: 16px;
+            color: #6B4E9B;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Week selector */
+        .week-selector {
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+        
+        .week-days {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .week-day {
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.4);
+            border: 2px solid rgba(255,255,255,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(0,0,0,0.4);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .week-day.active {
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            border-color: #6B4E9B;
+            color: white;
+        }
+        
+        .week-day.today {
+            border: 3px solid #FF9800;
+            box-shadow: 0 0 10px rgba(255, 152, 0, 0.4);
+        }
+        
+        .week-day.today::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            width: 6px;
+            height: 6px;
+            background: #FF9800;
+            border-radius: 50%;
+        }
+        
+        .week-day .done-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 14px;
+            height: 14px;
+            background: #4CAF50;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            color: white;
+            border: 2px solid white;
+        }
+        
+        .week-info {
+            text-align: center;
+            margin-top: 14px;
+            font-size: 11px;
+            color: rgba(0,0,0,0.5);
+        }
+        
+        .today-alert {
+            background: linear-gradient(135deg, rgba(255, 152, 0, 0.15), rgba(255, 193, 7, 0.15));
+            border: 1px solid rgba(255, 152, 0, 0.3);
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-top: 10px;
+            font-size: 11px;
+            color: #e65100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .today-alert-icon {
+            font-size: 16px;
+        }
+        
+        /* Today Quick Actions */
+        .today-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .today-card {
+            background: rgba(255,255,255,0.6);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255,255,255,0.7);
+            border-radius: 14px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .today-card.done {
+            opacity: 0.6;
+            background: rgba(76, 175, 80, 0.1);
+            border-color: rgba(76, 175, 80, 0.3);
+        }
+        
+        .today-card-emoji {
+            font-size: 28px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.5);
+            border-radius: 12px;
+        }
+        
+        .today-card-info {
+            flex: 1;
+        }
+        
+        .today-card-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .today-card-desc {
+            font-size: 11px;
+            color: rgba(0,0,0,0.5);
+            margin-top: 2px;
+        }
+        
+        .today-card-done {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid rgba(76, 175, 80, 0.5);
+            background: rgba(255,255,255,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .today-card-done:active {
+            transform: scale(0.95);
+        }
+        
+        .today-card-done.checked {
+            background: #4CAF50;
+            border-color: #4CAF50;
+            color: white;
+        }
+        
+        /* Quick Eval Modal */
+        .quick-eval-field {
+            margin-bottom: 16px;
+        }
+        
+        .quick-eval-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .quick-eval-emojis {
+            display: flex;
+            gap: 8px;
+            justify-content: space-between;
+        }
+        
+        .eval-emoji {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            background: rgba(255,255,255,0.5);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .eval-emoji.selected {
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            border-color: #6B4E9B;
+            transform: scale(1.1);
+        }
+        
+        .quick-eval-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.5);
+            font-size: 13px;
+            font-family: 'Comfortaa', sans-serif;
+            box-sizing: border-box;
+        }
+        
+        .quick-eval-input:focus {
+            outline: none;
+            border-color: #6B4E9B;
+        }
+        
+        /* Session cards */
+        .session-card {
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+        
+        .session-delete {
+            position: absolute;
+            top: 10px; right: 10px;
+            width: 26px; height: 26px;
+            background: rgba(244, 67, 54, 0.1);
+            border: none;
+            border-radius: 50%;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.6;
+        }
+        
+        .session-delete:active {
+            opacity: 1;
+            background: rgba(244, 67, 54, 0.3);
+        }
+        
+        .session-edit {
+            position: absolute;
+            top: 10px; right: 42px;
+            width: 26px; height: 26px;
+            background: rgba(107, 78, 155, 0.1);
+            border: none;
+            border-radius: 50%;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.6;
+        }
+        
+        .session-edit:active {
+            opacity: 1;
+            background: rgba(107, 78, 155, 0.3);
+        }
+        
+        .session-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            padding-right: 30px;
+        }
+        
+        .session-emoji {
+            font-size: 24px;
+        }
+        
+        .session-info {
+            flex: 1;
+        }
+        
+        .session-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .session-days {
+            display: flex;
+            gap: 4px;
+            margin-top: 4px;
+            flex-wrap: wrap;
+        }
+        
+        .session-day-tag {
+            font-size: 9px;
+            padding: 2px 8px;
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            color: white;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        
+        .session-program {
+            font-size: 11px;
+            color: rgba(0,0,0,0.6);
+            line-height: 1.4;
+            padding: 10px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 10px;
+        }
+        
+        .session-program.empty {
+            color: rgba(0,0,0,0.3);
+            font-style: italic;
+            text-align: center;
+        }
+        
+        .session-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 10px;
+        }
+        
+        .session-btn {
+            flex: 1;
+            padding: 10px 8px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Comfortaa', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        
+        .session-btn.primary {
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            color: white;
+        }
+        
+        .session-btn.secondary {
+            background: rgba(255,255,255,0.5);
+            color: #333;
+        }
+        
+        .session-btn.voice {
+            background: linear-gradient(135deg, #4CAF50, #66BB6A);
+            color: white;
+        }
+        
+        /* History items */
+        .history-item {
+            background: rgba(255,255,255,0.4);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .history-date {
+            font-size: 9px;
+            font-weight: 600;
+            color: #333;
+            min-width: 55px;
+        }
+        
+        .history-content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .history-exercises {
+            font-size: 10px;
+            color: #6B4E9B;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .history-notes {
+            font-size: 9px;
+            color: rgba(0,0,0,0.5);
+            font-style: italic;
+            margin-top: 2px;
+        }
+        
+        .history-metrics {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            font-size: 14px;
+        }
+        
+        .history-rpe {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .history-rating {
+            font-size: 10px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 20px;
+            color: rgba(0,0,0,0.4);
+            font-size: 11px;
+        }
+        
+        /* Add session button */
+        .add-card {
+            background: rgba(255,255,255,0.25);
+            border: 2px dashed rgba(255,255,255,0.5);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .add-card:active {
+            transform: scale(0.98);
+        }
+        
+        .add-card-icon {
+            font-size: 24px;
+            opacity: 0.5;
+            margin-bottom: 5px;
+        }
+        
+        .add-card-text {
+            font-size: 11px;
+            color: rgba(0,0,0,0.4);
+        }
+        
+        /* Habits section */
+        .habits-row {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 5px 0;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .habits-row::-webkit-scrollbar { display: none; }
+        
+        .habit-mini {
+            min-width: 70px;
+            padding: 10px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        
+        .habit-mini.done {
+            background: rgba(76, 175, 80, 0.3);
+        }
+        
+        .habit-mini-emoji {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        .habit-mini-name {
+            font-size: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .habit-add {
+            min-width: 70px;
+            padding: 10px;
+            background: rgba(255,255,255,0.25);
+            border: 2px dashed rgba(255,255,255,0.4);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        
+        /* Modals */
+        .modal-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+        
+        .modal-overlay.show { display: flex; }
+        
+        .modal {
+            width: 90%;
+            max-height: 90%;
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.3);
+        }
+        
+        .modal-header {
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.3);
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+        }
+        
+        .modal-title { flex: 1; font-size: 15px; font-weight: 600; color: #333; }
+        .modal-close { width: 32px; height: 32px; background: rgba(255,255,255,0.4); border: none; border-radius: 50%; font-size: 18px; cursor: pointer; }
+        
+        .modal-content {
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 65vh;
+        }
+        
+        .input-group { margin-bottom: 16px; }
+        .input-label { display: block; font-size: 11px; color: rgba(0,0,0,0.6); text-transform: uppercase; font-weight: 600; margin-bottom: 8px; }
+        .input-field { width: 100%; padding: 12px 14px; border: 2px solid rgba(255,255,255,0.5); border-radius: 12px; font-size: 14px; font-family: 'Comfortaa', sans-serif; background: rgba(255,255,255,0.4); color: #333; }
+        .input-field:focus { outline: none; border-color: #6B4E9B; }
+        
+        .input-textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 12px;
+            font-size: 13px;
+            font-family: 'Comfortaa', sans-serif;
+            background: rgba(255,255,255,0.4);
+            color: #333;
+            resize: none;
+            min-height: 80px;
+        }
+        
+        .input-textarea:focus { outline: none; border-color: #6B4E9B; }
+        
+        .emoji-picker { display: flex; flex-wrap: wrap; gap: 8px; }
+        .emoji-option { width: 40px; height: 40px; background: rgba(255,255,255,0.4); border: 2px solid transparent; border-radius: 10px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .emoji-option.selected { border-color: #6B4E9B; background: rgba(255,255,255,0.7); }
+        
+        .day-picker { display: flex; flex-wrap: wrap; gap: 8px; }
+        .day-option { 
+            padding: 10px 14px; 
+            background: rgba(255,255,255,0.4); 
+            border: 2px solid transparent; 
+            border-radius: 10px; 
+            font-size: 12px; 
+            cursor: pointer; 
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .day-option.selected { 
+            border-color: #6B4E9B; 
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B); 
+            color: white; 
+        }
+        
+        .day-picker-hint {
+            font-size: 10px;
+            color: rgba(0,0,0,0.4);
+            margin-top: 6px;
+        }
+        
+        /* Session type toggle */
+        .session-type-toggle {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        
+        .type-option {
+            flex: 1;
+            padding: 12px;
+            background: rgba(255,255,255,0.4);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .type-option.selected {
+            border-color: #6B4E9B;
+            background: rgba(107, 78, 155, 0.15);
+        }
+        
+        .type-option-icon {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        
+        .type-option-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .type-option-desc {
+            font-size: 9px;
+            color: rgba(0,0,0,0.5);
+            margin-top: 2px;
+        }
+        
+        /* Frequency picker */
+        .freq-picker {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .freq-option {
+            padding: 12px 18px;
+            background: rgba(255,255,255,0.4);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .freq-option.selected {
+            border-color: #6B4E9B;
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            color: white;
+        }
+        
+        .suggestion-box {
+            background: rgba(76, 175, 80, 0.15);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-top: 10px;
+            font-size: 11px;
+            color: #2e7d32;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .suggestion-box-icon {
+            font-size: 16px;
+        }
+        
+        /* Session card flex badge */
+        .session-flex-badge {
+            font-size: 9px;
+            padding: 3px 8px;
+            background: rgba(76, 175, 80, 0.2);
+            color: #2e7d32;
+            border-radius: 10px;
+            font-weight: 600;
+            margin-left: 6px;
+        }
+        
+        .session-progress {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 6px;
+            font-size: 10px;
+            color: rgba(0,0,0,0.5);
+        }
+        
+        .session-progress-bar {
+            flex: 1;
+            height: 4px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .session-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            border-radius: 2px;
+        }
+        
+        .session-progress-fill.complete {
+            background: #4CAF50;
+        }
+        
+        /* Evaluation styles (Garmin-like) */
+        .eval-section {
+            margin-bottom: 18px;
+        }
+        
+        .eval-label {
+            font-size: 11px;
+            color: rgba(0,0,0,0.6);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .eval-scale {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .eval-option {
+            flex: 1;
+            padding: 12px 6px;
+            background: rgba(255,255,255,0.4);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .eval-option.selected {
+            border-color: #6B4E9B;
+            background: rgba(107, 78, 155, 0.2);
+        }
+        
+        .eval-option-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        
+        .eval-option-label {
+            font-size: 8px;
+            color: rgba(0,0,0,0.6);
+            font-weight: 600;
+        }
+        
+        /* RPE Scale (1-10) */
+        .rpe-scale {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .rpe-option {
+            flex: 1;
+            height: 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            opacity: 0.4;
+            transition: all 0.2s;
+            color: white;
+        }
+        
+        .rpe-option.selected {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        
+        .rpe-option:nth-child(1) { background: #4CAF50; }
+        .rpe-option:nth-child(2) { background: #8BC34A; }
+        .rpe-option:nth-child(3) { background: #CDDC39; }
+        .rpe-option:nth-child(4) { background: #FFEB3B; }
+        .rpe-option:nth-child(5) { background: #FFC107; }
+        .rpe-option:nth-child(6) { background: #FF9800; }
+        .rpe-option:nth-child(7) { background: #FF5722; }
+        .rpe-option:nth-child(8) { background: #f44336; }
+        .rpe-option:nth-child(9) { background: #E91E63; }
+        .rpe-option:nth-child(10) { background: #9C27B0; }
+        
+        .rpe-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 6px;
+            font-size: 9px;
+            color: rgba(0,0,0,0.4);
+        }
+        
+        .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+        .btn { flex: 1; padding: 14px; border: none; border-radius: 14px; font-family: 'Comfortaa', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; }
+        .btn-primary { background: linear-gradient(135deg, #6B4E9B, #9B6B9B); color: white; }
+        .btn-secondary { background: rgba(255,255,255,0.5); color: #333; }
+        .btn-danger { background: rgba(244, 67, 54, 0.8); color: white; }
+        
+        /* Rating */
+        .rating-container { display: flex; gap: 8px; justify-content: center; }
+        .rating-star { font-size: 28px; cursor: pointer; opacity: 0.3; transition: all 0.2s; }
+        .rating-star.active { opacity: 1; }
+        
+        /* Voice button */
+        .voice-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #4CAF50, #66BB6A);
+            border: none;
+            border-radius: 14px;
+            color: white;
+            font-family: 'Comfortaa', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .voice-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Bottom menu */
+        .bottom-menu {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.4);
+            z-index: 90;
+        }
+        
+        .menu-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 8px 16px; border-radius: 16px; }
+        .menu-item.active { background: rgba(255, 255, 255, 0.6); }
+        .menu-icon { font-size: 24px; }
+        .menu-label { font-size: 10px; color: rgba(0,0,0,0.6); font-weight: 500; }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="petal"></div><div class="petal"></div>
+        <div class="petal"></div><div class="petal"></div>
+        
+        <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
+        
+        <div class="header">
+            <button class="back-btn" onclick="goBack()">←</button>
+            <div class="header-content">
+                <div class="header-title">
+                    <span id="objectiveEmoji">🎯</span>
+                    <span id="objectiveName">Objectif</span>
+                </div>
+                <div class="header-subtitle" id="headerSubtitle">💪 Santé › 🏋️ Sport</div>
+            </div>
+            <div class="header-actions">
+                <button class="header-btn" onclick="openEditModal()" title="Modifier">✏️</button>
+                <button class="header-btn delete" onclick="deleteObjective()" title="Supprimer">🗑️</button>
+            </div>
+        </div>
+        
+        <div class="content">
+            <!-- Progress -->
+            <div class="progress-card">
+                <div class="progress-header">
+                    <div class="progress-deadline" id="progressDeadline">📅 15 juin 2026</div>
+                    <div class="progress-remaining" id="progressRemaining">65 jours restants</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 35%"></div>
+                </div>
+                <div class="progress-text" id="progressText">35% du temps écoulé</div>
+            </div>
+            
+            <!-- Aujourd'hui - Quick Actions -->
+            <div class="section" id="todaySection" style="display: none;">
+                <div class="section-header">
+                    <div class="section-title">⚡ Aujourd'hui</div>
+                </div>
+                <div class="today-cards" id="todayContainer"></div>
+            </div>
+            
+            <!-- Séances de la semaine -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">📅 Séances de la semaine</div>
+                </div>
+                <div class="week-selector">
+                    <div class="week-days" id="weekDays"></div>
+                    <div class="week-info" id="weekInfo">Clique pour ajouter/retirer des jours</div>
+                </div>
+            </div>
+            
+            <!-- Mes séances -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">🏋️ Mes séances</div>
+                    <button class="section-add" onclick="openSessionModal()">+</button>
+                </div>
+                <div id="sessionsContainer"></div>
+            </div>
+            
+            <!-- Historique -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">📝 Historique</div>
+                    <button class="section-add" onclick="openLogModal()">+</button>
+                </div>
+                <div id="historyContainer"></div>
+            </div>
+            
+            <!-- Habitudes liées -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">🌱 Habitudes liées</div>
+                </div>
+                <div class="habits-row" id="habitsContainer"></div>
+            </div>
+        </div>
+        
+        <div class="bottom-menu">
+            <div class="menu-item" onclick="goToVision()">
+                <div class="menu-icon">🔮</div>
+                <div class="menu-label">Vision</div>
+            </div>
+            <div class="menu-item active">
+                <div class="menu-icon">🌳</div>
+                <div class="menu-label">Arbre</div>
+            </div>
+            <div class="menu-item" onclick="goToTasks()">
+                <div class="menu-icon">📋</div>
+                <div class="menu-label">Tâches</div>
+            </div>
+        </div>
+        
+        <!-- Modal Edit Objectif -->
+        <div class="modal-overlay" id="editModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title">✏️ Modifier l'objectif</div>
+                    <button class="modal-close" onclick="closeModal('edit')">×</button>
+                </div>
+                <div class="modal-content">
+                    <div class="input-group">
+                        <label class="input-label">Nom de l'objectif</label>
+                        <input type="text" class="input-field" id="editName">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Deadline</label>
+                        <input type="date" class="input-field" id="editDeadline">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Emoji</label>
+                        <div class="emoji-picker" id="editEmojis"></div>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="closeModal('edit')">Annuler</button>
+                        <button class="btn btn-primary" onclick="saveEdit()">Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal Nouvelle Séance -->
+        <div class="modal-overlay" id="sessionModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title">🏋️ Nouvelle séance</div>
+                    <button class="modal-close" onclick="closeModal('session')">×</button>
+                </div>
+                <div class="modal-content">
+                    <div class="input-group">
+                        <label class="input-label">Nom de la séance</label>
+                        <input type="text" class="input-field" id="sessionName" placeholder="Ex: Musculation, Cardio, Yoga...">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Type de planification</label>
+                        <div class="session-type-toggle">
+                            <div class="type-option selected" onclick="setSessionType('fixed')" data-type="fixed">
+                                <div class="type-option-icon">📅</div>
+                                <div class="type-option-label">Jours fixes</div>
+                                <div class="type-option-desc">L/M/V par exemple</div>
+                            </div>
+                            <div class="type-option" onclick="setSessionType('flexible')" data-type="flexible">
+                                <div class="type-option-icon">🌊</div>
+                                <div class="type-option-label">Flexible</div>
+                                <div class="type-option-desc">X fois/semaine</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Fixed days picker -->
+                    <div class="input-group" id="fixedDaysGroup">
+                        <label class="input-label">Jour(s) de la semaine</label>
+                        <div class="day-picker" id="dayPicker"></div>
+                        <div class="day-picker-hint">Tu peux sélectionner plusieurs jours</div>
+                    </div>
+                    
+                    <!-- Flexible frequency picker -->
+                    <div class="input-group" id="flexibleFreqGroup" style="display: none;">
+                        <label class="input-label">Combien de fois par semaine ?</label>
+                        <div class="freq-picker" id="freqPicker"></div>
+                        <div class="suggestion-box" id="suggestionBox" style="display: none;">
+                            <span class="suggestion-box-icon">💡</span>
+                            <span id="suggestionText">Suggestion : Mardi ou Samedi (pas de muscu)</span>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Emoji</label>
+                        <div class="emoji-picker" id="sessionEmojis"></div>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="closeModal('session')">Annuler</button>
+                        <button class="btn btn-primary" onclick="saveSession()">Créer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal Programme Séance -->
+        <div class="modal-overlay" id="programModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title" id="programModalTitle">📝 Programme</div>
+                    <button class="modal-close" onclick="closeModal('program')">×</button>
+                </div>
+                <div class="modal-content">
+                    <button class="voice-btn" onclick="startVoiceInput()" id="voiceBtn">
+                        🎤 Dicter le programme (IA)
+                    </button>
+                    <div class="input-group">
+                        <label class="input-label">Programme de la séance</label>
+                        <textarea class="input-textarea" id="programContent" placeholder="Ex:
+2x20 pompes (repos 1min)
+2x10 tractions assistées
+3x15 abdos
+1x30s gainage"></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="closeModal('program')">Annuler</button>
+                        <button class="btn btn-primary" onclick="saveProgram()">Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal Log Séance (Garmin-style) -->
+        <div class="modal-overlay" id="logModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title">📝 Évaluation de la séance</div>
+                    <button class="modal-close" onclick="closeModal('log')">×</button>
+                </div>
+                <div class="modal-content">
+                    <div class="input-group">
+                        <label class="input-label">Date</label>
+                        <input type="date" class="input-field" id="logDate">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Séance</label>
+                        <select class="input-field" id="logSession"></select>
+                    </div>
+                    
+                    <!-- RPE - Effort perçu -->
+                    <div class="eval-section">
+                        <label class="eval-label">💪 Effort perçu (RPE)</label>
+                        <div class="rpe-scale" id="rpeScale"></div>
+                        <div class="rpe-labels">
+                            <span>Facile</span>
+                            <span>Modéré</span>
+                            <span>Difficile</span>
+                            <span>Max</span>
+                        </div>
+                        <input type="hidden" id="logRpe" value="5">
+                    </div>
+                    
+                    <!-- Niveau d'énergie -->
+                    <div class="eval-section">
+                        <label class="eval-label">⚡ Niveau d'énergie</label>
+                        <div class="eval-scale" id="energyScale">
+                            <div class="eval-option" data-value="1" onclick="setEnergy(1)">
+                                <div class="eval-option-icon">😴</div>
+                                <div class="eval-option-label">Épuisé</div>
+                            </div>
+                            <div class="eval-option" data-value="2" onclick="setEnergy(2)">
+                                <div class="eval-option-icon">😔</div>
+                                <div class="eval-option-label">Fatigué</div>
+                            </div>
+                            <div class="eval-option" data-value="3" onclick="setEnergy(3)">
+                                <div class="eval-option-icon">😐</div>
+                                <div class="eval-option-label">Normal</div>
+                            </div>
+                            <div class="eval-option selected" data-value="4" onclick="setEnergy(4)">
+                                <div class="eval-option-icon">😊</div>
+                                <div class="eval-option-label">Bien</div>
+                            </div>
+                            <div class="eval-option" data-value="5" onclick="setEnergy(5)">
+                                <div class="eval-option-icon">🔥</div>
+                                <div class="eval-option-label">Plein</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="logEnergy" value="4">
+                    </div>
+                    
+                    <!-- Humeur -->
+                    <div class="eval-section">
+                        <label class="eval-label">😊 Humeur après la séance</label>
+                        <div class="eval-scale" id="moodScale">
+                            <div class="eval-option" data-value="1" onclick="setMood(1)">
+                                <div class="eval-option-icon">😤</div>
+                                <div class="eval-option-label">Frustré</div>
+                            </div>
+                            <div class="eval-option" data-value="2" onclick="setMood(2)">
+                                <div class="eval-option-icon">😕</div>
+                                <div class="eval-option-label">Mitigé</div>
+                            </div>
+                            <div class="eval-option" data-value="3" onclick="setMood(3)">
+                                <div class="eval-option-icon">😌</div>
+                                <div class="eval-option-label">Content</div>
+                            </div>
+                            <div class="eval-option selected" data-value="4" onclick="setMood(4)">
+                                <div class="eval-option-icon">😄</div>
+                                <div class="eval-option-label">Satisfait</div>
+                            </div>
+                            <div class="eval-option" data-value="5" onclick="setMood(5)">
+                                <div class="eval-option-icon">🤩</div>
+                                <div class="eval-option-label">Euphorique</div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="logMood" value="4">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Exercices réalisés</label>
+                        <textarea class="input-textarea" id="logExercises" placeholder="Ce que tu as fait..."></textarea>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Notes (optionnel)</label>
+                        <textarea class="input-textarea" id="logNotes" placeholder="Ressenti, difficultés, progrès..."></textarea>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="closeModal('log')">Annuler</button>
+                        <button class="btn btn-primary" onclick="saveLog()">Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal Habit -->
+        <div class="modal-overlay" id="habitModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title">🌱 Nouvelle habitude</div>
+                    <button class="modal-close" onclick="closeModal('habit')">×</button>
+                </div>
+                <div class="modal-content">
+                    <div class="input-group">
+                        <label class="input-label">Habitude liée à cet objectif</label>
+                        <input type="text" class="input-field" id="habitName" placeholder="Ex: Protéines après séance">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Emoji</label>
+                        <div class="emoji-picker" id="habitEmojis"></div>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="closeModal('habit')">Annuler</button>
+                        <button class="btn btn-primary" onclick="saveHabit()">Ajouter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal Quick Eval -->
+        <div class="modal-overlay" id="quickEvalModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title" id="quickEvalTitle">⚡ Bilan rapide</div>
+                    <button class="modal-close" onclick="closeModal('quickEval')">×</button>
+                </div>
+                <div class="modal-content">
+                    <div id="quickEvalFields"></div>
+                    
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="closeModal('quickEval')">Annuler</button>
+                        <button class="btn btn-primary" onclick="saveQuickEval()">✓ Valider</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const currentObjectiveId = localStorage.getItem('wutree_current_objective') || '';
+        const currentActivityId = localStorage.getItem('wutree_current_activity') || '';
+        const currentDomainId = localStorage.getItem('wutree_current_domain') || '';
+        
+        const DAYS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+        const DAYS_SHORT = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+        
+        // Domain-specific configuration
+        const DOMAIN_CONFIG = {
+            sante: {
+                sessionLabel: 'Séance',
+                sessionLabelPlural: 'Séances',
+                sessionIcon: '🏋️',
+                addLabel: 'Nouvelle séance',
+                emojis: ['🏋️', '🏃', '🧘', '🚴', '🏊', '⚽', '🥊', '🤸', '💪', '🧗', '🎾', '🥋'],
+                suggestions: ['Musculation', 'Cardio', 'Yoga', 'HIIT', 'Étirements', 'Course', 'Natation'],
+                evalLabel: 'Évaluation de la séance'
+            },
+            business: {
+                sessionLabel: 'Session',
+                sessionLabelPlural: 'Sessions',
+                sessionIcon: '💼',
+                addLabel: 'Nouvelle session',
+                emojis: ['💼', '💻', '📊', '📈', '🎯', '💡', '📱', '🤝', '📝', '💰', '📧', '🎤'],
+                suggestions: ['Trading', 'Prospection', 'Création contenu', 'Analyse', 'Formation', 'Networking'],
+                evalLabel: 'Bilan de la session'
+            },
+            relations: {
+                sessionLabel: 'Moment',
+                sessionLabelPlural: 'Moments',
+                sessionIcon: '👥',
+                addLabel: 'Nouveau moment',
+                emojis: ['👥', '💬', '☕', '🍽️', '📞', '💑', '👨‍👩‍👧', '🤝', '🎁', '❤️', '🫂', '🎉'],
+                suggestions: ['Appel famille', 'Sortie amis', 'Date', 'Retrouvailles', 'Activité groupe'],
+                evalLabel: 'Comment c\'était ?'
+            },
+            connaissance: {
+                sessionLabel: 'Session',
+                sessionLabelPlural: 'Sessions',
+                sessionIcon: '📚',
+                addLabel: 'Nouvelle session',
+                emojis: ['📖', '✍️', '🎓', '💻', '🎧', '📚', '🧠', '🔬', '🌍', '🎨', '🎵', '🗣️'],
+                suggestions: ['Lecture', 'Cours en ligne', 'Pratique langue', 'Écriture', 'Projet perso', 'Recherche'],
+                evalLabel: 'Bilan d\'apprentissage'
+            },
+            loisirs: {
+                sessionLabel: 'Moment',
+                sessionLabelPlural: 'Moments',
+                sessionIcon: '🎮',
+                addLabel: 'Nouveau moment',
+                emojis: ['🎮', '🎬', '🎵', '📚', '🎨', '📷', '🎸', '🎭', '🧩', '🎯', '🎲', '🎪'],
+                suggestions: ['Gaming', 'Film/Série', 'Musique', 'Dessin', 'Photo', 'Lecture plaisir'],
+                evalLabel: 'Comment c\'était ?'
+            },
+            maison: {
+                sessionLabel: 'Session',
+                sessionLabelPlural: 'Sessions',
+                sessionIcon: '🏠',
+                addLabel: 'Nouvelle session',
+                emojis: ['🧹', '🛠️', '🌱', '🍳', '🧺', '📦', '🔧', '🪴', '✨', '🛋️', '🪑', '🏠'],
+                suggestions: ['Ménage', 'Bricolage', 'Jardinage', 'Cuisine', 'Rangement', 'Décoration'],
+                evalLabel: 'Bilan'
+            },
+            voyages: {
+                sessionLabel: 'Sortie',
+                sessionLabelPlural: 'Sorties',
+                sessionIcon: '✈️',
+                addLabel: 'Nouvelle sortie',
+                emojis: ['✈️', '🏖️', '⛺', '🗺️', '🎒', '🚗', '🏔️', '🌴', '📸', '🧳', '🚂', '🛳️'],
+                suggestions: ['Excursion', 'Randonnée', 'Visite', 'Road trip', 'Découverte', 'Aventure'],
+                evalLabel: 'Comment c\'était ?'
+            }
+        };
+        
+        // Get config for current domain
+        function getDomainConfig() {
+            return DOMAIN_CONFIG[currentDomainId] || DOMAIN_CONFIG.sante;
+        }
+        
+        const HABIT_EMOJIS = ['🥤', '🧘', '💧', '🍎', '😴', '📖', '🚿', '💊', '🧠', '✨'];
+        
+        let currentSessionIdForProgram = null;
+        let currentSessionType = 'fixed';
+        let objective = null;
+        
+        function init() {
+            loadObjective();
+            updateDomainLabels();
+            renderProgress();
+            renderToday();
+            renderWeekDays();
+            renderSessions();
+            renderHistory();
+            renderHabits();
+            setupPickers();
+        }
+        
+        function updateDomainLabels() {
+            const config = getDomainConfig();
+            
+            // Update section titles
+            document.querySelector('.section-title').textContent = `⚡ Aujourd'hui`;
+            document.querySelectorAll('.section-title')[1].textContent = `📅 ${config.sessionLabelPlural} de la semaine`;
+            document.querySelectorAll('.section-title')[2].innerHTML = `${config.sessionIcon} Mes ${config.sessionLabelPlural.toLowerCase()}`;
+        }
+        
+        function renderToday() {
+            const todaySessions = getTodaySessions();
+            const flexibleSessions = getSessions().filter(s => s.type === 'flexible');
+            const completedToday = getCompletedSessionsToday();
+            const config = getDomainConfig();
+            
+            // Combine fixed sessions for today + flexible sessions not yet completed this week
+            const allTodayItems = [];
+            
+            // Add fixed sessions for today
+            todaySessions.forEach(s => {
+                const isDone = completedToday.includes(s.id);
+                allTodayItems.push({
+                    ...s,
+                    isDone,
+                    desc: 'Prévu aujourd\'hui'
+                });
+            });
+            
+            // Add flexible sessions not yet at goal
+            flexibleSessions.forEach(s => {
+                const weekProgress = getWeeklyProgress(s.id, s.frequency);
+                if (weekProgress.done < weekProgress.target) {
+                    const isDone = completedToday.includes(s.id);
+                    allTodayItems.push({
+                        ...s,
+                        isDone,
+                        desc: `${weekProgress.done}/${weekProgress.target} cette semaine`
+                    });
+                }
+            });
+            
+            const container = document.getElementById('todayContainer');
+            const section = document.getElementById('todaySection');
+            
+            if (allTodayItems.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            
+            section.style.display = 'block';
+            
+            container.innerHTML = allTodayItems.map(item => `
+                <div class="today-card ${item.isDone ? 'done' : ''}" data-session-id="${item.id}">
+                    <div class="today-card-emoji">${item.emoji}</div>
+                    <div class="today-card-info">
+                        <div class="today-card-name">${item.name}</div>
+                        <div class="today-card-desc">${item.desc}</div>
+                    </div>
+                    <div class="today-card-done ${item.isDone ? 'checked' : ''}" onclick="quickValidateSession('${item.id}')">
+                        ${item.isDone ? '✓' : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function getCompletedSessionsToday() {
+            const history = getHistory();
+            const today = new Date().toISOString().split('T')[0];
+            
+            return history
+                .filter(log => log.date === today)
+                .map(log => log.sessionId);
+        }
+        
+        let quickValidateSessionId = null;
+        
+        function quickValidateSession(sessionId) {
+            const completedToday = getCompletedSessionsToday();
+            
+            if (completedToday.includes(sessionId)) {
+                // Already done today - cannot validate twice
+                return;
+            }
+            
+            // Show quick eval modal
+            quickValidateSessionId = sessionId;
+            const sessions = getSessions();
+            const session = sessions.find(s => s.id === sessionId);
+            if (!session) return;
+            
+            document.getElementById('quickEvalTitle').textContent = `${session.emoji} ${session.name}`;
+            
+            // Adapt eval based on domain
+            renderQuickEvalFields();
+            
+            openModal('quickEval');
+        }
+        
+        function renderQuickEvalFields() {
+            const config = getDomainConfig();
+            const container = document.getElementById('quickEvalFields');
+            
+            // Different eval fields per domain type
+            const evalTypes = {
+                sante: [
+                    { id: 'effort', label: '💪 Effort', emojis: ['😴', '😌', '💪', '🔥', '🏆'] },
+                    { id: 'energy', label: '⚡ Énergie après', emojis: ['😫', '😔', '😐', '😊', '🚀'] }
+                ],
+                business: [
+                    { id: 'productivity', label: '📊 Productivité', emojis: ['😞', '😕', '😐', '👍', '🎯'] },
+                    { id: 'focus', label: '🎯 Focus', emojis: ['🌀', '😵', '😐', '🧘', '💎'] }
+                ],
+                connaissance: [
+                    { id: 'comprehension', label: '🧠 Compréhension', emojis: ['😕', '🤔', '😐', '💡', '🎓'] },
+                    { id: 'progress', label: '📈 Progression', emojis: ['📉', '➖', '📊', '📈', '🚀'] }
+                ],
+                relations: [
+                    { id: 'quality', label: '💝 Qualité', emojis: ['😞', '😕', '😊', '💖', '✨'] },
+                    { id: 'connection', label: '🤝 Connexion', emojis: ['😶', '🙂', '😊', '🫂', '💞'] }
+                ],
+                loisirs: [
+                    { id: 'enjoyment', label: '😄 Plaisir', emojis: ['😐', '🙂', '😊', '😄', '🤩'] },
+                    { id: 'relaxation', label: '🧘 Détente', emojis: ['😫', '😕', '😌', '😊', '🧘'] }
+                ],
+                maison: [
+                    { id: 'satisfaction', label: '✨ Satisfaction', emojis: ['😞', '😕', '😐', '😊', '✨'] },
+                    { id: 'efficiency', label: '⚡ Efficacité', emojis: ['🐌', '🚶', '🏃', '⚡', '🚀'] }
+                ],
+                voyages: [
+                    { id: 'discovery', label: '🌟 Découverte', emojis: ['😐', '🙂', '😊', '🤩', '🌟'] },
+                    { id: 'memorable', label: '📸 Mémorable', emojis: ['😶', '🙂', '😊', '😍', '💫'] }
+                ]
+            };
+            
+            const fields = evalTypes[currentDomainId] || evalTypes.sante;
+            
+            container.innerHTML = fields.map(field => `
+                <div class="quick-eval-field">
+                    <div class="quick-eval-label">${field.label}</div>
+                    <div class="quick-eval-emojis" data-field="${field.id}">
+                        ${field.emojis.map((e, i) => `
+                            <div class="eval-emoji ${i === 2 ? 'selected' : ''}" onclick="selectQuickEval(this, '${field.id}', ${i + 1})" data-value="${i + 1}">${e}</div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('') + `
+                <div class="quick-eval-field">
+                    <div class="quick-eval-label">📝 Note rapide (optionnel)</div>
+                    <input type="text" class="quick-eval-input" id="quickEvalNote" placeholder="Comment ça s'est passé ?">
+                </div>
+            `;
+        }
+        
+        function selectQuickEval(el, fieldId, value) {
+            const container = el.closest('.quick-eval-emojis');
+            container.querySelectorAll('.eval-emoji').forEach(e => e.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+        
+        function saveQuickEval() {
+            if (!quickValidateSessionId) return;
+            
+            const sessions = getSessions();
+            const session = sessions.find(s => s.id === quickValidateSessionId);
+            if (!session) return;
+            
+            // Collect eval data
+            const evalData = {};
+            document.querySelectorAll('.quick-eval-emojis').forEach(container => {
+                const fieldId = container.dataset.field;
+                const selected = container.querySelector('.eval-emoji.selected');
+                evalData[fieldId] = selected ? parseInt(selected.dataset.value) : 3;
+            });
+            
+            const note = document.getElementById('quickEvalNote').value.trim();
+            const today = new Date().toISOString().split('T')[0];
+            
+            // Check for duplicate - same session same day
+            let history = getHistory();
+            const existingIndex = history.findIndex(h => h.sessionId === quickValidateSessionId && h.date === today);
+            
+            if (existingIndex >= 0) {
+                // Update existing
+                history[existingIndex] = {
+                    ...history[existingIndex],
+                    ...evalData,
+                    notes: note,
+                    updatedAt: new Date().toISOString()
+                };
+            } else {
+                // Add new
+                history.push({
+                    id: 'log_' + Date.now(),
+                    objectiveId: currentObjectiveId,
+                    sessionId: quickValidateSessionId,
+                    date: today,
+                    exercises: session.program || '',
+                    notes: note,
+                    ...evalData,
+                    createdAt: new Date().toISOString()
+                });
+            }
+            
+            saveHistory(history);
+            
+            quickValidateSessionId = null;
+            closeModal('quickEval');
+            
+            renderToday();
+            renderWeekDays();
+            renderHistory();
+            renderSessions();
+        }
+        
+        function loadObjective() {
+            const objectives = JSON.parse(localStorage.getItem('wutree_objectives') || '[]');
+            objective = objectives.find(o => o.id === currentObjectiveId);
+            
+            if (!objective) {
+                goBack();
+                return;
+            }
+            
+            document.getElementById('objectiveEmoji').textContent = objective.emoji;
+            document.getElementById('objectiveName').textContent = objective.name;
+            
+            // Load breadcrumb
+            const activities = JSON.parse(localStorage.getItem('wutree_activities') || '[]');
+            const domains = JSON.parse(localStorage.getItem('wutree_domains') || '[]');
+            const activity = activities.find(a => a.id === currentActivityId);
+            const domain = domains.find(d => d.id === currentDomainId);
+            
+            if (activity && domain) {
+                document.getElementById('headerSubtitle').textContent = `${domain.emoji} ${domain.name} › ${activity.emoji} ${activity.name}`;
+            }
+        }
+        
+        function renderProgress() {
+            if (!objective) return;
+            
+            const deadline = new Date(objective.deadline);
+            const today = new Date();
+            const created = new Date(objective.createdAt);
+            const total = Math.ceil((deadline - created) / (1000 * 60 * 60 * 24));
+            const remaining = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+            const progress = Math.max(0, Math.min(100, ((total - remaining) / total) * 100));
+            
+            document.getElementById('progressDeadline').textContent = `📅 ${deadline.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+            document.getElementById('progressRemaining').textContent = remaining > 0 ? `${remaining} jours restants` : 'Échéance passée';
+            document.getElementById('progressFill').style.width = `${progress}%`;
+            document.getElementById('progressText').textContent = `${Math.round(progress)}% du temps écoulé`;
+        }
+        
+        // ========== WEEK DAYS ==========
+        function renderWeekDays() {
+            if (!objective) return;
+            const selectedDays = objective.weekDays || [];
+            const config = getDomainConfig();
+            
+            // Get today's index (0 = Monday, 6 = Sunday)
+            const today = new Date().getDay();
+            const todayIndex = today === 0 ? 6 : today - 1;
+            
+            // Get completed days this week
+            const completedDays = getCompletedDaysThisWeek();
+            
+            document.getElementById('weekDays').innerHTML = DAYS_SHORT.map((day, i) => {
+                let classes = 'week-day';
+                if (selectedDays.includes(i)) classes += ' active';
+                if (i === todayIndex) classes += ' today';
+                
+                const doneBadge = completedDays.includes(i) ? '<span class="done-badge">✓</span>' : '';
+                
+                return `<div class="${classes}" onclick="toggleWeekDay(${i})">${day}${doneBadge}</div>`;
+            }).join('');
+            
+            // Count sessions
+            const sessions = getSessions();
+            const fixedCount = sessions.filter(s => s.type !== 'flexible').length;
+            const flexCount = sessions.filter(s => s.type === 'flexible').length;
+            
+            let infoText = '';
+            if (fixedCount > 0 || flexCount > 0) {
+                const parts = [];
+                if (selectedDays.length > 0) {
+                    parts.push(`${selectedDays.length} jour${selectedDays.length > 1 ? 's' : ''} fixe${selectedDays.length > 1 ? 's' : ''}`);
+                }
+                if (flexCount > 0) {
+                    parts.push(`${flexCount} flexible${flexCount > 1 ? 's' : ''}`);
+                }
+                infoText = parts.join(' + ');
+            } else {
+                infoText = `Ajoute des ${config.sessionLabelPlural.toLowerCase()} ci-dessous`;
+            }
+            
+            document.getElementById('weekInfo').innerHTML = infoText;
+            
+            // Show today's alert if there's a session today
+            const todaySessions = getTodaySessions();
+            const weekSelectorEl = document.querySelector('.week-selector');
+            const existingAlert = weekSelectorEl.querySelector('.today-alert');
+            if (existingAlert) existingAlert.remove();
+            
+            if (todaySessions.length > 0 && !completedDays.includes(todayIndex)) {
+                const alertHtml = `
+                    <div class="today-alert">
+                        <span class="today-alert-icon">🔔</span>
+                        <span>Aujourd'hui : ${todaySessions.map(s => s.emoji + ' ' + s.name).join(', ')}</span>
+                    </div>
+                `;
+                weekSelectorEl.insertAdjacentHTML('beforeend', alertHtml);
+            }
+        }
+        
+        function getCompletedDaysThisWeek() {
+            const history = getHistory();
+            const today = new Date();
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - ((today.getDay() + 6) % 7)); // Monday
+            startOfWeek.setHours(0, 0, 0, 0);
+            
+            const completedDays = [];
+            
+            history.forEach(log => {
+                const logDate = new Date(log.date);
+                if (logDate >= startOfWeek) {
+                    const dayIndex = logDate.getDay() === 0 ? 6 : logDate.getDay() - 1;
+                    if (!completedDays.includes(dayIndex)) {
+                        completedDays.push(dayIndex);
+                    }
+                }
+            });
+            
+            return completedDays;
+        }
+        
+        function getTodaySessions() {
+            const sessions = getSessions();
+            const today = new Date().getDay();
+            const todayIndex = today === 0 ? 6 : today - 1;
+            
+            return sessions.filter(s => {
+                if (s.type === 'flexible') return false;
+                const days = s.days || [s.dayIndex];
+                return days.includes(todayIndex);
+            });
+        }
+        
+        function toggleWeekDay(dayIndex) {
+            if (!objective.weekDays) objective.weekDays = [];
+            
+            if (objective.weekDays.includes(dayIndex)) {
+                objective.weekDays = objective.weekDays.filter(d => d !== dayIndex);
+            } else {
+                objective.weekDays.push(dayIndex);
+                objective.weekDays.sort();
+            }
+            
+            saveObjective();
+            renderWeekDays();
+        }
+        
+        // ========== SESSIONS ==========
+        function getSessions() {
+            return JSON.parse(localStorage.getItem('wutree_objective_sessions_templates') || '[]')
+                .filter(s => s.objectiveId === currentObjectiveId);
+        }
+        
+        function saveSessions(sessions) {
+            const all = JSON.parse(localStorage.getItem('wutree_objective_sessions_templates') || '[]')
+                .filter(s => s.objectiveId !== currentObjectiveId);
+            localStorage.setItem('wutree_objective_sessions_templates', JSON.stringify([...all, ...sessions]));
+        }
+        
+        function renderSessions() {
+            const container = document.getElementById('sessionsContainer');
+            const sessions = getSessions();
+            const config = getDomainConfig();
+            
+            if (sessions.length === 0) {
+                container.innerHTML = `
+                    <div class="add-card" onclick="openSessionModal()">
+                        <div class="add-card-icon">+</div>
+                        <div class="add-card-text">Créer ta première ${config.sessionLabel.toLowerCase()}</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = sessions.map(session => {
+                const isFlexible = session.type === 'flexible';
+                
+                if (isFlexible) {
+                    // Calculate weekly progress
+                    const weekProgress = getWeeklyProgress(session.id, session.frequency);
+                    const progressPercent = Math.min(100, (weekProgress.done / weekProgress.target) * 100);
+                    const isComplete = weekProgress.done >= weekProgress.target;
+                    
+                    return `
+                        <div class="session-card">
+                            <button class="session-edit" onclick="editSession('${session.id}')" title="Modifier">✏️</button>
+                            <button class="session-delete" onclick="deleteSession('${session.id}')" title="Supprimer">🗑️</button>
+                            <div class="session-header">
+                                <div class="session-emoji">${session.emoji}</div>
+                                <div class="session-info">
+                                    <div class="session-name">
+                                        ${session.name}
+                                        <span class="session-flex-badge">🌊 Flexible</span>
+                                    </div>
+                                    <div class="session-progress">
+                                        <span>${weekProgress.done}/${weekProgress.target} cette semaine</span>
+                                        <div class="session-progress-bar">
+                                            <div class="session-progress-fill ${isComplete ? 'complete' : ''}" style="width: ${progressPercent}%"></div>
+                                        </div>
+                                        ${isComplete ? '✓' : ''}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="session-program ${!session.program ? 'empty' : ''}">
+                                ${session.program || 'Aucun programme défini'}
+                            </div>
+                            ${!isComplete ? getSuggestionHtml(session.id) : ''}
+                            <div class="session-actions">
+                                <button class="session-btn secondary" onclick="editSessionProgram('${session.id}')">✏️ Programme</button>
+                                <button class="session-btn voice" onclick="voiceSessionProgram('${session.id}')">🎤 Vocal</button>
+                                <button class="session-btn primary" onclick="logSessionDone('${session.id}')">✓ Fait</button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // Fixed session - show days
+                    const days = session.days || [session.dayIndex];
+                    const daysHtml = days.map(d => `<span class="session-day-tag">${DAYS[d]}</span>`).join('');
+                    
+                    return `
+                        <div class="session-card">
+                            <button class="session-edit" onclick="editSession('${session.id}')" title="Modifier">✏️</button>
+                            <button class="session-delete" onclick="deleteSession('${session.id}')" title="Supprimer">🗑️</button>
+                            <div class="session-header">
+                                <div class="session-emoji">${session.emoji}</div>
+                                <div class="session-info">
+                                    <div class="session-name">${session.name}</div>
+                                    <div class="session-days">${daysHtml}</div>
+                                </div>
+                            </div>
+                            <div class="session-program ${!session.program ? 'empty' : ''}">
+                                ${session.program || 'Aucun programme défini'}
+                            </div>
+                            <div class="session-actions">
+                                <button class="session-btn secondary" onclick="editSessionProgram('${session.id}')">✏️ Programme</button>
+                                <button class="session-btn voice" onclick="voiceSessionProgram('${session.id}')">🎤 Vocal</button>
+                                <button class="session-btn primary" onclick="logSessionDone('${session.id}')">✓ Fait</button>
+                            </div>
+                        </div>
+                    `;
+                }
+            }).join('');
+            
+            // Add button at the end
+            container.innerHTML += `
+                <div class="add-card" onclick="openSessionModal()">
+                    <div class="add-card-icon">+</div>
+                    <div class="add-card-text">Ajouter une ${config.sessionLabel.toLowerCase()}</div>
+                </div>
+            `;
+        }
+        
+        function getWeeklyProgress(sessionId, targetFreq) {
+            const history = getHistory();
+            const today = new Date();
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - today.getDay() + 1); // Monday
+            startOfWeek.setHours(0, 0, 0, 0);
+            
+            const thisWeekLogs = history.filter(log => {
+                if (log.sessionId !== sessionId) return false;
+                const logDate = new Date(log.date);
+                return logDate >= startOfWeek;
+            });
+            
+            return {
+                done: thisWeekLogs.length,
+                target: targetFreq
+            };
+        }
+        
+        function getSuggestionHtml(sessionId) {
+            // Find days without fixed sessions this week
+            const sessions = getSessions();
+            const fixedDays = new Set();
+            const config = getDomainConfig();
+            
+            sessions.forEach(s => {
+                if (s.type !== 'flexible' && s.days) {
+                    s.days.forEach(d => fixedDays.add(d));
+                }
+            });
+            
+            const today = new Date().getDay();
+            const todayIndex = today === 0 ? 6 : today - 1;
+            
+            // Find upcoming free days
+            const freeDays = [];
+            for (let i = todayIndex; i < 7; i++) {
+                if (!fixedDays.has(i)) {
+                    freeDays.push(DAYS[i]);
+                }
+            }
+            
+            if (freeDays.length > 0) {
+                return `
+                    <div class="suggestion-box">
+                        <span class="suggestion-box-icon">💡</span>
+                        <span>Suggestion : ${freeDays.slice(0, 2).join(' ou ')}</span>
+                    </div>
+                `;
+            }
+            return '';
+        }
+        
+        function deleteSession(sessionId) {
+            if (confirm('Supprimer cette séance ?')) {
+                let sessions = getSessions().filter(s => s.id !== sessionId);
+                saveSessions(sessions);
+                renderSessions();
+                updateWeekDaysFromSessions();
+            }
+        }
+        
+        function updateWeekDaysFromSessions() {
+            const sessions = getSessions();
+            const allDays = new Set();
+            
+            // Only count fixed sessions for weekDays display
+            sessions.forEach(s => {
+                if (s.type !== 'flexible') {
+                    const days = s.days || [s.dayIndex];
+                    days.forEach(d => allDays.add(d));
+                }
+            });
+            
+            objective.weekDays = Array.from(allDays).sort();
+            saveObjective();
+            renderWeekDays();
+        }
+        
+        let editingSessionId = null;
+        
+        function openSessionModal(sessionIdToEdit = null) {
+            const config = getDomainConfig();
+            editingSessionId = sessionIdToEdit;
+            
+            if (sessionIdToEdit) {
+                // Edit mode
+                const sessions = getSessions();
+                const session = sessions.find(s => s.id === sessionIdToEdit);
+                if (!session) return;
+                
+                document.querySelector('#sessionModal .modal-title').textContent = `✏️ Modifier la ${config.sessionLabel.toLowerCase()}`;
+                document.getElementById('sessionName').value = session.name;
+                
+                // Set type
+                currentSessionType = session.type || 'fixed';
+                setSessionType(currentSessionType);
+                
+                if (session.type === 'flexible') {
+                    // Select frequency
+                    document.querySelectorAll('.freq-option').forEach(o => {
+                        o.classList.toggle('selected', parseInt(o.dataset.freq) === session.frequency);
+                    });
+                } else {
+                    // Select days
+                    setupDayPicker(session.days || []);
+                }
+                
+                // Select emoji
+                setupSessionEmojis(session.emoji);
+                
+                // Update button text
+                document.querySelector('#sessionModal .btn-primary').textContent = 'Enregistrer';
+            } else {
+                // Create mode
+                document.querySelector('#sessionModal .modal-title').textContent = `${config.sessionIcon} ${config.addLabel}`;
+                const placeholder = config.suggestions.slice(0, 3).join(', ') + '...';
+                document.getElementById('sessionName').placeholder = `Ex: ${placeholder}`;
+                document.getElementById('sessionName').value = '';
+                currentSessionType = 'fixed';
+                setupDayPicker([]);
+                setupFreqPicker();
+                setupSessionEmojis();
+                setSessionType('fixed');
+                
+                // Update button text
+                document.querySelector('#sessionModal .btn-primary').textContent = 'Créer';
+            }
+            
+            openModal('session');
+        }
+        
+        function editSession(sessionId) {
+            openSessionModal(sessionId);
+        }
+        
+        function setSessionType(type) {
+            currentSessionType = type;
+            
+            document.querySelectorAll('.type-option').forEach(opt => {
+                opt.classList.toggle('selected', opt.dataset.type === type);
+            });
+            
+            document.getElementById('fixedDaysGroup').style.display = type === 'fixed' ? 'block' : 'none';
+            document.getElementById('flexibleFreqGroup').style.display = type === 'flexible' ? 'block' : 'none';
+            
+            if (type === 'flexible') {
+                updateSuggestions();
+            }
+        }
+        
+        function setupFreqPicker() {
+            const container = document.getElementById('freqPicker');
+            container.innerHTML = [1, 2, 3, 4, 5].map(n => `
+                <div class="freq-option ${n === 1 ? 'selected' : ''}" onclick="selectFreq(this, ${n})" data-freq="${n}">
+                    ${n}x/sem
+                </div>
+            `).join('');
+        }
+        
+        function selectFreq(el, freq) {
+            document.querySelectorAll('.freq-option').forEach(o => o.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+        
+        function getSelectedFreq() {
+            const selected = document.querySelector('.freq-option.selected');
+            return selected ? parseInt(selected.dataset.freq) : 1;
+        }
+        
+        function updateSuggestions() {
+            // Find days without fixed sessions
+            const sessions = getSessions();
+            const fixedDays = new Set();
+            
+            sessions.forEach(s => {
+                if (s.type !== 'flexible' && s.days) {
+                    s.days.forEach(d => fixedDays.add(d));
+                }
+            });
+            
+            const freeDays = DAYS.filter((_, i) => !fixedDays.has(i));
+            const config = getDomainConfig();
+            
+            if (freeDays.length > 0) {
+                document.getElementById('suggestionBox').style.display = 'flex';
+                document.getElementById('suggestionText').textContent = 
+                    `Suggestion : ${freeDays.slice(0, 3).join(', ')} (pas de ${config.sessionLabel.toLowerCase()} fixe)`;
+            } else {
+                document.getElementById('suggestionBox').style.display = 'none';
+            }
+        }
+        
+        function setupSessionEmojis(selectedEmoji = null) {
+            const config = getDomainConfig();
+            document.getElementById('sessionEmojis').innerHTML = config.emojis.map((e, i) => {
+                const isSelected = selectedEmoji ? e === selectedEmoji : i === 0;
+                return `<div class="emoji-option ${isSelected ? 'selected' : ''}" onclick="selectEmoji(this)">${e}</div>`;
+            }).join('');
+        }
+        
+        function setupDayPicker(selectedDays = []) {
+            document.getElementById('dayPicker').innerHTML = DAYS.map((day, i) => `
+                <div class="day-option ${selectedDays.includes(i) ? 'selected' : ''}" onclick="toggleDay(this, ${i})" data-day="${i}">${day}</div>
+            `).join('');
+        }
+        
+        function toggleDay(el, dayIndex) {
+            el.classList.toggle('selected');
+        }
+        
+        function getSelectedDays() {
+            const selected = document.querySelectorAll('.day-option.selected');
+            return Array.from(selected).map(el => parseInt(el.dataset.day));
+        }
+        
+        function saveSession() {
+            const name = document.getElementById('sessionName').value.trim();
+            const emoji = document.querySelector('#sessionEmojis .emoji-option.selected')?.textContent || '🏋️';
+            
+            if (!name) { alert('Entre un nom !'); return; }
+            
+            let sessions = getSessions();
+            
+            if (editingSessionId) {
+                // Edit mode - update existing session
+                const index = sessions.findIndex(s => s.id === editingSessionId);
+                if (index === -1) return;
+                
+                if (currentSessionType === 'fixed') {
+                    const days = getSelectedDays();
+                    if (days.length === 0) { alert('Choisis au moins un jour !'); return; }
+                    
+                    sessions[index] = {
+                        ...sessions[index],
+                        type: 'fixed',
+                        name,
+                        days,
+                        emoji,
+                        frequency: undefined
+                    };
+                } else {
+                    const frequency = getSelectedFreq();
+                    
+                    sessions[index] = {
+                        ...sessions[index],
+                        type: 'flexible',
+                        name,
+                        frequency,
+                        emoji,
+                        days: undefined
+                    };
+                }
+                
+                editingSessionId = null;
+            } else {
+                // Create mode
+                if (currentSessionType === 'fixed') {
+                    const days = getSelectedDays();
+                    if (days.length === 0) { alert('Choisis au moins un jour !'); return; }
+                    
+                    sessions.push({
+                        id: 'sess_' + Date.now(),
+                        objectiveId: currentObjectiveId,
+                        type: 'fixed',
+                        name,
+                        days,
+                        emoji,
+                        program: '',
+                        createdAt: new Date().toISOString()
+                    });
+                } else {
+                    const frequency = getSelectedFreq();
+                    
+                    sessions.push({
+                        id: 'sess_' + Date.now(),
+                        objectiveId: currentObjectiveId,
+                        type: 'flexible',
+                        name,
+                        frequency,
+                        emoji,
+                        program: '',
+                        createdAt: new Date().toISOString()
+                    });
+                }
+            }
+            
+            saveSessions(sessions);
+            updateWeekDaysFromSessions();
+            
+            closeModal('session');
+            renderSessions();
+            renderWeekDays();
+        }
+        
+        function editSessionProgram(sessionId) {
+            currentSessionIdForProgram = sessionId;
+            const sessions = getSessions();
+            const session = sessions.find(s => s.id === sessionId);
+            
+            document.getElementById('programModalTitle').textContent = `📝 ${session.name}`;
+            document.getElementById('programContent').value = session.program || '';
+            openModal('program');
+        }
+        
+        function voiceSessionProgram(sessionId) {
+            currentSessionIdForProgram = sessionId;
+            const sessions = getSessions();
+            const session = sessions.find(s => s.id === sessionId);
+            
+            document.getElementById('programModalTitle').textContent = `🎤 ${session.name}`;
+            document.getElementById('programContent').value = session.program || '';
+            openModal('program');
+            
+            // Start voice input
+            startVoiceInput();
+        }
+        
+        function startVoiceInput() {
+            const btn = document.getElementById('voiceBtn');
+            
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert('La reconnaissance vocale n\'est pas supportée par ton navigateur. Utilise Chrome ou Safari.');
+                return;
+            }
+            
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            
+            recognition.lang = 'fr-FR';
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            
+            btn.textContent = '🎤 Écoute en cours...';
+            btn.disabled = true;
+            
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                const textarea = document.getElementById('programContent');
+                textarea.value = (textarea.value ? textarea.value + '\n' : '') + transcript;
+                btn.innerHTML = '🎤 Dicter le programme (IA)';
+                btn.disabled = false;
+            };
+            
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                btn.innerHTML = '🎤 Dicter le programme (IA)';
+                btn.disabled = false;
+                alert('Erreur de reconnaissance vocale. Réessaie.');
+            };
+            
+            recognition.onend = () => {
+                btn.innerHTML = '🎤 Dicter le programme (IA)';
+                btn.disabled = false;
+            };
+            
+            recognition.start();
+        }
+        
+        function saveProgram() {
+            const content = document.getElementById('programContent').value.trim();
+            const sessions = getSessions();
+            const session = sessions.find(s => s.id === currentSessionIdForProgram);
+            
+            if (session) {
+                session.program = content;
+                saveSessions(sessions);
+            }
+            
+            closeModal('program');
+            renderSessions();
+        }
+        
+        // ========== HISTORY ==========
+        function getHistory() {
+            return JSON.parse(localStorage.getItem('wutree_objective_logs') || '[]')
+                .filter(l => l.objectiveId === currentObjectiveId)
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+        }
+        
+        function saveHistory(logs) {
+            const all = JSON.parse(localStorage.getItem('wutree_objective_logs') || '[]')
+                .filter(l => l.objectiveId !== currentObjectiveId);
+            localStorage.setItem('wutree_objective_logs', JSON.stringify([...all, ...logs]));
+        }
+        
+        function renderHistory() {
+            const container = document.getElementById('historyContainer');
+            const history = getHistory();
+            
+            if (history.length === 0) {
+                container.innerHTML = '<div class="empty-state">Aucune séance enregistrée</div>';
+                return;
+            }
+            
+            const energyEmojis = ['', '😴', '😔', '😐', '😊', '🔥'];
+            const moodEmojis = ['', '😤', '😕', '😌', '😄', '🤩'];
+            
+            container.innerHTML = history.slice(0, 5).map(log => {
+                const rpeColor = getRpeColor(log.rpe || 5);
+                const energyEmoji = energyEmojis[log.energy || 4];
+                const moodEmoji = moodEmojis[log.mood || 4];
+                
+                return `
+                    <div class="history-item">
+                        <div class="history-date">${new Date(log.date).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' })}</div>
+                        <div class="history-content">
+                            ${log.exercises ? `<div class="history-exercises">${log.exercises.substring(0, 50)}${log.exercises.length > 50 ? '...' : ''}</div>` : ''}
+                            ${log.notes ? `<div class="history-notes">"${log.notes.substring(0, 40)}${log.notes.length > 40 ? '...' : ''}"</div>` : ''}
+                        </div>
+                        <div class="history-metrics">
+                            <span class="history-rpe" style="background: ${rpeColor}">${log.rpe || 5}</span>
+                            <span>${energyEmoji}</span>
+                            <span>${moodEmoji}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function getRpeColor(rpe) {
+            const colors = ['', '#4CAF50', '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722', '#f44336', '#E91E63', '#9C27B0'];
+            return colors[rpe] || '#FFC107';
+        }
+        
+        function openLogModal(sessionId) {
+            const config = getDomainConfig();
+            
+            // Update modal title
+            document.querySelector('#logModal .modal-title').textContent = `📝 ${config.evalLabel}`;
+            
+            document.getElementById('logDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('logExercises').value = '';
+            document.getElementById('logNotes').value = '';
+            
+            // Setup RPE scale
+            setupRpeScale();
+            
+            // Reset energy and mood
+            setEnergy(4);
+            setMood(4);
+            
+            // Fill session selector
+            const sessions = getSessions();
+            const select = document.getElementById('logSession');
+            select.innerHTML = sessions.map(s => `<option value="${s.id}">${s.emoji} ${s.name}</option>`).join('');
+            if (sessions.length === 0) {
+                select.innerHTML = `<option value="">Aucune ${config.sessionLabel.toLowerCase()}</option>`;
+            }
+            if (sessionId) {
+                select.value = sessionId;
+                // Pre-fill with program
+                const session = sessions.find(s => s.id === sessionId);
+                if (session?.program) {
+                    document.getElementById('logExercises').value = session.program;
+                }
+            }
+            
+            openModal('log');
+        }
+        
+        function setupRpeScale() {
+            const container = document.getElementById('rpeScale');
+            container.innerHTML = '';
+            for (let i = 1; i <= 10; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'rpe-option' + (i === 5 ? ' selected' : '');
+                btn.textContent = i;
+                btn.onclick = () => setRpe(i);
+                container.appendChild(btn);
+            }
+            document.getElementById('logRpe').value = 5;
+        }
+        
+        function setRpe(value) {
+            document.getElementById('logRpe').value = value;
+            document.querySelectorAll('.rpe-option').forEach((btn, i) => {
+                btn.classList.toggle('selected', i + 1 === value);
+            });
+        }
+        
+        function setEnergy(value) {
+            document.getElementById('logEnergy').value = value;
+            document.querySelectorAll('#energyScale .eval-option').forEach(opt => {
+                opt.classList.toggle('selected', parseInt(opt.dataset.value) === value);
+            });
+        }
+        
+        function setMood(value) {
+            document.getElementById('logMood').value = value;
+            document.querySelectorAll('#moodScale .eval-option').forEach(opt => {
+                opt.classList.toggle('selected', parseInt(opt.dataset.value) === value);
+            });
+        }
+        
+        function logSessionDone(sessionId) {
+            openLogModal(sessionId);
+        }
+        
+        function setRating(rating) {
+            // Legacy function, keep for compatibility
+        }
+        
+        function saveLog() {
+            const date = document.getElementById('logDate').value;
+            const sessionId = document.getElementById('logSession').value;
+            const exercises = document.getElementById('logExercises').value.trim();
+            const notes = document.getElementById('logNotes').value.trim();
+            const rpe = parseInt(document.getElementById('logRpe').value) || 5;
+            const energy = parseInt(document.getElementById('logEnergy').value) || 4;
+            const mood = parseInt(document.getElementById('logMood').value) || 4;
+            
+            if (!date) { alert('Choisis une date !'); return; }
+            
+            const history = getHistory();
+            history.push({
+                id: 'log_' + Date.now(),
+                objectiveId: currentObjectiveId,
+                sessionId,
+                date,
+                exercises,
+                notes,
+                rpe,
+                energy,
+                mood,
+                createdAt: new Date().toISOString()
+            });
+            
+            saveHistory(history);
+            closeModal('log');
+            renderHistory();
+        }
+        
+        // ========== HABITS ==========
+        function getHabits() {
+            return JSON.parse(localStorage.getItem('wutree_objective_habits') || '[]')
+                .filter(h => h.objectiveId === currentObjectiveId);
+        }
+        
+        function saveHabits(habits) {
+            const all = JSON.parse(localStorage.getItem('wutree_objective_habits') || '[]')
+                .filter(h => h.objectiveId !== currentObjectiveId);
+            localStorage.setItem('wutree_objective_habits', JSON.stringify([...all, ...habits]));
+        }
+        
+        function renderHabits() {
+            const container = document.getElementById('habitsContainer');
+            const habits = getHabits();
+            const today = new Date().toISOString().split('T')[0];
+            
+            let html = habits.map(h => {
+                const done = h.completedDays?.includes(today);
+                return `
+                    <div class="habit-mini ${done ? 'done' : ''}" onclick="toggleHabit('${h.id}')">
+                        <div class="habit-mini-emoji">${h.emoji}</div>
+                        <div class="habit-mini-name">${h.name}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            html += `
+                <div class="habit-add" onclick="openHabitModal()">
+                    <div class="habit-mini-emoji" style="opacity: 0.4">+</div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+        
+        function toggleHabit(habitId) {
+            const habits = getHabits();
+            const habit = habits.find(h => h.id === habitId);
+            const today = new Date().toISOString().split('T')[0];
+            
+            if (!habit.completedDays) habit.completedDays = [];
+            
+            if (habit.completedDays.includes(today)) {
+                habit.completedDays = habit.completedDays.filter(d => d !== today);
+            } else {
+                habit.completedDays.push(today);
+            }
+            
+            saveHabits(habits);
+            renderHabits();
+        }
+        
+        function openHabitModal() {
+            document.getElementById('habitName').value = '';
+            document.getElementById('habitEmojis').innerHTML = HABIT_EMOJIS.map((e, i) => 
+                `<div class="emoji-option ${i === 0 ? 'selected' : ''}" onclick="selectEmoji(this)">${e}</div>`
+            ).join('');
+            openModal('habit');
+        }
+        
+        function saveHabit() {
+            const name = document.getElementById('habitName').value.trim();
+            const emoji = document.querySelector('#habitEmojis .emoji-option.selected')?.textContent || '🌱';
+            
+            if (!name) { alert('Entre un nom !'); return; }
+            
+            const habits = getHabits();
+            habits.push({
+                id: 'habit_' + Date.now(),
+                objectiveId: currentObjectiveId,
+                name,
+                emoji,
+                completedDays: [],
+                createdAt: new Date().toISOString()
+            });
+            
+            saveHabits(habits);
+            closeModal('habit');
+            renderHabits();
+        }
+        
+        // ========== EDIT OBJECTIVE ==========
+        function setupPickers() {
+            const config = getDomainConfig();
+            document.getElementById('editEmojis').innerHTML = config.emojis.map((e, i) => 
+                `<div class="emoji-option ${objective?.emoji === e ? 'selected' : (i === 0 && !objective ? 'selected' : '')}" onclick="selectEmoji(this)">${e}</div>`
+            ).join('');
+        }
+        
+        function openEditModal() {
+            document.getElementById('editName').value = objective.name;
+            document.getElementById('editDeadline').value = objective.deadline;
+            
+            document.querySelectorAll('#editEmojis .emoji-option').forEach(el => {
+                el.classList.toggle('selected', el.textContent === objective.emoji);
+            });
+            
+            openModal('edit');
+        }
+        
+        function saveEdit() {
+            const name = document.getElementById('editName').value.trim();
+            const deadline = document.getElementById('editDeadline').value;
+            const emoji = document.querySelector('#editEmojis .emoji-option.selected')?.textContent || '🎯';
+            
+            if (!name || !deadline) { alert('Remplis tous les champs !'); return; }
+            
+            objective.name = name;
+            objective.deadline = deadline;
+            objective.emoji = emoji;
+            
+            saveObjective();
+            closeModal('edit');
+            
+            document.getElementById('objectiveEmoji').textContent = emoji;
+            document.getElementById('objectiveName').textContent = name;
+            renderProgress();
+        }
+        
+        function saveObjective() {
+            const all = JSON.parse(localStorage.getItem('wutree_objectives') || '[]');
+            const index = all.findIndex(o => o.id === currentObjectiveId);
+            if (index !== -1) {
+                all[index] = objective;
+                localStorage.setItem('wutree_objectives', JSON.stringify(all));
+            }
+        }
+        
+        function deleteObjective() {
+            if (confirm('Supprimer cet objectif et toutes ses données ?')) {
+                // Delete objective
+                let all = JSON.parse(localStorage.getItem('wutree_objectives') || '[]');
+                all = all.filter(o => o.id !== currentObjectiveId);
+                localStorage.setItem('wutree_objectives', JSON.stringify(all));
+                
+                // Delete related data
+                let sessions = JSON.parse(localStorage.getItem('wutree_objective_sessions_templates') || '[]');
+                sessions = sessions.filter(s => s.objectiveId !== currentObjectiveId);
+                localStorage.setItem('wutree_objective_sessions_templates', JSON.stringify(sessions));
+                
+                let logs = JSON.parse(localStorage.getItem('wutree_objective_logs') || '[]');
+                logs = logs.filter(l => l.objectiveId !== currentObjectiveId);
+                localStorage.setItem('wutree_objective_logs', JSON.stringify(logs));
+                
+                let habits = JSON.parse(localStorage.getItem('wutree_objective_habits') || '[]');
+                habits = habits.filter(h => h.objectiveId !== currentObjectiveId);
+                localStorage.setItem('wutree_objective_habits', JSON.stringify(habits));
+                
+                goBack();
+            }
+        }
+        
+        // ========== MODALS ==========
+        function openModal(type) { document.getElementById(type + 'Modal').classList.add('show'); }
+        function closeModal(type) { document.getElementById(type + 'Modal').classList.remove('show'); }
+        function selectEmoji(el) {
+            el.parentElement.querySelectorAll('.emoji-option').forEach(e => e.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+        
+        // ========== NAV ==========
+        function goBack() { window.location.href = 'wu-tree-v2-activity.html'; }
+        function goToVision() { window.location.href = 'wu-tree-v2-visualization.html'; }
+        function goToTasks() { window.location.href = 'wu-tree-v2-tasks.html'; }
+        
+        init();
+    </script>
+</body>
+</html>
