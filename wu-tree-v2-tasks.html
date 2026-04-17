@@ -397,6 +397,71 @@
             text-align: right;
         }
         
+        /* Objective cards */
+        .objective-mini-card {
+            background: rgba(255,255,255,0.5);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 14px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .objective-mini-card:active {
+            transform: scale(0.98);
+        }
+        
+        .objective-mini-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        
+        .objective-mini-emoji {
+            font-size: 24px;
+        }
+        
+        .objective-mini-info {
+            flex: 1;
+        }
+        
+        .objective-mini-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .objective-mini-deadline {
+            font-size: 10px;
+            color: rgba(0,0,0,0.5);
+        }
+        
+        .objective-mini-deadline.urgent {
+            color: #FF5722;
+            font-weight: 600;
+        }
+        
+        .objective-mini-domain {
+            font-size: 10px;
+            color: #6B4E9B;
+        }
+        
+        .objective-mini-progress {
+            height: 6px;
+            background: rgba(255,255,255,0.6);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .objective-mini-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6B4E9B, #9B6B9B);
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+        
         /* Quick eval modal */
         .modal-overlay {
             display: none;
@@ -600,6 +665,14 @@
                 <div id="weeklyContainer"></div>
             </div>
             
+            <!-- Objectifs en cours -->
+            <div class="section" id="objectivesSection">
+                <div class="section-header">
+                    <div class="section-title">🎯 Mes objectifs</div>
+                </div>
+                <div id="objectivesContainer"></div>
+            </div>
+            
             <!-- Tâches manuelles -->
             <div class="section">
                 <div class="section-header">
@@ -759,6 +832,7 @@
         function init() {
             updateHeaderDate();
             loadTodayEvents();
+            loadObjectives();
             loadManualTasks();
             loadJournal();
             updateStats();
@@ -933,6 +1007,121 @@
                     </div>
                 </div>
             `).join('');
+        }
+        
+        // ========== OBJECTIVES ==========
+        function loadObjectives() {
+            const container = document.getElementById('objectivesContainer');
+            const section = document.getElementById('objectivesSection');
+            
+            const allObjectives = JSON.parse(localStorage.getItem('wutree_objectives') || '[]');
+            const allActivities = JSON.parse(localStorage.getItem('wutree_activities') || '[]');
+            const allDomains = JSON.parse(localStorage.getItem('wutree_domains') || '[]');
+            const allHistory = JSON.parse(localStorage.getItem('wutree_objective_logs') || '[]');
+            const allSessions = JSON.parse(localStorage.getItem('wutree_objective_sessions_templates') || '[]');
+            
+            // Filter non-completed objectives
+            const activeObjectives = allObjectives.filter(obj => !obj.completed);
+            
+            if (activeObjectives.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            
+            section.style.display = 'block';
+            
+            // Calculate progress for each objective
+            const today = new Date();
+            
+            const objectivesData = activeObjectives.map(obj => {
+                const activity = allActivities.find(a => a.id === obj.activityId);
+                const domain = allDomains.find(d => d.id === (activity?.domainId || obj.domainId));
+                
+                // Calculate progress based on sessions completed this week
+                const sessions = allSessions.filter(s => s.objectiveId === obj.id);
+                let totalTarget = 0;
+                let totalDone = 0;
+                
+                const weekStart = new Date(today);
+                weekStart.setDate(today.getDate() - ((today.getDay() + 6) % 7));
+                weekStart.setHours(0, 0, 0, 0);
+                
+                sessions.forEach(session => {
+                    if (session.type === 'flexible') {
+                        totalTarget += session.frequency || 1;
+                    } else {
+                        totalTarget += (session.days || []).length;
+                    }
+                    
+                    const weekLogs = allHistory.filter(h => {
+                        if (h.sessionId !== session.id) return false;
+                        return new Date(h.date) >= weekStart;
+                    });
+                    totalDone += weekLogs.length;
+                });
+                
+                const progress = totalTarget > 0 ? Math.min(100, Math.round((totalDone / totalTarget) * 100)) : 0;
+                
+                // Calculate days remaining
+                const deadline = new Date(obj.deadline);
+                const daysRemaining = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+                
+                return {
+                    id: obj.id,
+                    name: obj.name,
+                    emoji: obj.emoji,
+                    deadline: obj.deadline,
+                    daysRemaining,
+                    progress,
+                    domainName: domain?.name || 'Domaine',
+                    domainEmoji: domain?.emoji || '📁',
+                    activityId: obj.activityId
+                };
+            });
+            
+            // Sort by deadline (soonest first)
+            objectivesData.sort((a, b) => a.daysRemaining - b.daysRemaining);
+            
+            container.innerHTML = objectivesData.map(obj => {
+                const deadlineDate = new Date(obj.deadline);
+                const deadlineStr = deadlineDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+                const isUrgent = obj.daysRemaining <= 7 && obj.daysRemaining > 0;
+                const isOverdue = obj.daysRemaining < 0;
+                
+                let deadlineText = `📅 ${deadlineStr}`;
+                if (isOverdue) {
+                    deadlineText = `⚠️ Dépassé de ${Math.abs(obj.daysRemaining)}j`;
+                } else if (obj.daysRemaining === 0) {
+                    deadlineText = `🔥 Aujourd'hui !`;
+                } else if (isUrgent) {
+                    deadlineText = `⏰ ${obj.daysRemaining}j restants`;
+                } else {
+                    deadlineText = `📅 ${deadlineStr} (${obj.daysRemaining}j)`;
+                }
+                
+                return `
+                    <div class="objective-mini-card" onclick="goToObjective('${obj.id}', '${obj.activityId}')">
+                        <div class="objective-mini-header">
+                            <div class="objective-mini-emoji">${obj.emoji}</div>
+                            <div class="objective-mini-info">
+                                <div class="objective-mini-name">${obj.name}</div>
+                                <div class="objective-mini-domain">${obj.domainEmoji} ${obj.domainName}</div>
+                                <div class="objective-mini-deadline ${isUrgent || isOverdue ? 'urgent' : ''}">${deadlineText}</div>
+                            </div>
+                            <div style="font-size: 12px; color: #6B4E9B; font-weight: 600;">${obj.progress}%</div>
+                        </div>
+                        <div class="objective-mini-progress">
+                            <div class="objective-mini-fill" style="width: ${obj.progress}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function goToObjective(objectiveId, activityId) {
+            localStorage.setItem('wutree_current_objective', objectiveId);
+            localStorage.setItem('wutree_current_activity', activityId);
+            window.location.href = 'wu-tree-v2-objective.html';
         }
         
         function toggleEvent(sessionId, domainId, objectiveId) {
