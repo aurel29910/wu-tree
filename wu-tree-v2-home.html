@@ -336,10 +336,45 @@
             align-items: center;
             justify-content: center;
             z-index: 10;
+            animation: pulse-delete 0.5s ease-in-out infinite;
         }
         
-        .edit-mode .bubble-delete {
+        .bubble-delete.show {
             display: flex;
+        }
+        
+        @keyframes pulse-delete {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        /* FAB - Floating Action Button */
+        .fab {
+            position: absolute;
+            bottom: 90px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(107, 78, 155, 0.4);
+            z-index: 95;
+            transition: all 0.2s;
+            border: none;
+        }
+        
+        .fab:active {
+            transform: scale(0.95);
+        }
+        
+        .fab:hover {
+            box-shadow: 0 6px 20px rgba(107, 78, 155, 0.5);
         }
         
         .bubble.add-bubble {
@@ -555,6 +590,9 @@
             </div>
         </div>
         
+        <!-- FAB pour ajouter un domaine -->
+        <button class="fab" onclick="openAddDomainModal()">+</button>
+        
         <div class="bottom-menu">
             <div class="menu-item" onclick="goToWellbeing()">
                 <div class="menu-icon">🔮</div>
@@ -634,14 +672,18 @@
             const container = document.getElementById('bubblesContainer');
             const domains = loadDomains();
             
-            let html = domains.map((domain, index) => {
+            container.innerHTML = domains.map((domain, index) => {
                 const taskCount = getTaskCountForDomain(domain.id);
                 const badgeClass = taskCount === 0 ? 'bubble-badge empty' : 'bubble-badge';
                 const priorityClass = index < 3 ? 'bubble-priority' : 'bubble-priority hidden';
                 
                 return `
-                    <div class="bubble" data-id="${domain.id}" data-order="${domain.order}" onclick="handleBubbleClick('${domain.id}')">
-                        <button class="bubble-delete" onclick="event.stopPropagation(); deleteDomain('${domain.id}')">×</button>
+                    <div class="bubble" data-id="${domain.id}" data-order="${domain.order}" 
+                         ontouchstart="startLongPress('${domain.id}')" 
+                         ontouchend="cancelLongPress()" 
+                         ontouchmove="cancelLongPress()"
+                         onclick="handleBubbleClick('${domain.id}')">
+                        <button class="bubble-delete" id="delete-${domain.id}" onclick="event.stopPropagation(); deleteDomain('${domain.id}')">×</button>
                         <div class="${priorityClass}">${index + 1}</div>
                         <div class="${badgeClass}">${taskCount}</div>
                         <div class="bubble-emoji">${domain.emoji}</div>
@@ -653,16 +695,6 @@
                     </div>
                 `;
             }).join('');
-            
-            // Add bubble for new domain
-            html += `
-                <div class="bubble add-bubble" onclick="openAddDomainModal()">
-                    <div class="bubble-emoji">➕</div>
-                    <div class="bubble-label">Ajouter</div>
-                </div>
-            `;
-            
-            container.innerHTML = html;
         }
         
         function handleBubbleClick(domainId) {
@@ -798,6 +830,41 @@
         function goToTasks() {
             window.location.href = 'wu-tree-v2-tasks.html';
         }
+        
+        // ========== LONG PRESS (iPhone style) ==========
+        let longPressTimer = null;
+        let longPressDomainId = null;
+        
+        function startLongPress(domainId) {
+            longPressDomainId = domainId;
+            longPressTimer = setTimeout(() => {
+                // Show delete button with animation
+                const deleteBtn = document.getElementById('delete-' + domainId);
+                if (deleteBtn) {
+                    deleteBtn.classList.add('show');
+                    // Vibrate if supported
+                    if (navigator.vibrate) {
+                        navigator.vibrate(50);
+                    }
+                }
+            }, 500); // 500ms long press
+        }
+        
+        function cancelLongPress() {
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+            }
+        }
+        
+        // Hide all delete buttons when clicking elsewhere
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.bubble-delete') && !e.target.closest('.bubble')) {
+                document.querySelectorAll('.bubble-delete.show').forEach(btn => {
+                    btn.classList.remove('show');
+                });
+            }
+        });
         
         // ========== INIT ==========
         renderBubbles();
