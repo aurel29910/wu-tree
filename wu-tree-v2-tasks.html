@@ -717,6 +717,13 @@
                     { id: 'connection', label: '🤝 Connexion', emojis: ['😶', '🙂', '😊', '🫂', '💞'] }
                 ]
             },
+            creativite: {
+                icon: '🎨',
+                fields: [
+                    { id: 'enjoyment', label: '😄 Plaisir', emojis: ['😐', '🙂', '😊', '😄', '🤩'] },
+                    { id: 'flow', label: '🌊 Flow créatif', emojis: ['😫', '😕', '😌', '🎨', '✨'] }
+                ]
+            },
             loisirs: {
                 icon: '🎮',
                 fields: [
@@ -790,11 +797,8 @@
             const dailyEvents = [];
             const weeklyEvents = [];
             
+            // Process ALL sessions
             allSessions.forEach(session => {
-                const isForToday = session.type !== 'flexible' && 
-                                   (session.days || []).includes(todayDayIndex);
-                const isFlexible = session.type === 'flexible';
-                
                 // Get objective info
                 const objective = allObjectives.find(o => o.id === session.objectiveId);
                 if (!objective) return;
@@ -814,14 +818,20 @@
                     objectiveName: objective.name,
                     sessionName: session.name,
                     sessionEmoji: session.emoji,
-                    isDone
+                    isDone,
+                    type: session.type || 'fixed'
                 };
                 
+                // Determine where to show this session
+                const isFlexible = session.type === 'flexible';
+                const isForToday = !isFlexible && (session.days || []).includes(todayDayIndex);
+                
                 if (isForToday) {
+                    // Fixed session scheduled for today
                     eventData.desc = 'Prévu aujourd\'hui';
                     dailyEvents.push(eventData);
                 } else if (isFlexible) {
-                    // Check weekly progress
+                    // Flexible session - show in weekly
                     const weekStart = new Date(today);
                     weekStart.setDate(today.getDate() - ((today.getDay() + 6) % 7));
                     weekStart.setHours(0, 0, 0, 0);
@@ -834,15 +844,29 @@
                     const done = weekLogs.length;
                     const target = session.frequency || 1;
                     
-                    if (done < target) {
-                        eventData.desc = `${done}/${target} cette semaine`;
-                        weeklyEvents.push(eventData);
-                    }
+                    eventData.desc = `${done}/${target} cette semaine`;
+                    eventData.weeklyDone = done;
+                    eventData.weeklyTarget = target;
+                    
+                    // Always show flexible sessions (even if target reached, so user can see progress)
+                    weeklyEvents.push(eventData);
                 }
             });
             
             renderDailyEvents(dailyEvents);
             renderWeeklyEvents(weeklyEvents);
+            
+            // Show empty state if nothing scheduled
+            if (dailyEvents.length === 0 && weeklyEvents.length === 0) {
+                document.getElementById('dailySection').style.display = 'block';
+                document.getElementById('dailyContainer').innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: rgba(0,0,0,0.4); font-size: 12px;">
+                        🌿 Aucune session prévue.<br>
+                        <span style="font-size: 10px;">Crée des sessions dans tes objectifs pour les voir ici.</span>
+                    </div>
+                `;
+                document.getElementById('dailyBadge').textContent = '0';
+            }
         }
         
         function renderDailyEvents(events) {
@@ -913,13 +937,19 @@
         
         function toggleEvent(sessionId, domainId, objectiveId) {
             const todayStr = new Date().toISOString().split('T')[0];
-            const history = JSON.parse(localStorage.getItem('wutree_objective_logs') || '[]');
+            let history = JSON.parse(localStorage.getItem('wutree_objective_logs') || '[]');
             
             // Check if already done today
-            const existingLog = history.find(h => h.sessionId === sessionId && h.date === todayStr);
+            const existingLogIndex = history.findIndex(h => h.sessionId === sessionId && h.date === todayStr);
             
-            if (existingLog) {
-                // Already done - can't undo from here
+            if (existingLogIndex >= 0) {
+                // Already done - ask to uncheck
+                if (confirm('Décocher cette session ?')) {
+                    history.splice(existingLogIndex, 1);
+                    localStorage.setItem('wutree_objective_logs', JSON.stringify(history));
+                    loadTodayEvents();
+                    updateStats();
+                }
                 return;
             }
             
