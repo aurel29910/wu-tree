@@ -386,7 +386,7 @@
             </div>
             <div class="menu-item active">
                 <div class="menu-icon">🌳</div>
-                <div class="menu-label">Arbre</div>
+                <div class="menu-label">Home</div>
             </div>
             <div class="menu-item" onclick="goToTasks()">
                 <div class="menu-icon">📋</div>
@@ -499,7 +499,14 @@
                 const badgeClass = count === 0 ? 'bubble-badge empty' : 'bubble-badge';
                 
                 return `
-                    <div class="bubble" data-activity-id="${activity.id}" onclick="handleBubbleClick('${activity.id}')" ontouchstart="startLongPress('${activity.id}')" ontouchend="cancelLongPress()" ontouchcancel="cancelLongPress()">
+                    <div class="bubble" data-activity-id="${activity.id}" 
+                         onclick="handleBubbleClick('${activity.id}')" 
+                         ontouchstart="startLongPress('${activity.id}')" 
+                         ontouchend="cancelLongPress()" 
+                         ontouchcancel="cancelLongPress()"
+                         onmousedown="startLongPress('${activity.id}')"
+                         onmouseup="cancelLongPress()"
+                         onmouseleave="cancelLongPress()">
                         <button class="bubble-delete" id="delete-${activity.id}" onclick="event.stopPropagation(); deleteActivity('${activity.id}')">×</button>
                         <div class="${badgeClass}">${count}</div>
                         <div class="bubble-emoji">${activity.emoji}</div>
