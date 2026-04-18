@@ -981,6 +981,7 @@
         }
         
         function openObjective(objectiveId) {
+            console.log('openObjective called with:', objectiveId);
             localStorage.setItem('wutree_current_objective', objectiveId);
             window.location.href = 'wu-tree-v2-objective.html';
         }
