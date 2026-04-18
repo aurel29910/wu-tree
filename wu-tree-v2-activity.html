@@ -981,15 +981,8 @@
         }
         
         function openObjective(objectiveId) {
-            // DEBUG: Affiche une alerte pour confirmer
-            alert('Redirection vers objectif: ' + objectiveId);
-            
             localStorage.setItem('wutree_current_objective', objectiveId);
-            
-            // Redirection explicite vers la page objectif
-            const targetUrl = 'wu-tree-v2-objective.html';
-            console.log('Navigating to:', targetUrl);
-            window.location.href = targetUrl;
+            window.location.href = 'wu-tree-v2-objective.html';
         }
         
         function saveObjective() {
