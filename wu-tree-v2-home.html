@@ -2,510 +2,391 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wu Tree - Aujourd'hui</title>
-    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Wu Tree</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Comfortaa', cursive;
-            background: linear-gradient(180deg, #87CEEB 0%, #FFB6C1 100%);
-            min-height: 100vh; display: flex; justify-content: center; align-items: center; }
-        .phone-frame { width: 375px; height: 812px;
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            font-family: 'Comfortaa', sans-serif;
             background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
-            border-radius: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-            position: relative; overflow: hidden; }
+            min-height: 100vh;
+            display: flex; justify-content: center; align-items: center;
+            padding: 20px;
+        }
         
-        .petal { position: absolute; width: 10px; height: 10px;
+        .phone-frame {
+            width: 100%; max-width: 390px;
+            height: 844px; max-height: 95vh;
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+            border-radius: 45px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.15);
+        }
+        
+        /* Pétales flottants */
+        .petal {
+            position: absolute;
+            width: 10px; height: 10px;
             background: linear-gradient(135deg, rgba(255, 182, 193, 0.8), rgba(255, 105, 180, 0.6));
-            border-radius: 50% 0 50% 0; animation: fall linear infinite; pointer-events: none; z-index: 50; }
-        .petal:nth-child(1) { left: 10%; animation-duration: 12s; }
-        .petal:nth-child(2) { left: 30%; animation-duration: 14s; animation-delay: 2s; }
-        .petal:nth-child(3) { left: 50%; animation-duration: 16s; animation-delay: 4s; }
-        .petal:nth-child(4) { left: 70%; animation-duration: 13s; animation-delay: 1s; }
-        @keyframes fall { 0% { transform: translateY(-50px) rotate(0deg); opacity: 0.8; }
-            100% { transform: translateY(812px) rotate(360deg); opacity: 0; } }
+            border-radius: 50% 0 50% 0;
+            animation: fall linear infinite;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .petal:nth-child(1) { left: 10%; animation-duration: 12s; width: 8px; }
+        .petal:nth-child(2) { left: 25%; animation-duration: 14s; animation-delay: 2s; }
+        .petal:nth-child(3) { left: 40%; animation-duration: 16s; animation-delay: 4s; }
+        .petal:nth-child(4) { left: 55%; animation-duration: 13s; animation-delay: 1s; }
+        .petal:nth-child(5) { left: 70%; animation-duration: 15s; animation-delay: 3s; }
+        .petal:nth-child(6) { left: 85%; animation-duration: 17s; animation-delay: 5s; }
         
-        .status-bar { position: absolute; top: 0; left: 0; right: 0; height: 44px;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 20px; color: rgba(255,255,255,0.95); font-size: 14px; z-index: 100; }
-        
-        .header { position: absolute; top: 44px; left: 0; right: 0; height: 80px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 0 15px; z-index: 90;
-            background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
-        .header-title { font-family: 'Comfortaa', cursive; font-size: 20px; font-weight: 600;
-            color: white; text-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-        
-        .date-nav {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-top: 6px;
+        @keyframes fall {
+            0% { transform: translateY(-50px) rotate(0deg); opacity: 0.8; }
+            100% { transform: translateY(900px) rotate(360deg); opacity: 0; }
         }
         
-        .date-nav-btn {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-            border: none;
-            font-size: 14px;
+        /* Nuages */
+        .cloud {
+            position: absolute;
             color: white;
-            cursor: pointer;
+            font-size: 50px;
+            opacity: 0.5;
+            animation: float-cloud linear infinite;
+            pointer-events: none;
+            z-index: 5;
+        }
+        .cloud:nth-child(7) { top: 80px; animation-duration: 180s; }
+        .cloud:nth-child(8) { top: 180px; animation-duration: 220s; animation-delay: -60s; font-size: 40px; }
+        
+        @keyframes float-cloud {
+            0% { transform: translateX(-80px); }
+            100% { transform: translateX(470px); }
+        }
+        
+        .status-bar {
+            height: 47px;
+            padding: 15px 25px 0;
             display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .date-nav-btn:active {
-            background: rgba(255,255,255,0.5);
-        }
-        
-        .header-date { 
-            font-size: 13px; 
-            color: rgba(255,255,255,0.9); 
-            cursor: pointer;
-            padding: 4px 12px;
-            background: rgba(255,255,255,0.15);
-            border-radius: 12px;
-        }
-        
-        .header-date:active {
-            background: rgba(255,255,255,0.3);
-        }
-        
-        .today-indicator {
-            font-size: 10px;
-            color: #FFD700;
+            justify-content: space-between;
+            font-size: 14px;
             font-weight: 600;
+            color: rgba(0,0,0,0.6);
+            position: relative;
+            z-index: 100;
         }
         
-        .content { position: absolute; top: 124px; left: 0; right: 0; bottom: 70px;
-            overflow-y: auto; padding: 15px 20px; z-index: 60; }
-        
-        /* Stats row */
-        .stats-row {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .stat-card {
-            flex: 1;
-            background: rgba(255,255,255,0.5);
-            backdrop-filter: blur(15px);
-            border: 2px solid rgba(255,255,255,0.6);
-            border-radius: 16px;
-            padding: 14px;
+        .header {
+            padding: 15px 20px 10px;
             text-align: center;
+            position: relative;
+            z-index: 100;
         }
         
-        .stat-value {
-            font-size: 28px;
+        .header-title {
+            font-size: 26px;
             font-weight: 700;
             color: #333;
         }
         
-        .stat-label {
-            font-size: 10px;
+        .header-subtitle {
+            font-size: 12px;
             color: rgba(0,0,0,0.5);
-            margin-top: 4px;
-            text-transform: uppercase;
+            margin-top: 5px;
         }
         
-        /* Section */
-        .section {
-            margin-bottom: 20px;
-        }
-        
-        .section-header {
+        /* Content */
+        .content {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
+            padding: 10px 15px;
+            height: calc(100% - 180px);
+            overflow-y: auto;
+            position: relative;
+            z-index: 50;
         }
         
-        .section-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .section-badge {
-            font-size: 11px;
-            padding: 4px 10px;
-            background: rgba(255,255,255,0.5);
-            border-radius: 12px;
-            color: rgba(0,0,0,0.6);
-        }
-        
-        /* Event cards */
-        .event-card {
-            background: rgba(255,255,255,0.6);
-            backdrop-filter: blur(15px);
-            border: 2px solid rgba(255,255,255,0.7);
-            border-radius: 16px;
-            padding: 14px;
-            margin-bottom: 10px;
+        /* Bubbles grid */
+        .bubbles-container {
             display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: all 0.2s;
-        }
-        
-        .event-card.done {
-            opacity: 0.5;
-            background: rgba(76, 175, 80, 0.15);
-            border-color: rgba(76, 175, 80, 0.3);
-        }
-        
-        .event-emoji {
-            font-size: 28px;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
+            flex-wrap: wrap;
             justify-content: center;
-            background: rgba(255,255,255,0.5);
-            border-radius: 14px;
+            gap: 20px;
+            padding: 10px;
         }
         
-        .event-info {
-            flex: 1;
-        }
-        
-        .event-domain {
-            font-size: 10px;
-            color: rgba(0,0,0,0.4);
-            text-transform: uppercase;
-            margin-bottom: 2px;
-        }
-        
-        .event-name {
-            font-size: 14px;
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .event-objective {
-            font-size: 11px;
-            color: rgba(0,0,0,0.5);
-            margin-top: 2px;
-        }
-        
-        .event-check {
-            width: 44px;
-            height: 44px;
+        /* Bulles flottantes */
+        .bubble {
+            width: 100px; height: 100px;
             border-radius: 50%;
-            border: 3px solid rgba(76, 175, 80, 0.4);
-            background: rgba(255,255,255,0.5);
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(15px);
+            border: 3px solid rgba(255, 255, 255, 0.6);
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
             cursor: pointer;
-            transition: all 0.2s;
+            box-shadow: 
+                0 8px 32px rgba(0,0,0,0.1),
+                inset 0 2px 10px rgba(255,255,255,0.4);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
         }
         
-        .event-check:active {
-            transform: scale(0.95);
+        .bubble:hover {
+            box-shadow: 
+                0 15px 40px rgba(0,0,0,0.15),
+                inset 0 2px 10px rgba(255,255,255,0.4);
         }
         
-        .event-check.checked {
-            background: #4CAF50;
-            border-color: #4CAF50;
-            color: white;
+        .bubble:active {
+            transform: scale(0.95) !important;
         }
         
-        /* Empty state */
-        .empty-state {
+        /* Animations flottantes organiques */
+        .bubble:nth-child(1) { animation: float1 6s ease-in-out infinite; }
+        .bubble:nth-child(2) { animation: float2 7s ease-in-out infinite; animation-delay: -1s; }
+        .bubble:nth-child(3) { animation: float3 6.5s ease-in-out infinite; animation-delay: -2s; }
+        .bubble:nth-child(4) { animation: float4 7.5s ease-in-out infinite; animation-delay: -0.5s; }
+        .bubble:nth-child(5) { animation: float1 6.8s ease-in-out infinite; animation-delay: -3s; }
+        .bubble:nth-child(6) { animation: float2 7.2s ease-in-out infinite; animation-delay: -1.5s; }
+        .bubble:nth-child(7) { animation: float3 6.3s ease-in-out infinite; animation-delay: -2.5s; }
+        
+        @keyframes float1 {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(8px, -12px) rotate(2deg); }
+            50% { transform: translate(-5px, -8px) rotate(-1deg); }
+            75% { transform: translate(10px, -15px) rotate(1deg); }
+        }
+        
+        @keyframes float2 {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(-10px, -10px) rotate(-2deg); }
+            50% { transform: translate(6px, -18px) rotate(1deg); }
+            75% { transform: translate(-8px, -6px) rotate(-1deg); }
+        }
+        
+        @keyframes float3 {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(6px, -15px) rotate(1deg); }
+            50% { transform: translate(-8px, -10px) rotate(-2deg); }
+            75% { transform: translate(4px, -8px) rotate(0deg); }
+        }
+        
+        @keyframes float4 {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(-6px, -8px) rotate(-1deg); }
+            50% { transform: translate(10px, -14px) rotate(2deg); }
+            75% { transform: translate(-4px, -12px) rotate(0deg); }
+        }
+        
+        .bubble-emoji {
+            font-size: 36px;
+            margin-bottom: 5px;
+        }
+        
+        .bubble-label {
+            font-size: 9px;
+            font-weight: 600;
+            color: #333;
             text-align: center;
-            padding: 30px 20px;
-            color: rgba(0,0,0,0.4);
+            line-height: 1.2;
         }
         
-        .empty-icon {
-            font-size: 48px;
-            margin-bottom: 12px;
-        }
-        
-        .empty-text {
-            font-size: 13px;
-        }
-        
-        /* Journal section */
-        .journal-card {
+        /* Effet de brillance */
+        .bubble::before {
+            content: '';
+            position: absolute;
+            top: 10%; left: 15%;
+            width: 30%; height: 20%;
             background: rgba(255,255,255,0.5);
-            backdrop-filter: blur(15px);
-            border: 2px solid rgba(255,255,255,0.6);
-            border-radius: 16px;
-            padding: 16px;
+            border-radius: 50%;
+            filter: blur(5px);
         }
         
-        .journal-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-        
-        .journal-title {
-            font-size: 13px;
-            font-weight: 600;
+        /* Priority badge */
+        .bubble-priority {
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border-radius: 50%;
             color: #333;
+            font-size: 12px;
+            font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 8px;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(255, 165, 0, 0.4);
+            border: 2px solid white;
         }
         
-        .journal-footer {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-top: 10px;
+        .bubble-priority.hidden {
+            display: none;
         }
         
-        .journal-save {
-            padding: 6px 14px;
+        /* Badge compteur */
+        .bubble-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            min-width: 20px;
+            height: 20px;
             background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
-            border: none;
-            border-radius: 12px;
+            border-radius: 10px;
             color: white;
+            font-size: 10px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            box-shadow: 0 2px 8px rgba(107, 78, 155, 0.4);
+        }
+        
+        .bubble-badge.empty {
+            display: none;
+        }
+        
+        /* Edit mode */
+        .edit-mode .bubble {
+            animation: none !important;
+            animation: shake 0.3s ease-in-out infinite !important;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: rotate(-1deg); }
+            50% { transform: rotate(1deg); }
+        }
+        
+        .edit-btn {
+            position: absolute;
+            top: 55px;
+            right: 20px;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 20px;
+            font-family: 'Comfortaa', sans-serif;
             font-size: 11px;
             font-weight: 600;
+            color: #333;
             cursor: pointer;
-            font-family: 'Comfortaa', cursive;
+            z-index: 100;
         }
         
-        .journal-save:disabled {
-            opacity: 0.5;
+        .edit-btn.active {
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            color: white;
+            border-color: transparent;
         }
         
-        .voice-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.5);
+        /* Arrows for reordering */
+        .bubble-arrows {
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            gap: 10px;
+        }
+        
+        .edit-mode .bubble-arrows {
+            display: flex;
+        }
+        
+        .arrow-btn {
+            width: 28px;
+            height: 28px;
+            background: rgba(255,255,255,0.8);
             border: 2px solid rgba(107, 78, 155, 0.3);
-            font-size: 16px;
+            border-radius: 50%;
+            font-size: 14px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
         }
         
-        .voice-btn.recording {
+        .arrow-btn:active {
+            background: #6B4E9B;
+            color: white;
+        }
+        
+        .bubble-delete {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 24px;
+            height: 24px;
             background: #ff4444;
-            border-color: #ff4444;
-            animation: pulse 1s infinite;
+            border: 2px solid white;
+            border-radius: 50%;
+            font-size: 12px;
+            color: white;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            animation: pulse-delete 0.5s ease-in-out infinite;
         }
         
-        @keyframes pulse {
+        .bubble-delete.show {
+            display: flex;
+        }
+        
+        @keyframes pulse-delete {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.1); }
         }
         
-        .section-add {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
+        /* FAB - Floating Action Button */
+        .fab {
+            position: absolute;
+            bottom: 90px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
             background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
-            border: none;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        /* Manual task card */
-        .manual-task-card {
-            background: rgba(255,255,255,0.5);
-            border: 2px solid rgba(255,255,255,0.6);
-            border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .manual-task-emoji {
-            font-size: 20px;
-        }
-        
-        .manual-task-info {
-            flex: 1;
-        }
-        
-        .manual-task-name {
-            font-size: 13px;
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .manual-task-time {
-            font-size: 10px;
-            color: rgba(0,0,0,0.4);
-        }
-        
-        .manual-task-delete {
-            width: 24px;
-            height: 24px;
             border-radius: 50%;
-            background: rgba(244, 67, 54, 0.1);
-            border: none;
-            font-size: 12px;
-            cursor: pointer;
-        }
-        
-        /* Input styles for modal */
-        .input-group {
-            margin-bottom: 16px;
-        }
-        
-        .input-label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
-            display: block;
-        }
-        
-        .input-field {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid rgba(255,255,255,0.6);
-            border-radius: 12px;
-            background: rgba(255,255,255,0.5);
-            font-size: 14px;
-            font-family: 'Comfortaa', cursive;
-            box-sizing: border-box;
-        }
-        
-        .input-field:focus {
-            outline: none;
-            border-color: #6B4E9B;
-        }
-        
-        .emoji-picker {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        
-        .emoji-option {
-            width: 40px;
-            height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
-            background: rgba(255,255,255,0.5);
-            border: 2px solid rgba(255,255,255,0.6);
-            border-radius: 10px;
+            font-size: 28px;
+            color: white;
             cursor: pointer;
-        }
-        
-        .emoji-option.selected {
-            border-color: #6B4E9B;
-            background: rgba(107, 78, 155, 0.2);
-        }
-        
-        .journal-textarea {
-            width: 100%;
-            min-height: 80px;
-            padding: 12px;
-            border: 2px solid rgba(255,255,255,0.6);
-            border-radius: 12px;
-            background: rgba(255,255,255,0.4);
-            font-size: 13px;
-            font-family: 'Comfortaa', cursive;
-            resize: vertical;
-            box-sizing: border-box;
-        }
-        
-        .journal-textarea:focus {
-            outline: none;
-            border-color: #6B4E9B;
-        }
-        
-        .journal-saved {
-            font-size: 10px;
-            color: rgba(0,0,0,0.4);
-            margin-top: 8px;
-            text-align: right;
-        }
-        
-        /* Objective cards */
-        .objective-mini-card {
-            background: rgba(255,255,255,0.5);
-            border: 2px solid rgba(255,255,255,0.6);
-            border-radius: 14px;
-            padding: 12px;
-            margin-bottom: 10px;
-            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(107, 78, 155, 0.4);
+            z-index: 95;
             transition: all 0.2s;
+            border: none;
         }
         
-        .objective-mini-card:active {
-            transform: scale(0.98);
+        .fab:active {
+            transform: scale(0.95);
         }
         
-        .objective-mini-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
+        .fab:hover {
+            box-shadow: 0 6px 20px rgba(107, 78, 155, 0.5);
         }
         
-        .objective-mini-emoji {
-            font-size: 24px;
+        .bubble.add-bubble {
+            border: 3px dashed rgba(107, 78, 155, 0.4);
+            background: rgba(255,255,255,0.3);
         }
         
-        .objective-mini-info {
-            flex: 1;
+        .bubble.add-bubble .bubble-emoji {
+            opacity: 0.6;
         }
         
-        .objective-mini-name {
-            font-size: 13px;
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .objective-mini-deadline {
-            font-size: 10px;
-            color: rgba(0,0,0,0.5);
-        }
-        
-        .objective-mini-deadline.urgent {
-            color: #FF5722;
-            font-weight: 600;
-        }
-        
-        .objective-mini-domain {
-            font-size: 10px;
-            color: #6B4E9B;
-        }
-        
-        .objective-mini-progress {
-            height: 6px;
-            background: rgba(255,255,255,0.6);
-            border-radius: 3px;
-            overflow: hidden;
-        }
-        
-        .objective-mini-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #6B4E9B, #9B6B9B);
-            border-radius: 3px;
-            transition: width 0.3s;
-        }
-        
-        /* Quick eval modal */
+        /* Modal */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -549,15 +430,56 @@
             border: none;
             font-size: 18px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
         
         .modal-content {
             padding: 20px;
-            max-height: 60vh;
-            overflow-y: auto;
+        }
+        
+        .input-group {
+            margin-bottom: 16px;
+        }
+        
+        .input-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.5);
+            font-size: 14px;
+            font-family: 'Comfortaa', cursive;
+        }
+        
+        .emoji-picker {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .emoji-option {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            background: rgba(255,255,255,0.5);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 12px;
+            cursor: pointer;
+        }
+        
+        .emoji-option.selected {
+            border-color: #6B4E9B;
+            background: rgba(107, 78, 155, 0.2);
         }
         
         .modal-actions {
@@ -587,153 +509,29 @@
             color: white;
         }
         
-        /* Calendar Modal */
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 4px;
-            margin-top: 10px;
-        }
-        
-        .calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-        
-        .calendar-month {
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .calendar-nav {
-            display: flex;
-            gap: 8px;
-        }
-        
-        .calendar-nav-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.5);
-            border: none;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        
-        .calendar-weekday {
-            text-align: center;
-            font-size: 10px;
-            font-weight: 600;
-            color: rgba(0,0,0,0.5);
-            padding: 8px 0;
-        }
-        
-        .calendar-day {
-            aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-            border-radius: 50%;
-            cursor: pointer;
-            background: rgba(255,255,255,0.3);
-            border: none;
-            font-family: 'Comfortaa', cursive;
-        }
-        
-        .calendar-day:hover {
-            background: rgba(255,255,255,0.6);
-        }
-        
-        .calendar-day.today {
-            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
-            color: white;
-            font-weight: 600;
-        }
-        
-        .calendar-day.selected {
-            border: 2px solid #6B4E9B;
-        }
-        
-        .calendar-day.other-month {
-            color: rgba(0,0,0,0.3);
-        }
-        
-        .calendar-day.has-events::after {
-            content: '';
+        /* Quote */
+        .quote-container {
             position: absolute;
-            bottom: 2px;
-            width: 4px;
-            height: 4px;
-            background: #FF9800;
-            border-radius: 50%;
+            bottom: 90px;
+            left: 30px;
+            right: 30px;
+            text-align: center;
+            z-index: 50;
         }
         
-        .calendar-day {
-            position: relative;
-        }
-        
-        /* Quick eval fields */
-        .quick-eval-field {
-            margin-bottom: 16px;
-        }
-        
-        .quick-eval-label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
-        }
-        
-        .quick-eval-emojis {
-            display: flex;
-            gap: 8px;
-            justify-content: space-between;
-        }
-        
-        .eval-emoji {
-            width: 44px;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            background: rgba(255,255,255,0.5);
-            border: 2px solid rgba(255,255,255,0.6);
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .eval-emoji.selected {
-            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
-            border-color: #6B4E9B;
-            transform: scale(1.1);
-        }
-        
-        .quick-eval-input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid rgba(255,255,255,0.6);
-            border-radius: 12px;
-            background: rgba(255,255,255,0.5);
-            font-size: 13px;
-            font-family: 'Comfortaa', cursive;
-            box-sizing: border-box;
-        }
-        
-        .quick-eval-input:focus {
-            outline: none;
-            border-color: #6B4E9B;
+        .quote-text {
+            font-size: 11px;
+            color: rgba(0,0,0,0.4);
+            font-style: italic;
+            line-height: 1.5;
         }
         
         /* Bottom menu */
         .bottom-menu {
             position: absolute;
-            bottom: 0; left: 0; right: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
             height: 70px;
             background: rgba(255, 255, 255, 0.5);
             backdrop-filter: blur(20px);
@@ -744,165 +542,89 @@
             z-index: 90;
         }
         
-        .menu-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 8px 16px; border-radius: 16px; }
-        .menu-item.active { background: rgba(255, 255, 255, 0.6); }
+        .menu-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 16px;
+            transition: all 0.3s;
+        }
+        
+        .menu-item.active {
+            background: rgba(255, 255, 255, 0.6);
+        }
+        
         .menu-icon { font-size: 24px; }
         .menu-label { font-size: 10px; color: rgba(0,0,0,0.6); font-weight: 500; }
     </style>
 </head>
 <body>
     <div class="phone-frame">
-        <div class="petal"></div><div class="petal"></div>
-        <div class="petal"></div><div class="petal"></div>
+        <!-- Pétales -->
+        <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+        <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+        <!-- Nuages -->
+        <div class="cloud">☁️</div><div class="cloud">☁️</div>
         
         <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
         
         <div class="header">
-            <div class="header-title">⚡ Aujourd'hui</div>
-            <div class="date-nav">
-                <button class="date-nav-btn" onclick="previousDay()">‹</button>
-                <div class="header-date" id="headerDate" onclick="openCalendar()">Mercredi 16 avril 2026</div>
-                <button class="date-nav-btn" onclick="nextDay()">›</button>
-            </div>
-            <div class="today-indicator" id="todayIndicator"></div>
+            <div class="header-title">🌳 Wu Tree</div>
+            <div class="header-subtitle">Agis dans le flow</div>
         </div>
         
         <div class="content">
-            <!-- Stats -->
-            <div class="stats-row">
-                <div class="stat-card">
-                    <div class="stat-value" id="statDone">0</div>
-                    <div class="stat-label">Fait</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="statRemaining">0</div>
-                    <div class="stat-label">Restant</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="statStreak">0</div>
-                    <div class="stat-label">🔥 Streak</div>
-                </div>
-            </div>
-            
-            <!-- Événements du jour (fixes) -->
-            <div class="section" id="dailySection">
-                <div class="section-header">
-                    <div class="section-title">📅 Aujourd'hui</div>
-                    <div class="section-badge" id="dailyBadge">0</div>
-                </div>
-                <div id="dailyContainer"></div>
-            </div>
-            
-            <!-- Événements de la semaine (flexibles) -->
-            <div class="section" id="weeklySection">
-                <div class="section-header">
-                    <div class="section-title">🌊 Cette semaine</div>
-                    <div class="section-badge" id="weeklyBadge">0</div>
-                </div>
-                <div id="weeklyContainer"></div>
-            </div>
-            
-            <!-- Tâches manuelles -->
-            <div class="section">
-                <div class="section-header">
-                    <div class="section-title">✨ Bonus accomplis</div>
-                    <button class="section-add" onclick="openManualTaskModal()">+</button>
-                </div>
-                <div id="manualTasksContainer"></div>
-            </div>
-            
-            <!-- Journal avec vocal -->
-            <div class="section">
-                <div class="section-header">
-                    <div class="section-title">📝 Journal du jour</div>
-                </div>
-                <div class="journal-card">
-                    <div class="journal-header">
-                        <div class="journal-title">✍️ Notes personnelles</div>
-                        <button class="voice-btn" id="voiceBtn" onclick="toggleVoiceRecording()">🎤</button>
-                    </div>
-                    <textarea class="journal-textarea" id="journalText" placeholder="Comment s'est passée ta journée ? Réflexions, gratitudes, apprentissages..." oninput="onJournalInput()"></textarea>
-                    <div class="journal-footer">
-                        <div class="journal-saved" id="journalSaved"></div>
-                        <button class="journal-save" id="journalSave" onclick="saveJournal()" disabled>Enregistrer</button>
-                    </div>
-                </div>
+            <div class="bubbles-container" id="bubblesContainer">
+                <!-- Rempli par JS -->
             </div>
         </div>
         
+        <div class="quote-container">
+            <div class="quote-text">
+                « Le voyage de mille lieues<br>commence par un pas. »
+            </div>
+        </div>
+        
+        <!-- FAB pour ajouter un domaine -->
+        <button class="fab" onclick="openAddDomainModal()">+</button>
+        
         <div class="bottom-menu">
-            <div class="menu-item" onclick="goToVision()">
+            <div class="menu-item" onclick="goToWellbeing()">
                 <div class="menu-icon">🔮</div>
                 <div class="menu-label">Vision</div>
             </div>
-            <div class="menu-item" onclick="goToHome()">
+            <div class="menu-item active">
                 <div class="menu-icon">🌳</div>
                 <div class="menu-label">Arbre</div>
             </div>
-            <div class="menu-item active">
+            <div class="menu-item" onclick="goToTasks()">
                 <div class="menu-icon">📋</div>
                 <div class="menu-label">Aujourd'hui</div>
             </div>
         </div>
         
-        <!-- Modal Quick Eval -->
-        <div class="modal-overlay" id="quickEvalModal">
+        <!-- Modal Ajouter Domaine -->
+        <div class="modal-overlay" id="domainModal">
             <div class="modal">
                 <div class="modal-header">
-                    <div class="modal-title" id="quickEvalTitle">⚡ Bilan rapide</div>
+                    <div class="modal-title">➕ Nouveau domaine</div>
                     <button class="modal-close" onclick="closeModal()">×</button>
                 </div>
                 <div class="modal-content">
-                    <div id="quickEvalFields"></div>
-                    
-                    <div class="modal-actions">
-                        <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
-                        <button class="btn btn-primary" onclick="saveQuickEval()">✓ Valider</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Modal Manual Task -->
-        <div class="modal-overlay" id="manualTaskModal">
-            <div class="modal">
-                <div class="modal-header">
-                    <div class="modal-title">✨ Ajouter une action bonus</div>
-                    <button class="modal-close" onclick="closeManualTaskModal()">×</button>
-                </div>
-                <div class="modal-content">
                     <div class="input-group">
-                        <label class="input-label">Qu'as-tu accompli ?</label>
-                        <input type="text" class="input-field" id="manualTaskName" placeholder="Ex: Méditation, appel important...">
+                        <label class="input-label">Nom du domaine</label>
+                        <input type="text" class="input-field" id="domainName" placeholder="Ex: Sport, Spiritualité...">
                     </div>
                     <div class="input-group">
                         <label class="input-label">Emoji</label>
-                        <div class="emoji-picker" id="manualTaskEmojis"></div>
+                        <div class="emoji-picker" id="emojiPicker"></div>
                     </div>
                     <div class="modal-actions">
-                        <button class="btn btn-secondary" onclick="closeManualTaskModal()">Annuler</button>
-                        <button class="btn btn-primary" onclick="saveManualTask()">Ajouter</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Calendar Modal -->
-        <div class="modal-overlay" id="calendarModal">
-            <div class="modal">
-                <div class="modal-header">
-                    <div class="modal-title">📅 Calendrier</div>
-                    <button class="modal-close" onclick="closeCalendar()">×</button>
-                </div>
-                <div class="modal-content">
-                    <div class="calendar-header">
-                        <button class="calendar-nav-btn" onclick="prevMonth()">‹</button>
-                        <div class="calendar-month" id="calendarMonth">Avril 2026</div>
-                        <button class="calendar-nav-btn" onclick="nextMonth()">›</button>
-                    </div>
-                    <div class="calendar-grid" id="calendarGrid"></div>
-                    <div class="modal-actions" style="margin-top: 15px;">
-                        <button class="btn btn-secondary" onclick="goToToday()">Aujourd'hui</button>
+                        <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
+                        <button class="btn btn-primary" onclick="saveDomain()">Ajouter</button>
                     </div>
                 </div>
             </div>
@@ -910,883 +632,214 @@
     </div>
     
     <script>
-        // Domain config for eval types
-        const DOMAIN_EVAL_CONFIG = {
-            sante: {
-                icon: '💪',
-                fields: [
-                    { id: 'effort', label: '💪 Effort', emojis: ['😴', '😌', '💪', '🔥', '🏆'] },
-                    { id: 'energy', label: '⚡ Énergie après', emojis: ['😫', '😔', '😐', '😊', '🚀'] }
-                ]
-            },
-            business: {
-                icon: '💼',
-                fields: [
-                    { id: 'productivity', label: '📊 Productivité', emojis: ['😞', '😕', '😐', '👍', '🎯'] },
-                    { id: 'focus', label: '🎯 Focus', emojis: ['🌀', '😵', '😐', '🧘', '💎'] }
-                ]
-            },
-            connaissance: {
-                icon: '📚',
-                fields: [
-                    { id: 'comprehension', label: '🧠 Compréhension', emojis: ['😕', '🤔', '😐', '💡', '🎓'] },
-                    { id: 'progress', label: '📈 Progression', emojis: ['📉', '➖', '📊', '📈', '🚀'] }
-                ]
-            },
-            relations: {
-                icon: '👥',
-                fields: [
-                    { id: 'quality', label: '💝 Qualité', emojis: ['😞', '😕', '😊', '💖', '✨'] },
-                    { id: 'connection', label: '🤝 Connexion', emojis: ['😶', '🙂', '😊', '🫂', '💞'] }
-                ]
-            },
-            creativite: {
-                icon: '🎨',
-                fields: [
-                    { id: 'enjoyment', label: '😄 Plaisir', emojis: ['😐', '🙂', '😊', '😄', '🤩'] },
-                    { id: 'flow', label: '🌊 Flow créatif', emojis: ['😫', '😕', '😌', '🎨', '✨'] }
-                ]
-            },
-            loisirs: {
-                icon: '🎮',
-                fields: [
-                    { id: 'enjoyment', label: '😄 Plaisir', emojis: ['😐', '🙂', '😊', '😄', '🤩'] },
-                    { id: 'relaxation', label: '🧘 Détente', emojis: ['😫', '😕', '😌', '😊', '🧘'] }
-                ]
-            },
-            maison: {
-                icon: '🏠',
-                fields: [
-                    { id: 'satisfaction', label: '✨ Satisfaction', emojis: ['😞', '😕', '😐', '😊', '✨'] },
-                    { id: 'efficiency', label: '⚡ Efficacité', emojis: ['🐌', '🚶', '🏃', '⚡', '🚀'] }
-                ]
-            },
-            voyages: {
-                icon: '✈️',
-                fields: [
-                    { id: 'discovery', label: '🌟 Découverte', emojis: ['😐', '🙂', '😊', '🤩', '🌟'] },
-                    { id: 'memorable', label: '📸 Mémorable', emojis: ['😶', '🙂', '😊', '😍', '💫'] }
-                ]
-            }
-        };
+        // ========== DOMAINES ==========
+        const DEFAULT_DOMAINS = [
+            { id: 'sante', emoji: '💪', name: 'Santé', order: 0 },
+            { id: 'business', emoji: '💰', name: 'Business & Finance', order: 1 },
+            { id: 'relations', emoji: '❤️', name: 'Relations', order: 2 },
+            { id: 'connaissance', emoji: '📚', name: 'Connaissance', order: 3 },
+            { id: 'creativite', emoji: '🎨', name: 'Créativité', order: 4 },
+            { id: 'maison', emoji: '🏠', name: 'Maison', order: 5 },
+            { id: 'voyages', emoji: '✈️', name: 'Voyages', order: 6 }
+        ];
         
-        const DAYS = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-        const MONTHS = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
-        
-        let currentEvent = null;
-        let isRecording = false;
-        let recognition = null;
-        
-        // Date navigation
-        let selectedDate = new Date();
-        let calendarViewDate = new Date();
-        
-        const MANUAL_TASK_EMOJIS = ['✨', '🎯', '💡', '🧘', '📞', '✍️', '🎨', '🏃', '📚', '💪', '🧹', '🎵'];
-        
-        function init() {
-            updateHeaderDate();
-            loadTodayEvents();
-            loadManualTasks();
-            loadJournal();
-            updateStats();
-            setupVoiceRecognition();
-        }
-        
-        function updateHeaderDate() {
-            const dayName = DAYS[selectedDate.getDay()];
-            const day = selectedDate.getDate();
-            const month = MONTHS[selectedDate.getMonth()];
-            const year = selectedDate.getFullYear();
-            document.getElementById('headerDate').textContent = `${dayName} ${day} ${month} ${year}`;
+        function loadDomains() {
+            let domains = JSON.parse(localStorage.getItem('wutree_domains') || 'null');
             
-            // Show indicator if not today
-            const today = new Date();
-            const isToday = selectedDate.toDateString() === today.toDateString();
-            const indicator = document.getElementById('todayIndicator');
-            if (isToday) {
-                indicator.textContent = '';
-            } else {
-                const diff = Math.floor((selectedDate - today) / (1000 * 60 * 60 * 24));
-                if (diff === -1) {
-                    indicator.textContent = '← Hier';
-                } else if (diff === 1) {
-                    indicator.textContent = 'Demain →';
-                } else if (diff < 0) {
-                    indicator.textContent = `← Il y a ${Math.abs(diff)} jours`;
-                } else {
-                    indicator.textContent = `Dans ${diff} jours →`;
-                }
-            }
-        }
-        
-        function previousDay() {
-            selectedDate.setDate(selectedDate.getDate() - 1);
-            updateHeaderDate();
-            loadTodayEvents();
-            loadManualTasks();
-            loadJournal();
-            updateStats();
-        }
-        
-        function nextDay() {
-            selectedDate.setDate(selectedDate.getDate() + 1);
-            updateHeaderDate();
-            loadTodayEvents();
-            loadManualTasks();
-            loadJournal();
-            updateStats();
-        }
-        
-        function goToToday() {
-            selectedDate = new Date();
-            calendarViewDate = new Date();
-            updateHeaderDate();
-            loadTodayEvents();
-            loadManualTasks();
-            loadJournal();
-            updateStats();
-            closeCalendar();
-        }
-        
-        // Calendar functions
-        function openCalendar() {
-            calendarViewDate = new Date(selectedDate);
-            renderCalendar();
-            document.getElementById('calendarModal').classList.add('show');
-        }
-        
-        function closeCalendar() {
-            document.getElementById('calendarModal').classList.remove('show');
-        }
-        
-        function prevMonth() {
-            calendarViewDate.setMonth(calendarViewDate.getMonth() - 1);
-            renderCalendar();
-        }
-        
-        function nextMonth() {
-            calendarViewDate.setMonth(calendarViewDate.getMonth() + 1);
-            renderCalendar();
-        }
-        
-        function renderCalendar() {
-            const year = calendarViewDate.getFullYear();
-            const month = calendarViewDate.getMonth();
-            
-            document.getElementById('calendarMonth').textContent = 
-                MONTHS[month].charAt(0).toUpperCase() + MONTHS[month].slice(1) + ' ' + year;
-            
-            const firstDay = new Date(year, month, 1);
-            const lastDay = new Date(year, month + 1, 0);
-            const startDay = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1; // Monday = 0
-            
-            const today = new Date();
-            const todayStr = today.toISOString().split('T')[0];
-            const selectedStr = selectedDate.toISOString().split('T')[0];
-            
-            // Get days with events
-            const allHistory = JSON.parse(localStorage.getItem('wutree_objective_logs') || '[]');
-            const daysWithEvents = new Set(allHistory.map(h => h.date));
-            
-            let html = '';
-            
-            // Weekday headers
-            const weekDays = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
-            weekDays.forEach(d => {
-                html += `<div class="calendar-weekday">${d}</div>`;
-            });
-            
-            // Empty cells before first day
-            for (let i = 0; i < startDay; i++) {
-                const prevMonthDay = new Date(year, month, -startDay + i + 1);
-                html += `<button class="calendar-day other-month" onclick="selectDate(${prevMonthDay.getFullYear()}, ${prevMonthDay.getMonth()}, ${prevMonthDay.getDate()})">${prevMonthDay.getDate()}</button>`;
+            if (!domains) {
+                domains = DEFAULT_DOMAINS;
+                localStorage.setItem('wutree_domains', JSON.stringify(domains));
             }
             
-            // Days of the month
-            for (let day = 1; day <= lastDay.getDate(); day++) {
-                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const isToday = dateStr === todayStr;
-                const isSelected = dateStr === selectedStr;
-                const hasEvents = daysWithEvents.has(dateStr);
-                
-                let classes = 'calendar-day';
-                if (isToday) classes += ' today';
-                if (isSelected) classes += ' selected';
-                if (hasEvents) classes += ' has-events';
-                
-                html += `<button class="${classes}" onclick="selectDate(${year}, ${month}, ${day})">${day}</button>`;
-            }
-            
-            // Empty cells after last day
-            const endDay = lastDay.getDay() === 0 ? 6 : lastDay.getDay() - 1;
-            for (let i = endDay + 1; i < 7; i++) {
-                const nextMonthDay = new Date(year, month + 1, i - endDay);
-                html += `<button class="calendar-day other-month" onclick="selectDate(${nextMonthDay.getFullYear()}, ${nextMonthDay.getMonth()}, ${nextMonthDay.getDate()})">${nextMonthDay.getDate()}</button>`;
-            }
-            
-            document.getElementById('calendarGrid').innerHTML = html;
+            return domains.sort((a, b) => a.order - b.order);
         }
         
-        function selectDate(year, month, day) {
-            selectedDate = new Date(year, month, day);
-            calendarViewDate = new Date(year, month, day);
-            updateHeaderDate();
-            loadTodayEvents();
-            loadManualTasks();
-            loadJournal();
-            updateStats();
-            closeCalendar();
+        function saveDomains(domains) {
+            localStorage.setItem('wutree_domains', JSON.stringify(domains));
         }
         
-        function loadTodayEvents() {
-            const viewDate = selectedDate;
-            const viewDayIndex = viewDate.getDay() === 0 ? 6 : viewDate.getDay() - 1; // 0=Monday, 6=Sunday
-            const viewDateStr = viewDate.toISOString().split('T')[0];
-            
-            // Get all sessions from all objectives
-            const allSessions = JSON.parse(localStorage.getItem('wutree_objective_sessions_templates') || '[]');
-            const allObjectives = JSON.parse(localStorage.getItem('wutree_objectives') || '[]');
-            const allActivities = JSON.parse(localStorage.getItem('wutree_activities') || '[]');
-            const allDomains = JSON.parse(localStorage.getItem('wutree_domains') || '[]');
-            const allHistory = JSON.parse(localStorage.getItem('wutree_objective_logs') || '[]');
-            
-            // Get completed sessions for this date (by unique session ID)
-            const completedOnDate = new Set(
-                allHistory
-                    .filter(h => h.date === viewDateStr)
-                    .map(h => h.sessionId)
-            );
-            
-            // Separate daily and weekly events
-            const dailyEvents = [];
-            const weeklyEvents = [];
-            
-            // Process ALL sessions
-            allSessions.forEach(session => {
-                // Get objective info
-                const objective = allObjectives.find(o => o.id === session.objectiveId);
-                if (!objective) return;
-                
-                const activity = allActivities.find(a => a.id === objective.activityId);
-                const domain = allDomains.find(d => d.id === (activity?.domainId || objective.domainId));
-                
-                // Check if already completed on this date
-                const isDone = completedOnDate.has(session.id);
-                
-                const eventData = {
-                    sessionId: session.id,
-                    objectiveId: objective.id,
-                    domainId: domain?.id || 'sante',
-                    domainName: domain?.name || 'Santé',
-                    domainEmoji: domain?.emoji || '💪',
-                    objectiveName: objective.name,
-                    sessionName: session.name,
-                    sessionEmoji: session.emoji,
-                    isDone,
-                    type: session.type || 'fixed'
-                };
-                
-                // Determine where to show this session
-                const isFlexible = session.type === 'flexible';
-                const isForThisDay = !isFlexible && (session.days || []).includes(viewDayIndex);
-                
-                if (isForThisDay) {
-                    // Fixed session scheduled for this day
-                    eventData.desc = 'Prévu ce jour';
-                    dailyEvents.push(eventData);
-                } else if (isFlexible) {
-                    // Flexible session - show in weekly
-                    const weekStart = new Date(viewDate);
-                    weekStart.setDate(viewDate.getDate() - ((viewDate.getDay() + 6) % 7));
-                    weekStart.setHours(0, 0, 0, 0);
-                    
-                    const weekLogs = allHistory.filter(h => {
-                        if (h.sessionId !== session.id) return false;
-                        return new Date(h.date) >= weekStart;
-                    });
-                    
-                    const done = weekLogs.length;
-                    const target = session.frequency || 1;
-                    
-                    eventData.desc = `${done}/${target} cette semaine`;
-                    eventData.weeklyDone = done;
-                    eventData.weeklyTarget = target;
-                    
-                    // Always show flexible sessions (even if target reached, so user can see progress)
-                    weeklyEvents.push(eventData);
-                }
-            });
-            
-            renderDailyEvents(dailyEvents);
-            renderWeeklyEvents(weeklyEvents);
-            
-            // Show empty state if nothing scheduled
-            if (dailyEvents.length === 0 && weeklyEvents.length === 0) {
-                document.getElementById('dailySection').style.display = 'block';
-                document.getElementById('dailyContainer').innerHTML = `
-                    <div style="text-align: center; padding: 20px; color: rgba(0,0,0,0.4); font-size: 12px;">
-                        🌿 Aucune session prévue.<br>
-                        <span style="font-size: 10px;">Crée des sessions dans tes objectifs pour les voir ici.</span>
-                    </div>
-                `;
-                document.getElementById('dailyBadge').textContent = '0';
-            }
+        function getTaskCountForDomain(domainId) {
+            const tasks = JSON.parse(localStorage.getItem('wutree_tasks') || '[]');
+            return tasks.filter(t => t.domain === domainId && !t.completed).length;
         }
         
-        function renderDailyEvents(events) {
-            const container = document.getElementById('dailyContainer');
-            const section = document.getElementById('dailySection');
+        function renderBubbles() {
+            const container = document.getElementById('bubblesContainer');
+            const domains = loadDomains();
             
-            // Update badge
-            const remaining = events.filter(e => !e.isDone).length;
-            document.getElementById('dailyBadge').textContent = remaining > 0 ? remaining : '✓';
-            
-            if (events.length === 0) {
-                section.style.display = 'none';
-                return;
-            }
-            
-            section.style.display = 'block';
-            
-            // Sort: not done first
-            events.sort((a, b) => a.isDone - b.isDone);
-            
-            container.innerHTML = events.map(event => `
-                <div class="event-card ${event.isDone ? 'done' : ''}" data-session-id="${event.sessionId}">
-                    <div class="event-emoji">${event.sessionEmoji}</div>
-                    <div class="event-info">
-                        <div class="event-domain">${event.domainEmoji} ${event.domainName}</div>
-                        <div class="event-name">${event.sessionName}</div>
-                        <div class="event-objective">${event.objectiveName}</div>
-                    </div>
-                    <div class="event-check ${event.isDone ? 'checked' : ''}" onclick="toggleEvent('${event.sessionId}', '${event.domainId}', '${event.objectiveId}')">
-                        ${event.isDone ? '✓' : ''}
-                    </div>
-                </div>
-            `).join('');
-        }
-        
-        function renderWeeklyEvents(events) {
-            const container = document.getElementById('weeklyContainer');
-            const section = document.getElementById('weeklySection');
-            
-            // Update badge
-            const remaining = events.filter(e => !e.isDone).length;
-            document.getElementById('weeklyBadge').textContent = remaining > 0 ? remaining : '✓';
-            
-            if (events.length === 0) {
-                section.style.display = 'none';
-                return;
-            }
-            
-            section.style.display = 'block';
-            
-            // Sort: not done first
-            events.sort((a, b) => a.isDone - b.isDone);
-            
-            container.innerHTML = events.map(event => `
-                <div class="event-card ${event.isDone ? 'done' : ''}" data-session-id="${event.sessionId}">
-                    <div class="event-emoji">${event.sessionEmoji}</div>
-                    <div class="event-info">
-                        <div class="event-domain">${event.domainEmoji} ${event.domainName}</div>
-                        <div class="event-name">${event.sessionName}</div>
-                        <div class="event-objective">${event.objectiveName} • ${event.desc}</div>
-                    </div>
-                    <div class="event-check ${event.isDone ? 'checked' : ''}" onclick="toggleEvent('${event.sessionId}', '${event.domainId}', '${event.objectiveId}')">
-                        ${event.isDone ? '✓' : ''}
-                    </div>
-                </div>
-            `).join('');
-        }
-        
-        // ========== OBJECTIVES ==========
-        function loadObjectives() {
-            const container = document.getElementById('objectivesContainer');
-            const section = document.getElementById('objectivesSection');
-            
-            const allObjectives = JSON.parse(localStorage.getItem('wutree_objectives') || '[]');
-            const allActivities = JSON.parse(localStorage.getItem('wutree_activities') || '[]');
-            const allDomains = JSON.parse(localStorage.getItem('wutree_domains') || '[]');
-            const allHistory = JSON.parse(localStorage.getItem('wutree_objective_logs') || '[]');
-            const allSessions = JSON.parse(localStorage.getItem('wutree_objective_sessions_templates') || '[]');
-            
-            // Filter non-completed objectives
-            const activeObjectives = allObjectives.filter(obj => !obj.completed);
-            
-            if (activeObjectives.length === 0) {
-                section.style.display = 'none';
-                return;
-            }
-            
-            section.style.display = 'block';
-            
-            // Calculate progress for each objective
-            const today = new Date();
-            
-            const objectivesData = activeObjectives.map(obj => {
-                const activity = allActivities.find(a => a.id === obj.activityId);
-                const domain = allDomains.find(d => d.id === (activity?.domainId || obj.domainId));
-                
-                // Calculate progress based on sessions completed this week
-                const sessions = allSessions.filter(s => s.objectiveId === obj.id);
-                let totalTarget = 0;
-                let totalDone = 0;
-                
-                const weekStart = new Date(today);
-                weekStart.setDate(today.getDate() - ((today.getDay() + 6) % 7));
-                weekStart.setHours(0, 0, 0, 0);
-                
-                sessions.forEach(session => {
-                    if (session.type === 'flexible') {
-                        totalTarget += session.frequency || 1;
-                    } else {
-                        totalTarget += (session.days || []).length;
-                    }
-                    
-                    const weekLogs = allHistory.filter(h => {
-                        if (h.sessionId !== session.id) return false;
-                        return new Date(h.date) >= weekStart;
-                    });
-                    totalDone += weekLogs.length;
-                });
-                
-                const progress = totalTarget > 0 ? Math.min(100, Math.round((totalDone / totalTarget) * 100)) : 0;
-                
-                // Calculate days remaining
-                const deadline = new Date(obj.deadline);
-                const daysRemaining = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
-                
-                return {
-                    id: obj.id,
-                    name: obj.name,
-                    emoji: obj.emoji,
-                    deadline: obj.deadline,
-                    daysRemaining,
-                    progress,
-                    domainName: domain?.name || 'Domaine',
-                    domainEmoji: domain?.emoji || '📁',
-                    activityId: obj.activityId
-                };
-            });
-            
-            // Sort by deadline (soonest first)
-            objectivesData.sort((a, b) => a.daysRemaining - b.daysRemaining);
-            
-            container.innerHTML = objectivesData.map(obj => {
-                const deadlineDate = new Date(obj.deadline);
-                const deadlineStr = deadlineDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
-                const isUrgent = obj.daysRemaining <= 7 && obj.daysRemaining > 0;
-                const isOverdue = obj.daysRemaining < 0;
-                
-                let deadlineText = `📅 ${deadlineStr}`;
-                if (isOverdue) {
-                    deadlineText = `⚠️ Dépassé de ${Math.abs(obj.daysRemaining)}j`;
-                } else if (obj.daysRemaining === 0) {
-                    deadlineText = `🔥 Aujourd'hui !`;
-                } else if (isUrgent) {
-                    deadlineText = `⏰ ${obj.daysRemaining}j restants`;
-                } else {
-                    deadlineText = `📅 ${deadlineStr} (${obj.daysRemaining}j)`;
-                }
+            container.innerHTML = domains.map((domain, index) => {
+                const taskCount = getTaskCountForDomain(domain.id);
+                const badgeClass = taskCount === 0 ? 'bubble-badge empty' : 'bubble-badge';
+                const priorityClass = index < 3 ? 'bubble-priority' : 'bubble-priority hidden';
                 
                 return `
-                    <div class="objective-mini-card" onclick="goToObjective('${obj.id}', '${obj.activityId}')">
-                        <div class="objective-mini-header">
-                            <div class="objective-mini-emoji">${obj.emoji}</div>
-                            <div class="objective-mini-info">
-                                <div class="objective-mini-name">${obj.name}</div>
-                                <div class="objective-mini-domain">${obj.domainEmoji} ${obj.domainName}</div>
-                                <div class="objective-mini-deadline ${isUrgent || isOverdue ? 'urgent' : ''}">${deadlineText}</div>
-                            </div>
-                            <div style="font-size: 12px; color: #6B4E9B; font-weight: 600;">${obj.progress}%</div>
-                        </div>
-                        <div class="objective-mini-progress">
-                            <div class="objective-mini-fill" style="width: ${obj.progress}%"></div>
+                    <div class="bubble" data-id="${domain.id}" data-order="${domain.order}" 
+                         ontouchstart="startLongPress('${domain.id}')" 
+                         ontouchend="cancelLongPress()" 
+                         ontouchmove="cancelLongPress()"
+                         onclick="handleBubbleClick('${domain.id}')">
+                        <button class="bubble-delete" id="delete-${domain.id}" onclick="event.stopPropagation(); deleteDomain('${domain.id}')">×</button>
+                        <div class="${priorityClass}">${index + 1}</div>
+                        <div class="${badgeClass}">${taskCount}</div>
+                        <div class="bubble-emoji">${domain.emoji}</div>
+                        <div class="bubble-label">${domain.name}</div>
+                        <div class="bubble-arrows">
+                            <button class="arrow-btn" onclick="event.stopPropagation(); moveDomain('${domain.id}', -1)">↑</button>
+                            <button class="arrow-btn" onclick="event.stopPropagation(); moveDomain('${domain.id}', 1)">↓</button>
                         </div>
                     </div>
                 `;
             }).join('');
         }
         
-        function goToObjective(objectiveId, activityId) {
-            localStorage.setItem('wutree_current_objective', objectiveId);
-            localStorage.setItem('wutree_current_activity', activityId);
-            window.location.href = 'wu-tree-v2-objective.html';
-        }
-        
-        function toggleEvent(sessionId, domainId, objectiveId) {
-            const todayStr = new Date().toISOString().split('T')[0];
-            let history = JSON.parse(localStorage.getItem('wutree_objective_logs') || '[]');
-            
-            // Check if already done today
-            const existingLogIndex = history.findIndex(h => h.sessionId === sessionId && h.date === todayStr);
-            
-            if (existingLogIndex >= 0) {
-                // Already done - ask to uncheck
-                if (confirm('Décocher cette session ?')) {
-                    history.splice(existingLogIndex, 1);
-                    localStorage.setItem('wutree_objective_logs', JSON.stringify(history));
-                    loadTodayEvents();
-                    updateStats();
-                }
+        function handleBubbleClick(domainId) {
+            // If delete button is showing, don't navigate
+            const deleteBtn = document.getElementById('delete-' + domainId);
+            if (deleteBtn && deleteBtn.classList.contains('show')) {
                 return;
             }
-            
-            // Show quick eval modal
-            currentEvent = { sessionId, domainId, objectiveId };
-            
-            const sessions = JSON.parse(localStorage.getItem('wutree_objective_sessions_templates') || '[]');
-            const session = sessions.find(s => s.id === sessionId);
-            
-            document.getElementById('quickEvalTitle').textContent = `${session?.emoji || '📝'} ${session?.name || 'Session'}`;
-            
-            renderQuickEvalFields(domainId);
-            openModal();
+            openDomain(domainId);
         }
         
-        function renderQuickEvalFields(domainId) {
-            const config = DOMAIN_EVAL_CONFIG[domainId] || DOMAIN_EVAL_CONFIG.sante;
-            const container = document.getElementById('quickEvalFields');
-            
-            container.innerHTML = config.fields.map(field => `
-                <div class="quick-eval-field">
-                    <div class="quick-eval-label">${field.label}</div>
-                    <div class="quick-eval-emojis" data-field="${field.id}">
-                        ${field.emojis.map((e, i) => `
-                            <div class="eval-emoji ${i === 2 ? 'selected' : ''}" onclick="selectQuickEval(this, '${field.id}', ${i + 1})" data-value="${i + 1}">${e}</div>
-                        `).join('')}
-                    </div>
-                </div>
-            `).join('') + `
-                <div class="quick-eval-field">
-                    <div class="quick-eval-label">📝 Note rapide (optionnel)</div>
-                    <input type="text" class="quick-eval-input" id="quickEvalNote" placeholder="Comment ça s'est passé ?">
-                </div>
-            `;
+        function openDomain(domainId) {
+            localStorage.setItem('wutree_current_domain', domainId);
+            window.location.href = 'wu-tree-v2-domain.html';
         }
         
-        function selectQuickEval(el, fieldId, value) {
-            const container = el.closest('.quick-eval-emojis');
-            container.querySelectorAll('.eval-emoji').forEach(e => e.classList.remove('selected'));
-            el.classList.add('selected');
+        function moveDomain(domainId, direction) {
+            let domains = loadDomains();
+            const currentIndex = domains.findIndex(d => d.id === domainId);
+            const newIndex = currentIndex + direction;
+            
+            if (newIndex < 0 || newIndex >= domains.length) return;
+            
+            // Swap orders
+            const temp = domains[currentIndex].order;
+            domains[currentIndex].order = domains[newIndex].order;
+            domains[newIndex].order = temp;
+            
+            saveDomains(domains);
+            renderBubbles();
         }
         
-        function saveQuickEval() {
-            if (!currentEvent) return;
-            
-            const { sessionId, domainId, objectiveId } = currentEvent;
-            const sessions = JSON.parse(localStorage.getItem('wutree_objective_sessions_templates') || '[]');
-            const session = sessions.find(s => s.id === sessionId);
-            
-            // Collect eval data
-            const evalData = {};
-            document.querySelectorAll('.quick-eval-emojis').forEach(container => {
-                const fieldId = container.dataset.field;
-                const selected = container.querySelector('.eval-emoji.selected');
-                evalData[fieldId] = selected ? parseInt(selected.dataset.value) : 3;
-            });
-            
-            const note = document.getElementById('quickEvalNote').value.trim();
-            const todayStr = new Date().toISOString().split('T')[0];
-            
-            // Get history and check for duplicates
-            let history = JSON.parse(localStorage.getItem('wutree_objective_logs') || '[]');
-            const existingIndex = history.findIndex(h => h.sessionId === sessionId && h.date === todayStr);
-            
-            if (existingIndex >= 0) {
-                // Update existing - shouldn't happen but safety
-                history[existingIndex] = {
-                    ...history[existingIndex],
-                    ...evalData,
-                    notes: note,
-                    updatedAt: new Date().toISOString()
-                };
-            } else {
-                // Add new log
-                history.push({
-                    id: 'log_' + Date.now(),
-                    objectiveId,
-                    sessionId,
-                    date: todayStr,
-                    exercises: session?.program || '',
-                    notes: note,
-                    ...evalData,
-                    createdAt: new Date().toISOString()
-                });
-            }
-            
-            localStorage.setItem('wutree_objective_logs', JSON.stringify(history));
-            
-            currentEvent = null;
-            closeModal();
-            
-            loadTodayEvents();
-            updateStats();
-        }
+        // ========== ADD/DELETE DOMAINS ==========
+        const DOMAIN_EMOJIS = ['🎯', '🧘', '🏃', '🎵', '🎨', '💻', '📱', '🌱', '⭐', '🔥', '🎓', '🏆', '💎', '🌍', '🧠', '💡'];
         
-        function openModal() {
-            document.getElementById('quickEvalModal').classList.add('show');
+        function openAddDomainModal() {
+            document.getElementById('domainName').value = '';
+            setupEmojiPicker();
+            document.getElementById('domainModal').classList.add('show');
         }
         
         function closeModal() {
-            document.getElementById('quickEvalModal').classList.remove('show');
-            currentEvent = null;
+            document.getElementById('domainModal').classList.remove('show');
         }
         
-        function updateStats() {
-            const todayStr = new Date().toISOString().split('T')[0];
-            const history = JSON.parse(localStorage.getItem('wutree_objective_logs') || '[]');
-            
-            // Count done today
-            const doneToday = history.filter(h => h.date === todayStr).length;
-            document.getElementById('statDone').textContent = doneToday;
-            
-            // Count remaining
-            const todayDayIndex = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
-            const allSessions = JSON.parse(localStorage.getItem('wutree_objective_sessions_templates') || '[]');
-            const completedIds = new Set(history.filter(h => h.date === todayStr).map(h => h.sessionId));
-            
-            let remaining = 0;
-            allSessions.forEach(session => {
-                if (completedIds.has(session.id)) return;
-                
-                if (session.type !== 'flexible' && (session.days || []).includes(todayDayIndex)) {
-                    remaining++;
-                }
-            });
-            document.getElementById('statRemaining').textContent = remaining;
-            
-            // Calculate streak (consecutive days with at least one completed session)
-            const streak = calculateStreak(history);
-            document.getElementById('statStreak').textContent = streak;
-        }
-        
-        function calculateStreak(history) {
-            if (history.length === 0) return 0;
-            
-            // Get unique dates sorted
-            const dates = [...new Set(history.map(h => h.date))].sort().reverse();
-            
-            const today = new Date().toISOString().split('T')[0];
-            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-            
-            // Start counting from today or yesterday
-            let streak = 0;
-            let checkDate = dates.includes(today) ? today : yesterday;
-            
-            if (!dates.includes(today) && !dates.includes(yesterday)) {
-                return 0;
-            }
-            
-            while (dates.includes(checkDate)) {
-                streak++;
-                const nextDate = new Date(checkDate);
-                nextDate.setDate(nextDate.getDate() - 1);
-                checkDate = nextDate.toISOString().split('T')[0];
-            }
-            
-            return streak;
-        }
-        
-        // Journal functions
-        function loadJournal() {
-            const todayStr = new Date().toISOString().split('T')[0];
-            const journals = JSON.parse(localStorage.getItem('wutree_daily_journals') || '{}');
-            const todayJournal = journals[todayStr];
-            
-            if (todayJournal) {
-                document.getElementById('journalText').value = todayJournal.text || '';
-                updateJournalSavedTime(todayJournal.updatedAt);
-            }
-        }
-        
-        function onJournalInput() {
-            document.getElementById('journalSave').disabled = false;
-        }
-        
-        function saveJournal() {
-            const todayStr = new Date().toISOString().split('T')[0];
-            const text = document.getElementById('journalText').value.trim();
-            
-            const journals = JSON.parse(localStorage.getItem('wutree_daily_journals') || '{}');
-            
-            journals[todayStr] = {
-                text,
-                updatedAt: new Date().toISOString()
-            };
-            
-            localStorage.setItem('wutree_daily_journals', JSON.stringify(journals));
-            
-            document.getElementById('journalSave').disabled = true;
-            updateJournalSavedTime(new Date().toISOString());
-        }
-        
-        function updateJournalSavedTime(isoString) {
-            if (!isoString) return;
-            const date = new Date(isoString);
-            const time = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-            document.getElementById('journalSaved').textContent = `Enregistré à ${time}`;
-        }
-        
-        // ========== VOICE RECORDING ==========
-        function setupVoiceRecognition() {
-            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-                recognition = new SpeechRecognition();
-                recognition.continuous = true;
-                recognition.interimResults = true;
-                recognition.lang = 'fr-FR';
-                
-                recognition.onresult = (event) => {
-                    let transcript = '';
-                    for (let i = event.resultIndex; i < event.results.length; i++) {
-                        transcript += event.results[i][0].transcript;
-                    }
-                    const journalText = document.getElementById('journalText');
-                    journalText.value = journalText.value + transcript;
-                    onJournalInput();
-                };
-                
-                recognition.onerror = (event) => {
-                    console.error('Speech recognition error:', event.error);
-                    stopRecording();
-                };
-                
-                recognition.onend = () => {
-                    if (isRecording) {
-                        recognition.start(); // Continue if still recording
-                    }
-                };
-            }
-        }
-        
-        function toggleVoiceRecording() {
-            if (!recognition) {
-                alert('La reconnaissance vocale n\'est pas supportée sur ce navigateur.');
-                return;
-            }
-            
-            if (isRecording) {
-                stopRecording();
-            } else {
-                startRecording();
-            }
-        }
-        
-        function startRecording() {
-            isRecording = true;
-            document.getElementById('voiceBtn').classList.add('recording');
-            document.getElementById('voiceBtn').textContent = '⏹️';
-            recognition.start();
-        }
-        
-        function stopRecording() {
-            isRecording = false;
-            document.getElementById('voiceBtn').classList.remove('recording');
-            document.getElementById('voiceBtn').textContent = '🎤';
-            if (recognition) recognition.stop();
-        }
-        
-        // ========== MANUAL TASKS ==========
-        function loadManualTasks() {
-            const todayStr = new Date().toISOString().split('T')[0];
-            const allTasks = JSON.parse(localStorage.getItem('wutree_manual_tasks') || '[]');
-            const todayTasks = allTasks.filter(t => t.date === todayStr);
-            
-            renderManualTasks(todayTasks);
-        }
-        
-        function renderManualTasks(tasks) {
-            const container = document.getElementById('manualTasksContainer');
-            
-            if (tasks.length === 0) {
-                container.innerHTML = `
-                    <div style="text-align: center; padding: 15px; color: rgba(0,0,0,0.4); font-size: 12px;">
-                        Ajoute les petites victoires de ta journée ! ✨
-                    </div>
-                `;
-                return;
-            }
-            
-            container.innerHTML = tasks.map(task => `
-                <div class="manual-task-card">
-                    <div class="manual-task-emoji">${task.emoji}</div>
-                    <div class="manual-task-info">
-                        <div class="manual-task-name">${task.name}</div>
-                        <div class="manual-task-time">${formatTime(task.createdAt)}</div>
-                    </div>
-                    <button class="manual-task-delete" onclick="deleteManualTask('${task.id}')">🗑️</button>
-                </div>
-            `).join('');
-        }
-        
-        function formatTime(isoString) {
-            const date = new Date(isoString);
-            return date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-        }
-        
-        function openManualTaskModal() {
-            document.getElementById('manualTaskName').value = '';
-            setupManualTaskEmojis();
-            document.getElementById('manualTaskModal').classList.add('show');
-        }
-        
-        function closeManualTaskModal() {
-            document.getElementById('manualTaskModal').classList.remove('show');
-        }
-        
-        function setupManualTaskEmojis() {
-            const container = document.getElementById('manualTaskEmojis');
-            container.innerHTML = MANUAL_TASK_EMOJIS.map((e, i) => 
-                `<div class="emoji-option ${i === 0 ? 'selected' : ''}" onclick="selectManualEmoji(this)">${e}</div>`
+        function setupEmojiPicker() {
+            const container = document.getElementById('emojiPicker');
+            container.innerHTML = DOMAIN_EMOJIS.map((e, i) => 
+                `<div class="emoji-option ${i === 0 ? 'selected' : ''}" onclick="selectEmoji(this)">${e}</div>`
             ).join('');
         }
         
-        function selectManualEmoji(el) {
-            document.querySelectorAll('#manualTaskEmojis .emoji-option').forEach(e => e.classList.remove('selected'));
+        function selectEmoji(el) {
+            document.querySelectorAll('.emoji-option').forEach(e => e.classList.remove('selected'));
             el.classList.add('selected');
         }
         
-        function saveManualTask() {
-            const name = document.getElementById('manualTaskName').value.trim();
-            const emoji = document.querySelector('#manualTaskEmojis .emoji-option.selected')?.textContent || '✨';
+        function saveDomain() {
+            const name = document.getElementById('domainName').value.trim();
+            const emoji = document.querySelector('.emoji-option.selected')?.textContent || '🎯';
             
             if (!name) {
-                alert('Entre ce que tu as accompli !');
+                alert('Entre un nom pour le domaine !');
                 return;
             }
             
-            const todayStr = new Date().toISOString().split('T')[0];
-            const allTasks = JSON.parse(localStorage.getItem('wutree_manual_tasks') || '[]');
+            const domains = loadDomains();
+            const maxOrder = Math.max(...domains.map(d => d.order), -1);
             
-            allTasks.push({
-                id: 'manual_' + Date.now(),
-                name,
+            // Generate unique ID
+            const id = name.toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9]/g, '_')
+                .substring(0, 20) + '_' + Date.now();
+            
+            domains.push({
+                id,
                 emoji,
-                date: todayStr,
-                createdAt: new Date().toISOString()
+                name,
+                order: maxOrder + 1
             });
             
-            localStorage.setItem('wutree_manual_tasks', JSON.stringify(allTasks));
+            saveDomains(domains);
+            closeModal();
+            renderBubbles();
+        }
+        
+        function deleteDomain(domainId) {
+            const domains = loadDomains();
+            const domain = domains.find(d => d.id === domainId);
             
-            closeManualTaskModal();
-            loadManualTasks();
-            updateStats();
+            if (!confirm(`Supprimer le domaine "${domain?.name}" ?\n\nCela ne supprimera pas les activités et objectifs liés.`)) {
+                return;
+            }
+            
+            const filtered = domains.filter(d => d.id !== domainId);
+            
+            // Reorder
+            filtered.forEach((d, i) => d.order = i);
+            
+            saveDomains(filtered);
+            renderBubbles();
         }
         
-        function deleteManualTask(taskId) {
-            let allTasks = JSON.parse(localStorage.getItem('wutree_manual_tasks') || '[]');
-            allTasks = allTasks.filter(t => t.id !== taskId);
-            localStorage.setItem('wutree_manual_tasks', JSON.stringify(allTasks));
-            loadManualTasks();
-            updateStats();
+        // ========== NAVIGATION ==========
+        function goToWellbeing() {
+            window.location.href = 'wu-tree-v2-visualization.html';
         }
         
-        // Navigation
-        function goToVision() { window.location.href = 'wu-tree-v2-visualization.html'; }
-        function goToHome() { window.location.href = 'wu-tree-v2-home.html'; }
+        function goToTasks() {
+            window.location.href = 'wu-tree-v2-tasks.html';
+        }
         
-        init();
+        // ========== LONG PRESS (iPhone style) ==========
+        let longPressTimer = null;
+        let longPressDomainId = null;
+        
+        function startLongPress(domainId) {
+            longPressDomainId = domainId;
+            longPressTimer = setTimeout(() => {
+                // Show delete button with animation
+                const deleteBtn = document.getElementById('delete-' + domainId);
+                if (deleteBtn) {
+                    deleteBtn.classList.add('show');
+                    // Vibrate if supported
+                    if (navigator.vibrate) {
+                        navigator.vibrate(50);
+                    }
+                }
+            }, 500); // 500ms long press
+        }
+        
+        function cancelLongPress() {
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+            }
+        }
+        
+        // Hide all delete buttons when clicking elsewhere
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.bubble-delete') && !e.target.closest('.bubble')) {
+                document.querySelectorAll('.bubble-delete.show').forEach(btn => {
+                    btn.classList.remove('show');
+                });
+            }
+        });
+        
+        // ========== INIT ==========
+        renderBubbles();
     </script>
 </body>
 </html>
