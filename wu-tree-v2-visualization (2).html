@@ -243,7 +243,7 @@
         /* Quote */
         .quote-container {
             position: absolute;
-            bottom: 40px;
+            bottom: 100px;
             left: 30px;
             right: 30px;
             text-align: center;
@@ -266,6 +266,26 @@
             padding: 0 40px;
             line-height: 1.5;
         }
+        
+        /* Bottom menu */
+        .bottom-menu {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 70px;
+            background: rgba(200, 200, 200, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.6);
+            z-index: 100;
+        }
+        
+        .menu-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 8px 16px; border-radius: 16px; }
+        .menu-item.active { background: rgba(255, 255, 255, 0.6); }
+        .menu-icon { font-size: 24px; }
+        .menu-label { font-size: 10px; color: rgba(0,0,0,0.6); font-weight: 500; }
     </style>
 </head>
 <body>
@@ -312,6 +332,21 @@
                 « Vis depuis la fin,<br>comme si c'était déjà fait. »
             </div>
         </div>
+        
+        <div class="bottom-menu">
+            <div class="menu-item active">
+                <div class="menu-icon">🔮</div>
+                <div class="menu-label">Vision</div>
+            </div>
+            <div class="menu-item" onclick="goBack()">
+                <div class="menu-icon">🌳</div>
+                <div class="menu-label">Arbre</div>
+            </div>
+            <div class="menu-item" onclick="goToTasks()">
+                <div class="menu-icon">📋</div>
+                <div class="menu-label">Aujourd'hui</div>
+            </div>
+        </div>
     </div>
     
     <script>
@@ -347,6 +382,10 @@
         
         function goBack() {
             window.location.href = 'wu-tree-v2-home.html';
+        }
+        
+        function goToTasks() {
+            window.location.href = 'wu-tree-v2-tasks.html';
         }
         
         // Init
