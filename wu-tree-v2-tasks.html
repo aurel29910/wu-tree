@@ -924,7 +924,7 @@
                 <div class="menu-label">Vision</div>
             </div>
             <div class="menu-item" onclick="goToHome()">
-                <div class="menu-icon">🏠</div>
+                <div class="menu-icon">🌳</div>
                 <div class="menu-label">Home</div>
             </div>
             <div class="menu-item active">
@@ -1577,11 +1577,11 @@
         }
         
         function toggleEvent(sessionId, domainId, objectiveId) {
-            const todayStr = new Date().toISOString().split('T')[0];
+            const dateStr = selectedDate.toISOString().split('T')[0];
             let history = JSON.parse(localStorage.getItem('wutree_objective_logs') || '[]');
             
-            // Check if already done today
-            const existingLogIndex = history.findIndex(h => h.sessionId === sessionId && h.date === todayStr);
+            // Check if already done on selected date
+            const existingLogIndex = history.findIndex(h => h.sessionId === sessionId && h.date === dateStr);
             
             if (existingLogIndex >= 0) {
                 // Already done - ask to uncheck
@@ -1595,7 +1595,7 @@
             }
             
             // Show eval modal
-            currentEvent = { sessionId, domainId, objectiveId };
+            currentEvent = { sessionId, domainId, objectiveId, date: dateStr };
             
             const sessions = JSON.parse(localStorage.getItem('wutree_objective_sessions_templates') || '[]');
             const session = sessions.find(s => s.id === sessionId);
@@ -1668,15 +1668,15 @@
         function saveQuickEval() {
             if (!currentEvent) return;
             
-            const { sessionId, domainId, objectiveId } = currentEvent;
+            const { sessionId, domainId, objectiveId, date } = currentEvent;
             
             const exercises = document.getElementById('evalExercises').value.trim();
             const notes = document.getElementById('evalNotes').value.trim();
-            const todayStr = new Date().toISOString().split('T')[0];
+            const dateStr = date || selectedDate.toISOString().split('T')[0];
             
             // Get history and check for duplicates
             let history = JSON.parse(localStorage.getItem('wutree_objective_logs') || '[]');
-            const existingIndex = history.findIndex(h => h.sessionId === sessionId && h.date === todayStr);
+            const existingIndex = history.findIndex(h => h.sessionId === sessionId && h.date === dateStr);
             
             const logData = {
                 rpe: currentRpe,
@@ -1699,7 +1699,7 @@
                     id: 'log_' + Date.now(),
                     objectiveId,
                     sessionId,
-                    date: todayStr,
+                    date: dateStr,
                     ...logData,
                     createdAt: new Date().toISOString()
                 });
