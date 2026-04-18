@@ -730,6 +730,94 @@
             border-color: #6B4E9B;
         }
         
+        /* RPE Scale (1-10) */
+        .eval-section { margin-bottom: 18px; }
+        .eval-label { display: block; font-size: 12px; font-weight: 600; color: #333; margin-bottom: 10px; }
+        
+        .rpe-scale {
+            display: flex;
+            gap: 4px;
+        }
+        
+        .rpe-option {
+            flex: 1;
+            height: 36px;
+            border: none;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            opacity: 0.4;
+            transition: all 0.2s;
+            color: white;
+        }
+        
+        .rpe-option.selected {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        
+        .rpe-option:nth-child(1) { background: #4CAF50; }
+        .rpe-option:nth-child(2) { background: #8BC34A; }
+        .rpe-option:nth-child(3) { background: #CDDC39; }
+        .rpe-option:nth-child(4) { background: #FFEB3B; }
+        .rpe-option:nth-child(5) { background: #FFC107; }
+        .rpe-option:nth-child(6) { background: #FF9800; }
+        .rpe-option:nth-child(7) { background: #FF5722; }
+        .rpe-option:nth-child(8) { background: #f44336; }
+        .rpe-option:nth-child(9) { background: #E91E63; }
+        .rpe-option:nth-child(10) { background: #9C27B0; }
+        
+        .rpe-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 6px;
+            font-size: 9px;
+            color: rgba(0,0,0,0.4);
+        }
+        
+        .eval-scale {
+            display: flex;
+            gap: 8px;
+            justify-content: space-between;
+        }
+        
+        .eval-option {
+            flex: 1;
+            padding: 8px 4px;
+            background: rgba(255,255,255,0.5);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        
+        .eval-option.selected {
+            border-color: #6B4E9B;
+            background: rgba(107,78,155,0.1);
+        }
+        
+        .eval-option-icon { font-size: 24px; margin-bottom: 4px; }
+        .eval-option-label { font-size: 9px; color: rgba(0,0,0,0.6); }
+        
+        .input-textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 12px;
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.5);
+            font-size: 13px;
+            font-family: 'Comfortaa', cursive;
+            resize: vertical;
+        }
+        
+        .input-textarea:focus {
+            outline: none;
+            border-color: #6B4E9B;
+        }
+        
         /* Bottom menu */
         .bottom-menu {
             position: absolute;
@@ -836,8 +924,8 @@
                 <div class="menu-label">Vision</div>
             </div>
             <div class="menu-item" onclick="goToHome()">
-                <div class="menu-icon">🌳</div>
-                <div class="menu-label">Arbre</div>
+                <div class="menu-icon">🏠</div>
+                <div class="menu-label">Home</div>
             </div>
             <div class="menu-item active">
                 <div class="menu-icon">📋</div>
@@ -845,19 +933,93 @@
             </div>
         </div>
         
-        <!-- Modal Quick Eval -->
+        <!-- Modal Évaluation complète -->
         <div class="modal-overlay" id="quickEvalModal">
-            <div class="modal">
+            <div class="modal" style="max-height: 85vh; overflow-y: auto;">
                 <div class="modal-header">
-                    <div class="modal-title" id="quickEvalTitle">⚡ Bilan rapide</div>
+                    <div class="modal-title" id="quickEvalTitle">📝 Évaluation de la séance</div>
                     <button class="modal-close" onclick="closeModal()">×</button>
                 </div>
                 <div class="modal-content">
-                    <div id="quickEvalFields"></div>
+                    <!-- RPE - Effort perçu -->
+                    <div class="eval-section">
+                        <label class="eval-label">💪 Effort perçu (RPE)</label>
+                        <div class="rpe-scale" id="rpeScale"></div>
+                        <div class="rpe-labels">
+                            <span>Facile</span>
+                            <span>Modéré</span>
+                            <span>Difficile</span>
+                            <span>Max</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Niveau d'énergie -->
+                    <div class="eval-section">
+                        <label class="eval-label">⚡ Niveau d'énergie</label>
+                        <div class="eval-scale" id="energyScale">
+                            <div class="eval-option" data-value="1" onclick="setEnergy(1)">
+                                <div class="eval-option-icon">😴</div>
+                                <div class="eval-option-label">Épuisé</div>
+                            </div>
+                            <div class="eval-option" data-value="2" onclick="setEnergy(2)">
+                                <div class="eval-option-icon">😔</div>
+                                <div class="eval-option-label">Fatigué</div>
+                            </div>
+                            <div class="eval-option" data-value="3" onclick="setEnergy(3)">
+                                <div class="eval-option-icon">😐</div>
+                                <div class="eval-option-label">Normal</div>
+                            </div>
+                            <div class="eval-option selected" data-value="4" onclick="setEnergy(4)">
+                                <div class="eval-option-icon">😊</div>
+                                <div class="eval-option-label">Bien</div>
+                            </div>
+                            <div class="eval-option" data-value="5" onclick="setEnergy(5)">
+                                <div class="eval-option-icon">🔥</div>
+                                <div class="eval-option-label">Plein</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Humeur -->
+                    <div class="eval-section">
+                        <label class="eval-label">😊 Humeur après la séance</label>
+                        <div class="eval-scale" id="moodScale">
+                            <div class="eval-option" data-value="1" onclick="setMood(1)">
+                                <div class="eval-option-icon">😤</div>
+                                <div class="eval-option-label">Frustré</div>
+                            </div>
+                            <div class="eval-option" data-value="2" onclick="setMood(2)">
+                                <div class="eval-option-icon">😕</div>
+                                <div class="eval-option-label">Mitigé</div>
+                            </div>
+                            <div class="eval-option" data-value="3" onclick="setMood(3)">
+                                <div class="eval-option-icon">😌</div>
+                                <div class="eval-option-label">Content</div>
+                            </div>
+                            <div class="eval-option selected" data-value="4" onclick="setMood(4)">
+                                <div class="eval-option-icon">😄</div>
+                                <div class="eval-option-label">Satisfait</div>
+                            </div>
+                            <div class="eval-option" data-value="5" onclick="setMood(5)">
+                                <div class="eval-option-icon">🤩</div>
+                                <div class="eval-option-label">Euphorique</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Exercices réalisés</label>
+                        <textarea class="input-textarea" id="evalExercises" placeholder="Ce que tu as fait..."></textarea>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Notes (optionnel)</label>
+                        <textarea class="input-textarea" id="evalNotes" placeholder="Ressenti, difficultés, progrès..."></textarea>
+                    </div>
                     
                     <div class="modal-actions">
                         <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
-                        <button class="btn btn-primary" onclick="saveQuickEval()">✓ Valider</button>
+                        <button class="btn btn-primary" onclick="saveQuickEval()">Enregistrer</button>
                     </div>
                 </div>
             </div>
@@ -1432,73 +1594,103 @@
                 return;
             }
             
-            // Show quick eval modal
+            // Show eval modal
             currentEvent = { sessionId, domainId, objectiveId };
             
             const sessions = JSON.parse(localStorage.getItem('wutree_objective_sessions_templates') || '[]');
             const session = sessions.find(s => s.id === sessionId);
             
-            document.getElementById('quickEvalTitle').textContent = `${session?.emoji || '📝'} ${session?.name || 'Session'}`;
+            document.getElementById('quickEvalTitle').textContent = `📝 ${session?.name || 'Session'}`;
             
-            renderQuickEvalFields(domainId);
+            // Reset modal
+            setupRpeScale();
+            resetEvalModal();
+            
+            // Pre-fill exercises with session program
+            if (session?.program) {
+                document.getElementById('evalExercises').value = session.program;
+            }
+            
             openModal();
         }
         
-        function renderQuickEvalFields(domainId) {
-            const config = DOMAIN_EVAL_CONFIG[domainId] || DOMAIN_EVAL_CONFIG.sante;
-            const container = document.getElementById('quickEvalFields');
-            
-            container.innerHTML = config.fields.map(field => `
-                <div class="quick-eval-field">
-                    <div class="quick-eval-label">${field.label}</div>
-                    <div class="quick-eval-emojis" data-field="${field.id}">
-                        ${field.emojis.map((e, i) => `
-                            <div class="eval-emoji ${i === 2 ? 'selected' : ''}" onclick="selectQuickEval(this, '${field.id}', ${i + 1})" data-value="${i + 1}">${e}</div>
-                        `).join('')}
-                    </div>
-                </div>
-            `).join('') + `
-                <div class="quick-eval-field">
-                    <div class="quick-eval-label">📝 Note rapide (optionnel)</div>
-                    <input type="text" class="quick-eval-input" id="quickEvalNote" placeholder="Comment ça s'est passé ?">
-                </div>
-            `;
+        // ========== RPE SCALE ==========
+        let currentRpe = 5;
+        let currentEnergy = 4;
+        let currentMood = 4;
+        
+        function setupRpeScale() {
+            const container = document.getElementById('rpeScale');
+            container.innerHTML = '';
+            for (let i = 1; i <= 10; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'rpe-option' + (i === currentRpe ? ' selected' : '');
+                btn.textContent = i;
+                btn.onclick = () => setRpe(i);
+                container.appendChild(btn);
+            }
         }
         
-        function selectQuickEval(el, fieldId, value) {
-            const container = el.closest('.quick-eval-emojis');
-            container.querySelectorAll('.eval-emoji').forEach(e => e.classList.remove('selected'));
-            el.classList.add('selected');
+        function setRpe(value) {
+            currentRpe = value;
+            document.querySelectorAll('.rpe-option').forEach((btn, i) => {
+                btn.classList.toggle('selected', i + 1 === value);
+            });
+        }
+        
+        function setEnergy(value) {
+            currentEnergy = value;
+            document.querySelectorAll('#energyScale .eval-option').forEach(opt => {
+                opt.classList.toggle('selected', parseInt(opt.dataset.value) === value);
+            });
+        }
+        
+        function setMood(value) {
+            currentMood = value;
+            document.querySelectorAll('#moodScale .eval-option').forEach(opt => {
+                opt.classList.toggle('selected', parseInt(opt.dataset.value) === value);
+            });
+        }
+        
+        function resetEvalModal() {
+            currentRpe = 5;
+            currentEnergy = 4;
+            currentMood = 4;
+            
+            setupRpeScale();
+            setEnergy(4);
+            setMood(4);
+            
+            document.getElementById('evalExercises').value = '';
+            document.getElementById('evalNotes').value = '';
         }
         
         function saveQuickEval() {
             if (!currentEvent) return;
             
             const { sessionId, domainId, objectiveId } = currentEvent;
-            const sessions = JSON.parse(localStorage.getItem('wutree_objective_sessions_templates') || '[]');
-            const session = sessions.find(s => s.id === sessionId);
             
-            // Collect eval data
-            const evalData = {};
-            document.querySelectorAll('.quick-eval-emojis').forEach(container => {
-                const fieldId = container.dataset.field;
-                const selected = container.querySelector('.eval-emoji.selected');
-                evalData[fieldId] = selected ? parseInt(selected.dataset.value) : 3;
-            });
-            
-            const note = document.getElementById('quickEvalNote').value.trim();
+            const exercises = document.getElementById('evalExercises').value.trim();
+            const notes = document.getElementById('evalNotes').value.trim();
             const todayStr = new Date().toISOString().split('T')[0];
             
             // Get history and check for duplicates
             let history = JSON.parse(localStorage.getItem('wutree_objective_logs') || '[]');
             const existingIndex = history.findIndex(h => h.sessionId === sessionId && h.date === todayStr);
             
+            const logData = {
+                rpe: currentRpe,
+                energy: currentEnergy,
+                mood: currentMood,
+                exercises,
+                notes
+            };
+            
             if (existingIndex >= 0) {
-                // Update existing - shouldn't happen but safety
+                // Update existing
                 history[existingIndex] = {
                     ...history[existingIndex],
-                    ...evalData,
-                    notes: note,
+                    ...logData,
                     updatedAt: new Date().toISOString()
                 };
             } else {
@@ -1508,9 +1700,7 @@
                     objectiveId,
                     sessionId,
                     date: todayStr,
-                    exercises: session?.program || '',
-                    notes: note,
-                    ...evalData,
+                    ...logData,
                     createdAt: new Date().toISOString()
                 });
             }
