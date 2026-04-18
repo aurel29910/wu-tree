@@ -29,16 +29,59 @@
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 20px; color: rgba(255,255,255,0.95); font-size: 14px; z-index: 100; }
         
-        .header { position: absolute; top: 44px; left: 0; right: 0; height: 70px;
+        .header { position: absolute; top: 44px; left: 0; right: 0; height: 80px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             padding: 0 15px; z-index: 90;
             background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
         .header-title { font-family: 'Comfortaa', cursive; font-size: 20px; font-weight: 600;
             color: white; text-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-        .header-date { font-size: 12px; color: rgba(255,255,255,0.8); margin-top: 4px; }
         
-        .content { position: absolute; top: 114px; left: 0; right: 0; bottom: 70px;
+        .date-nav {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 6px;
+        }
+        
+        .date-nav-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            border: none;
+            font-size: 14px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .date-nav-btn:active {
+            background: rgba(255,255,255,0.5);
+        }
+        
+        .header-date { 
+            font-size: 13px; 
+            color: rgba(255,255,255,0.9); 
+            cursor: pointer;
+            padding: 4px 12px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 12px;
+        }
+        
+        .header-date:active {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .today-indicator {
+            font-size: 10px;
+            color: #FFD700;
+            font-weight: 600;
+        }
+        
+        .content { position: absolute; top: 124px; left: 0; right: 0; bottom: 70px;
             overflow-y: auto; padding: 15px 20px; z-index: 60; }
         
         /* Stats row */
@@ -544,6 +587,95 @@
             color: white;
         }
         
+        /* Calendar Modal */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-top: 10px;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .calendar-month {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .calendar-nav {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .calendar-nav-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.5);
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        .calendar-weekday {
+            text-align: center;
+            font-size: 10px;
+            font-weight: 600;
+            color: rgba(0,0,0,0.5);
+            padding: 8px 0;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            border-radius: 50%;
+            cursor: pointer;
+            background: rgba(255,255,255,0.3);
+            border: none;
+            font-family: 'Comfortaa', cursive;
+        }
+        
+        .calendar-day:hover {
+            background: rgba(255,255,255,0.6);
+        }
+        
+        .calendar-day.today {
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .calendar-day.selected {
+            border: 2px solid #6B4E9B;
+        }
+        
+        .calendar-day.other-month {
+            color: rgba(0,0,0,0.3);
+        }
+        
+        .calendar-day.has-events::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            width: 4px;
+            height: 4px;
+            background: #FF9800;
+            border-radius: 50%;
+        }
+        
+        .calendar-day {
+            position: relative;
+        }
+        
         /* Quick eval fields */
         .quick-eval-field {
             margin-bottom: 16px;
@@ -627,7 +759,12 @@
         
         <div class="header">
             <div class="header-title">⚡ Aujourd'hui</div>
-            <div class="header-date" id="headerDate">Mercredi 16 avril 2026</div>
+            <div class="date-nav">
+                <button class="date-nav-btn" onclick="previousDay()">‹</button>
+                <div class="header-date" id="headerDate" onclick="openCalendar()">Mercredi 16 avril 2026</div>
+                <button class="date-nav-btn" onclick="nextDay()">›</button>
+            </div>
+            <div class="today-indicator" id="todayIndicator"></div>
         </div>
         
         <div class="content">
@@ -749,6 +886,27 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Calendar Modal -->
+        <div class="modal-overlay" id="calendarModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title">📅 Calendrier</div>
+                    <button class="modal-close" onclick="closeCalendar()">×</button>
+                </div>
+                <div class="modal-content">
+                    <div class="calendar-header">
+                        <button class="calendar-nav-btn" onclick="prevMonth()">‹</button>
+                        <div class="calendar-month" id="calendarMonth">Avril 2026</div>
+                        <button class="calendar-nav-btn" onclick="nextMonth()">›</button>
+                    </div>
+                    <div class="calendar-grid" id="calendarGrid"></div>
+                    <div class="modal-actions" style="margin-top: 15px;">
+                        <button class="btn btn-secondary" onclick="goToToday()">Aujourd'hui</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <script>
@@ -819,6 +977,10 @@
         let isRecording = false;
         let recognition = null;
         
+        // Date navigation
+        let selectedDate = new Date();
+        let calendarViewDate = new Date();
+        
         const MANUAL_TASK_EMOJIS = ['✨', '🎯', '💡', '🧘', '📞', '✍️', '🎨', '🏃', '📚', '💪', '🧹', '🎵'];
         
         function init() {
@@ -831,18 +993,155 @@
         }
         
         function updateHeaderDate() {
-            const today = new Date();
-            const dayName = DAYS[today.getDay()];
-            const day = today.getDate();
-            const month = MONTHS[today.getMonth()];
-            const year = today.getFullYear();
+            const dayName = DAYS[selectedDate.getDay()];
+            const day = selectedDate.getDate();
+            const month = MONTHS[selectedDate.getMonth()];
+            const year = selectedDate.getFullYear();
             document.getElementById('headerDate').textContent = `${dayName} ${day} ${month} ${year}`;
+            
+            // Show indicator if not today
+            const today = new Date();
+            const isToday = selectedDate.toDateString() === today.toDateString();
+            const indicator = document.getElementById('todayIndicator');
+            if (isToday) {
+                indicator.textContent = '';
+            } else {
+                const diff = Math.floor((selectedDate - today) / (1000 * 60 * 60 * 24));
+                if (diff === -1) {
+                    indicator.textContent = '← Hier';
+                } else if (diff === 1) {
+                    indicator.textContent = 'Demain →';
+                } else if (diff < 0) {
+                    indicator.textContent = `← Il y a ${Math.abs(diff)} jours`;
+                } else {
+                    indicator.textContent = `Dans ${diff} jours →`;
+                }
+            }
+        }
+        
+        function previousDay() {
+            selectedDate.setDate(selectedDate.getDate() - 1);
+            updateHeaderDate();
+            loadTodayEvents();
+            loadManualTasks();
+            loadJournal();
+            updateStats();
+        }
+        
+        function nextDay() {
+            selectedDate.setDate(selectedDate.getDate() + 1);
+            updateHeaderDate();
+            loadTodayEvents();
+            loadManualTasks();
+            loadJournal();
+            updateStats();
+        }
+        
+        function goToToday() {
+            selectedDate = new Date();
+            calendarViewDate = new Date();
+            updateHeaderDate();
+            loadTodayEvents();
+            loadManualTasks();
+            loadJournal();
+            updateStats();
+            closeCalendar();
+        }
+        
+        // Calendar functions
+        function openCalendar() {
+            calendarViewDate = new Date(selectedDate);
+            renderCalendar();
+            document.getElementById('calendarModal').classList.add('show');
+        }
+        
+        function closeCalendar() {
+            document.getElementById('calendarModal').classList.remove('show');
+        }
+        
+        function prevMonth() {
+            calendarViewDate.setMonth(calendarViewDate.getMonth() - 1);
+            renderCalendar();
+        }
+        
+        function nextMonth() {
+            calendarViewDate.setMonth(calendarViewDate.getMonth() + 1);
+            renderCalendar();
+        }
+        
+        function renderCalendar() {
+            const year = calendarViewDate.getFullYear();
+            const month = calendarViewDate.getMonth();
+            
+            document.getElementById('calendarMonth').textContent = 
+                MONTHS[month].charAt(0).toUpperCase() + MONTHS[month].slice(1) + ' ' + year;
+            
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDay = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1; // Monday = 0
+            
+            const today = new Date();
+            const todayStr = today.toISOString().split('T')[0];
+            const selectedStr = selectedDate.toISOString().split('T')[0];
+            
+            // Get days with events
+            const allHistory = JSON.parse(localStorage.getItem('wutree_objective_logs') || '[]');
+            const daysWithEvents = new Set(allHistory.map(h => h.date));
+            
+            let html = '';
+            
+            // Weekday headers
+            const weekDays = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+            weekDays.forEach(d => {
+                html += `<div class="calendar-weekday">${d}</div>`;
+            });
+            
+            // Empty cells before first day
+            for (let i = 0; i < startDay; i++) {
+                const prevMonthDay = new Date(year, month, -startDay + i + 1);
+                html += `<button class="calendar-day other-month" onclick="selectDate(${prevMonthDay.getFullYear()}, ${prevMonthDay.getMonth()}, ${prevMonthDay.getDate()})">${prevMonthDay.getDate()}</button>`;
+            }
+            
+            // Days of the month
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const isToday = dateStr === todayStr;
+                const isSelected = dateStr === selectedStr;
+                const hasEvents = daysWithEvents.has(dateStr);
+                
+                let classes = 'calendar-day';
+                if (isToday) classes += ' today';
+                if (isSelected) classes += ' selected';
+                if (hasEvents) classes += ' has-events';
+                
+                html += `<button class="${classes}" onclick="selectDate(${year}, ${month}, ${day})">${day}</button>`;
+            }
+            
+            // Empty cells after last day
+            const endDay = lastDay.getDay() === 0 ? 6 : lastDay.getDay() - 1;
+            for (let i = endDay + 1; i < 7; i++) {
+                const nextMonthDay = new Date(year, month + 1, i - endDay);
+                html += `<button class="calendar-day other-month" onclick="selectDate(${nextMonthDay.getFullYear()}, ${nextMonthDay.getMonth()}, ${nextMonthDay.getDate()})">${nextMonthDay.getDate()}</button>`;
+            }
+            
+            document.getElementById('calendarGrid').innerHTML = html;
+        }
+        
+        function selectDate(year, month, day) {
+            selectedDate = new Date(year, month, day);
+            calendarViewDate = new Date(year, month, day);
+            updateHeaderDate();
+            loadTodayEvents();
+            loadManualTasks();
+            loadJournal();
+            updateStats();
+            closeCalendar();
         }
         
         function loadTodayEvents() {
-            const today = new Date();
-            const todayDayIndex = today.getDay() === 0 ? 6 : today.getDay() - 1; // 0=Monday, 6=Sunday
-            const todayStr = today.toISOString().split('T')[0];
+            const viewDate = selectedDate;
+            const viewDayIndex = viewDate.getDay() === 0 ? 6 : viewDate.getDay() - 1; // 0=Monday, 6=Sunday
+            const viewDateStr = viewDate.toISOString().split('T')[0];
             
             // Get all sessions from all objectives
             const allSessions = JSON.parse(localStorage.getItem('wutree_objective_sessions_templates') || '[]');
@@ -851,10 +1150,10 @@
             const allDomains = JSON.parse(localStorage.getItem('wutree_domains') || '[]');
             const allHistory = JSON.parse(localStorage.getItem('wutree_objective_logs') || '[]');
             
-            // Get completed sessions today (by unique session ID)
-            const completedToday = new Set(
+            // Get completed sessions for this date (by unique session ID)
+            const completedOnDate = new Set(
                 allHistory
-                    .filter(h => h.date === todayStr)
+                    .filter(h => h.date === viewDateStr)
                     .map(h => h.sessionId)
             );
             
@@ -871,8 +1170,8 @@
                 const activity = allActivities.find(a => a.id === objective.activityId);
                 const domain = allDomains.find(d => d.id === (activity?.domainId || objective.domainId));
                 
-                // Check if already completed today
-                const isDone = completedToday.has(session.id);
+                // Check if already completed on this date
+                const isDone = completedOnDate.has(session.id);
                 
                 const eventData = {
                     sessionId: session.id,
@@ -889,16 +1188,16 @@
                 
                 // Determine where to show this session
                 const isFlexible = session.type === 'flexible';
-                const isForToday = !isFlexible && (session.days || []).includes(todayDayIndex);
+                const isForThisDay = !isFlexible && (session.days || []).includes(viewDayIndex);
                 
-                if (isForToday) {
-                    // Fixed session scheduled for today
-                    eventData.desc = 'Prévu aujourd\'hui';
+                if (isForThisDay) {
+                    // Fixed session scheduled for this day
+                    eventData.desc = 'Prévu ce jour';
                     dailyEvents.push(eventData);
                 } else if (isFlexible) {
                     // Flexible session - show in weekly
-                    const weekStart = new Date(today);
-                    weekStart.setDate(today.getDate() - ((today.getDay() + 6) % 7));
+                    const weekStart = new Date(viewDate);
+                    weekStart.setDate(viewDate.getDate() - ((viewDate.getDay() + 6) % 7));
                     weekStart.setHours(0, 0, 0, 0);
                     
                     const weekLogs = allHistory.filter(h => {
