@@ -561,6 +561,59 @@
         
         .menu-icon { font-size: 24px; }
         .menu-label { font-size: 10px; color: rgba(0,0,0,0.6); font-weight: 500; }
+        
+        /* Habits bubble - fixed bottom left */
+        .habits-bubble {
+            position: absolute;
+            bottom: 90px;
+            left: 20px;
+            width: 70px;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(15px);
+            border: 3px solid rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 80;
+            box-shadow: 0 8px 25px rgba(107, 78, 155, 0.25);
+            transition: all 0.3s;
+        }
+        
+        .habits-bubble:active {
+            transform: scale(0.95);
+        }
+        
+        .habits-bubble-emoji {
+            font-size: 28px;
+        }
+        
+        .habits-bubble-label {
+            font-size: 8px;
+            font-weight: 600;
+            color: #6B4E9B;
+            margin-top: 2px;
+        }
+        
+        .habits-bubble-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            min-width: 22px;
+            height: 22px;
+            background: linear-gradient(135deg, #4CAF50, #66BB6A);
+            border-radius: 11px;
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid white;
+        }
     </style>
 </head>
 <body>
@@ -592,6 +645,13 @@
         
         <!-- FAB pour ajouter un domaine -->
         <button class="fab" onclick="openAddDomainModal()">+</button>
+        
+        <!-- Habits bubble -->
+        <div class="habits-bubble" onclick="goToHabits()">
+            <div class="habits-bubble-badge" id="habitsBadge">0</div>
+            <div class="habits-bubble-emoji">🌱</div>
+            <div class="habits-bubble-label">Habitudes</div>
+        </div>
         
         <div class="bottom-menu">
             <div class="menu-item" onclick="goToWellbeing()">
@@ -851,8 +911,34 @@
             }
         });
         
+        // ========== NAVIGATION ==========
+        function goToWellbeing() {
+            window.location.href = 'wu-tree-v2-visualization.html';
+        }
+        
+        function goToTasks() {
+            window.location.href = 'wu-tree-v2-tasks.html';
+        }
+        
+        function goToHabits() {
+            window.location.href = 'wu-tree-v2-new-habits.html';
+        }
+        
+        // ========== HABITS BADGE ==========
+        function updateHabitsBadge() {
+            const habits = JSON.parse(localStorage.getItem('wutree_new_habits') || '[]');
+            const badge = document.getElementById('habitsBadge');
+            if (habits.length > 0) {
+                badge.textContent = habits.length;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+        
         // ========== INIT ==========
         renderBubbles();
+        updateHabitsBadge();
     </script>
 </body>
 </html>
