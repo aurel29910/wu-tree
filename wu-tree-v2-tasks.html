@@ -29,13 +29,70 @@
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 20px; color: rgba(255,255,255,0.95); font-size: 14px; z-index: 100; }
         
-        .header { position: absolute; top: 44px; left: 0; right: 0; height: 80px;
+        .header { position: absolute; top: 44px; left: 0; right: 0; height: 100px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 0 15px; z-index: 90;
+            padding: 8px 15px; z-index: 90;
             background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
-        .header-title { font-family: 'Comfortaa', cursive; font-size: 20px; font-weight: 600;
-            color: white; text-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+        
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+        }
+        
+        .view-toggle {
+            display: flex;
+            background: rgba(255,255,255,0.2);
+            border-radius: 20px;
+            padding: 3px;
+        }
+        
+        .toggle-btn {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 17px;
+            font-family: 'Comfortaa', cursive;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            background: transparent;
+            color: rgba(255,255,255,0.7);
+            transition: all 0.2s;
+        }
+        
+        .toggle-btn.active {
+            background: rgba(255,255,255,0.9);
+            color: #6B4E9B;
+        }
+        
+        .bilan-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .bilan-btn:active {
+            background: rgba(255,255,255,0.5);
+        }
+        
+        .bilan-btn.has-new {
+            animation: pulse-bilan 2s infinite;
+        }
+        
+        @keyframes pulse-bilan {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(107,78,155,0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(107,78,155,0); }
+        }
         
         .date-nav {
             display: flex;
@@ -81,8 +138,199 @@
             font-weight: 600;
         }
         
-        .content { position: absolute; top: 124px; left: 0; right: 0; bottom: 70px;
+        .content { position: absolute; top: 144px; left: 0; right: 0; bottom: 70px;
             overflow-y: auto; padding: 15px 20px; z-index: 60; }
+        
+        /* Week View */
+        .week-view { display: none; }
+        .week-view.active { display: block; }
+        .day-view { display: block; }
+        .day-view.hidden { display: none; }
+        
+        .week-progress-card {
+            background: rgba(255,255,255,0.6);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.7);
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+        
+        .week-progress-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .week-progress-emoji { font-size: 24px; }
+        
+        .week-progress-info { flex: 1; }
+        
+        .week-progress-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .week-progress-domain {
+            font-size: 11px;
+            color: rgba(0,0,0,0.5);
+        }
+        
+        .week-progress-count {
+            font-size: 16px;
+            font-weight: 700;
+            color: #6B4E9B;
+        }
+        
+        .week-progress-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .week-progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        
+        .week-progress-fill.complete { background: linear-gradient(90deg, #4CAF50, #66BB6A); }
+        .week-progress-fill.partial { background: linear-gradient(90deg, #FF9800, #FFB74D); }
+        .week-progress-fill.low { background: linear-gradient(90deg, #f44336, #EF5350); }
+        
+        .week-summary {
+            background: rgba(107,78,155,0.1);
+            border: 2px solid rgba(107,78,155,0.3);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .week-summary-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #6B4E9B;
+            margin-bottom: 8px;
+        }
+        
+        .week-summary-stats {
+            display: flex;
+            justify-content: space-around;
+        }
+        
+        .week-stat {
+            text-align: center;
+        }
+        
+        .week-stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .week-stat-label {
+            font-size: 10px;
+            color: rgba(0,0,0,0.5);
+        }
+        
+        /* Bilan styles */
+        .bilan-section {
+            margin-bottom: 18px;
+        }
+        
+        .bilan-section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #6B4E9B;
+            margin-bottom: 10px;
+        }
+        
+        .bilan-ai-summary {
+            background: rgba(107,78,155,0.1);
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+        
+        .bilan-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .bilan-stat-card {
+            background: rgba(255,255,255,0.6);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+        }
+        
+        .bilan-stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #6B4E9B;
+        }
+        
+        .bilan-stat-label {
+            font-size: 10px;
+            color: rgba(0,0,0,0.5);
+        }
+        
+        .bilan-list-item {
+            background: rgba(255,255,255,0.6);
+            border: 2px solid rgba(255,255,255,0.7);
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        
+        .bilan-list-item:active {
+            background: rgba(255,255,255,0.8);
+        }
+        
+        .bilan-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        
+        .bilan-list-date {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .bilan-list-percent {
+            font-size: 14px;
+            font-weight: 700;
+            color: #6B4E9B;
+        }
+        
+        .bilan-list-preview {
+            font-size: 11px;
+            color: rgba(0,0,0,0.5);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .bilan-new-badge {
+            display: inline-block;
+            background: #FF9800;
+            color: white;
+            font-size: 9px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 8px;
+            margin-left: 8px;
+        }
         
         /* Stats row */
         .stats-row {
@@ -846,8 +1094,14 @@
         <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
         
         <div class="header">
-            <div class="header-title">⚡ Aujourd'hui</div>
-            <div class="date-nav">
+            <div class="header-top">
+                <div class="view-toggle">
+                    <button class="toggle-btn active" id="toggleDay" onclick="switchView('day')">Aujourd'hui</button>
+                    <button class="toggle-btn" id="toggleWeek" onclick="switchView('week')">Semaine</button>
+                </div>
+                <button class="bilan-btn" id="bilanBtn" onclick="openBilanList()">📊</button>
+            </div>
+            <div class="date-nav" id="dateNav">
                 <button class="date-nav-btn" onclick="previousDay()">‹</button>
                 <div class="header-date" id="headerDate" onclick="openCalendar()">Mercredi 16 avril 2026</div>
                 <button class="date-nav-btn" onclick="nextDay()">›</button>
@@ -856,7 +1110,8 @@
         </div>
         
         <div class="content">
-            <!-- Stats -->
+            <!-- DAY VIEW -->
+            <div class="day-view" id="dayView">
             <div class="stats-row">
                 <div class="stat-card">
                     <div class="stat-value" id="statDone">0</div>
@@ -915,6 +1170,29 @@
                         <button class="journal-save" id="journalSave" onclick="saveJournal()" disabled>Enregistrer</button>
                     </div>
                 </div>
+            </div>
+            </div><!-- End day-view -->
+            
+            <!-- WEEK VIEW -->
+            <div class="week-view" id="weekView">
+                <div class="week-summary" id="weekSummary">
+                    <div class="week-summary-title">📊 Semaine du <span id="weekRange">14 - 20 avril</span></div>
+                    <div class="week-summary-stats">
+                        <div class="week-stat">
+                            <div class="week-stat-value" id="weekTotal">0</div>
+                            <div class="week-stat-label">Sessions faites</div>
+                        </div>
+                        <div class="week-stat">
+                            <div class="week-stat-value" id="weekTarget">0</div>
+                            <div class="week-stat-label">Objectif</div>
+                        </div>
+                        <div class="week-stat">
+                            <div class="week-stat-value" id="weekPercent">0%</div>
+                            <div class="week-stat-label">Accompli</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="weekProgressContainer"></div>
             </div>
         </div>
         
@@ -1069,6 +1347,77 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Modal Liste des Bilans -->
+        <div class="modal-overlay" id="bilanListModal">
+            <div class="modal" style="max-height: 85vh; overflow-y: auto;">
+                <div class="modal-header">
+                    <div class="modal-title">📊 Mes bilans hebdo</div>
+                    <button class="modal-close" onclick="closeBilanList()">×</button>
+                </div>
+                <div class="modal-content">
+                    <div id="bilanListContainer">
+                        <div style="text-align: center; padding: 30px; color: rgba(0,0,0,0.4);">
+                            Aucun bilan pour l'instant.<br>
+                            <span style="font-size: 11px;">Le premier bilan sera disponible dimanche à 18h.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal Créer/Voir Bilan -->
+        <div class="modal-overlay" id="bilanModal">
+            <div class="modal" style="max-height: 90vh; overflow-y: auto;">
+                <div class="modal-header">
+                    <div class="modal-title" id="bilanModalTitle">📊 Bilan de la semaine</div>
+                    <button class="modal-close" onclick="closeBilan()">×</button>
+                </div>
+                <div class="modal-content">
+                    <!-- Résumé IA -->
+                    <div class="bilan-section">
+                        <div class="bilan-section-title">🤖 Analyse de la semaine</div>
+                        <div class="bilan-ai-summary" id="bilanAiSummary">
+                            <div style="text-align: center; color: rgba(0,0,0,0.4);">
+                                L'analyse IA sera disponible prochainement...
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Stats résumé -->
+                    <div class="bilan-section">
+                        <div class="bilan-section-title">📈 Statistiques</div>
+                        <div class="bilan-stats" id="bilanStats"></div>
+                    </div>
+                    
+                    <!-- Ressenti utilisateur -->
+                    <div class="bilan-section">
+                        <div class="bilan-section-title">💭 Mon ressenti</div>
+                        <textarea class="input-textarea" id="bilanFeeling" placeholder="Comment as-tu vécu cette semaine ?"></textarea>
+                    </div>
+                    
+                    <div class="bilan-section">
+                        <div class="bilan-section-title">🌟 Mes victoires</div>
+                        <textarea class="input-textarea" id="bilanWins" placeholder="Tes réussites, progrès, fiertés..."></textarea>
+                    </div>
+                    
+                    <div class="bilan-section">
+                        <div class="bilan-section-title">✨ Manifestations</div>
+                        <textarea class="input-textarea" id="bilanManifestations" placeholder="Synchronicités, signes, événements alignés..."></textarea>
+                    </div>
+                    
+                    <div class="bilan-section">
+                        <div class="bilan-section-title">🎯 Focus semaine prochaine</div>
+                        <textarea class="input-textarea" id="bilanNextFocus" placeholder="Sur quoi veux-tu te concentrer ?"></textarea>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="closeBilan()">Fermer</button>
+                        <button class="btn btn-primary" onclick="saveBilan()">💾 Sauvegarder</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <script>
@@ -1143,6 +1492,10 @@
         let selectedDate = new Date();
         let calendarViewDate = new Date();
         
+        // View state
+        let currentView = 'day'; // 'day' or 'week'
+        let currentBilanWeek = null;
+        
         const MANUAL_TASK_EMOJIS = ['✨', '🎯', '💡', '🧘', '📞', '✍️', '🎨', '🏃', '📚', '💪', '🧹', '🎵'];
         
         function init() {
@@ -1152,6 +1505,334 @@
             loadJournal();
             updateStats();
             setupVoiceRecognition();
+            checkBilanTime();
+        }
+        
+        // ========== VIEW TOGGLE ==========
+        function switchView(view) {
+            currentView = view;
+            
+            document.getElementById('toggleDay').classList.toggle('active', view === 'day');
+            document.getElementById('toggleWeek').classList.toggle('active', view === 'week');
+            
+            document.getElementById('dayView').classList.toggle('hidden', view !== 'day');
+            document.getElementById('weekView').classList.toggle('active', view === 'week');
+            
+            // Show/hide date navigation in week view
+            document.getElementById('dateNav').style.display = view === 'day' ? 'flex' : 'none';
+            document.getElementById('todayIndicator').style.display = view === 'day' ? 'block' : 'none';
+            
+            if (view === 'week') {
+                loadWeekProgress();
+            }
+        }
+        
+        function loadWeekProgress() {
+            const today = new Date();
+            const weekStart = new Date(today);
+            weekStart.setDate(today.getDate() - ((today.getDay() + 6) % 7)); // Monday
+            weekStart.setHours(0, 0, 0, 0);
+            
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekStart.getDate() + 6); // Sunday
+            
+            // Update week range display
+            const startStr = weekStart.getDate();
+            const endStr = weekEnd.getDate() + ' ' + MONTHS[weekEnd.getMonth()];
+            document.getElementById('weekRange').textContent = `${startStr} - ${endStr}`;
+            
+            const allSessions = JSON.parse(localStorage.getItem('wutree_objective_sessions_templates') || '[]');
+            const allObjectives = JSON.parse(localStorage.getItem('wutree_objectives') || '[]');
+            const allActivities = JSON.parse(localStorage.getItem('wutree_activities') || '[]');
+            const allDomains = JSON.parse(localStorage.getItem('wutree_domains') || '[]');
+            const allHistory = JSON.parse(localStorage.getItem('wutree_objective_logs') || '[]');
+            
+            // Filter history for this week
+            const weekHistory = allHistory.filter(h => {
+                const d = new Date(h.date);
+                return d >= weekStart && d <= weekEnd;
+            });
+            
+            // Group by session
+            const sessionProgress = {};
+            let totalTarget = 0;
+            let totalDone = 0;
+            
+            allSessions.forEach(session => {
+                const objective = allObjectives.find(o => o.id === session.objectiveId);
+                if (!objective) return;
+                
+                const activity = allActivities.find(a => a.id === objective.activityId);
+                const domain = allDomains.find(d => d.id === (activity?.domainId || objective.domainId));
+                
+                // Calculate target for this session
+                let target = 0;
+                if (session.type === 'flexible') {
+                    target = session.frequency || 1;
+                } else {
+                    target = (session.days || []).length;
+                }
+                
+                // Count completions this week
+                const done = weekHistory.filter(h => h.sessionId === session.id).length;
+                
+                totalTarget += target;
+                totalDone += Math.min(done, target);
+                
+                sessionProgress[session.id] = {
+                    session,
+                    objective,
+                    domain,
+                    target,
+                    done,
+                    percent: target > 0 ? Math.round((done / target) * 100) : 0
+                };
+            });
+            
+            // Update summary stats
+            document.getElementById('weekTotal').textContent = totalDone;
+            document.getElementById('weekTarget').textContent = totalTarget;
+            document.getElementById('weekPercent').textContent = totalTarget > 0 ? Math.round((totalDone / totalTarget) * 100) + '%' : '0%';
+            
+            // Render progress cards
+            const container = document.getElementById('weekProgressContainer');
+            const sessions = Object.values(sessionProgress).sort((a, b) => a.percent - b.percent);
+            
+            if (sessions.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 30px; color: rgba(0,0,0,0.4);">
+                        🌱 Aucune session planifiée.<br>
+                        <span style="font-size: 11px;">Crée des sessions dans tes objectifs.</span>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = sessions.map(s => {
+                const fillClass = s.percent >= 100 ? 'complete' : s.percent >= 50 ? 'partial' : 'low';
+                return `
+                    <div class="week-progress-card">
+                        <div class="week-progress-header">
+                            <div class="week-progress-emoji">${s.session.emoji}</div>
+                            <div class="week-progress-info">
+                                <div class="week-progress-name">${s.session.name}</div>
+                                <div class="week-progress-domain">${s.domain?.emoji || ''} ${s.objective.name}</div>
+                            </div>
+                            <div class="week-progress-count">${s.done}/${s.target}</div>
+                        </div>
+                        <div class="week-progress-bar">
+                            <div class="week-progress-fill ${fillClass}" style="width: ${Math.min(100, s.percent)}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // ========== BILAN ==========
+        function checkBilanTime() {
+            const now = new Date();
+            // Check if it's Sunday after 18:00
+            if (now.getDay() === 0 && now.getHours() >= 18) {
+                const weekKey = getWeekKey(now);
+                const bilans = JSON.parse(localStorage.getItem('wutree_bilans') || '{}');
+                
+                // If no bilan for this week yet, highlight the button
+                if (!bilans[weekKey]) {
+                    document.getElementById('bilanBtn').classList.add('has-new');
+                }
+            }
+        }
+        
+        function getWeekKey(date) {
+            const d = new Date(date);
+            d.setDate(d.getDate() - ((d.getDay() + 6) % 7)); // Monday
+            return d.toISOString().split('T')[0];
+        }
+        
+        function openBilanList() {
+            const bilans = JSON.parse(localStorage.getItem('wutree_bilans') || '{}');
+            const container = document.getElementById('bilanListContainer');
+            
+            const weekKeys = Object.keys(bilans).sort().reverse();
+            
+            if (weekKeys.length === 0) {
+                // Check if we can create one (Sunday 18h+)
+                const now = new Date();
+                if (now.getDay() === 0 && now.getHours() >= 18) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 20px;">
+                            <div style="font-size: 40px; margin-bottom: 15px;">📊</div>
+                            <div style="font-size: 14px; font-weight: 600; color: #6B4E9B; margin-bottom: 10px;">
+                                C'est l'heure du bilan !
+                            </div>
+                            <div style="font-size: 12px; color: rgba(0,0,0,0.5); margin-bottom: 20px;">
+                                Prends quelques minutes pour faire le point sur ta semaine.
+                            </div>
+                            <button class="btn btn-primary" onclick="openBilan('${getWeekKey(now)}')">
+                                ✨ Créer mon bilan
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 30px; color: rgba(0,0,0,0.4);">
+                            Aucun bilan pour l'instant.<br>
+                            <span style="font-size: 11px;">Le prochain bilan sera disponible dimanche à 18h.</span>
+                        </div>
+                    `;
+                }
+            } else {
+                container.innerHTML = weekKeys.map(key => {
+                    const bilan = bilans[key];
+                    const weekStart = new Date(key);
+                    const weekEnd = new Date(weekStart);
+                    weekEnd.setDate(weekStart.getDate() + 6);
+                    
+                    const dateStr = `${weekStart.getDate()} - ${weekEnd.getDate()} ${MONTHS[weekEnd.getMonth()]}`;
+                    const preview = bilan.feeling ? bilan.feeling.substring(0, 50) + '...' : 'Aucun ressenti noté';
+                    
+                    return `
+                        <div class="bilan-list-item" onclick="openBilan('${key}')">
+                            <div class="bilan-list-header">
+                                <div class="bilan-list-date">📊 Semaine du ${dateStr}</div>
+                                <div class="bilan-list-percent">${bilan.percent || 0}%</div>
+                            </div>
+                            <div class="bilan-list-preview">${preview}</div>
+                        </div>
+                    `;
+                }).join('');
+                
+                // Add "create new" if Sunday 18h+ and no bilan this week
+                const now = new Date();
+                const currentWeekKey = getWeekKey(now);
+                if (now.getDay() === 0 && now.getHours() >= 18 && !bilans[currentWeekKey]) {
+                    container.innerHTML = `
+                        <div class="bilan-list-item" style="background: rgba(107,78,155,0.1); border-color: #6B4E9B;" onclick="openBilan('${currentWeekKey}')">
+                            <div class="bilan-list-header">
+                                <div class="bilan-list-date">✨ Cette semaine <span class="bilan-new-badge">Nouveau</span></div>
+                            </div>
+                            <div class="bilan-list-preview">Créer ton bilan de la semaine</div>
+                        </div>
+                    ` + container.innerHTML;
+                }
+            }
+            
+            document.getElementById('bilanListModal').classList.add('show');
+        }
+        
+        function closeBilanList() {
+            document.getElementById('bilanListModal').classList.remove('show');
+        }
+        
+        function openBilan(weekKey) {
+            currentBilanWeek = weekKey;
+            closeBilanList();
+            
+            const weekStart = new Date(weekKey);
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekStart.getDate() + 6);
+            
+            document.getElementById('bilanModalTitle').textContent = 
+                `📊 Bilan du ${weekStart.getDate()} - ${weekEnd.getDate()} ${MONTHS[weekEnd.getMonth()]}`;
+            
+            // Load existing bilan or calculate stats
+            const bilans = JSON.parse(localStorage.getItem('wutree_bilans') || '{}');
+            const bilan = bilans[weekKey] || {};
+            
+            // Calculate stats for this week
+            const allHistory = JSON.parse(localStorage.getItem('wutree_objective_logs') || '[]');
+            const weekHistory = allHistory.filter(h => {
+                const d = new Date(h.date);
+                return d >= weekStart && d <= weekEnd;
+            });
+            
+            const allSessions = JSON.parse(localStorage.getItem('wutree_objective_sessions_templates') || '[]');
+            let totalTarget = 0;
+            let totalDone = 0;
+            
+            allSessions.forEach(session => {
+                let target = session.type === 'flexible' ? (session.frequency || 1) : (session.days || []).length;
+                totalTarget += target;
+                totalDone += Math.min(weekHistory.filter(h => h.sessionId === session.id).length, target);
+            });
+            
+            const percent = totalTarget > 0 ? Math.round((totalDone / totalTarget) * 100) : 0;
+            
+            // Render stats
+            document.getElementById('bilanStats').innerHTML = `
+                <div class="bilan-stat-card">
+                    <div class="bilan-stat-value">${totalDone}</div>
+                    <div class="bilan-stat-label">Sessions faites</div>
+                </div>
+                <div class="bilan-stat-card">
+                    <div class="bilan-stat-value">${totalTarget}</div>
+                    <div class="bilan-stat-label">Objectif</div>
+                </div>
+                <div class="bilan-stat-card">
+                    <div class="bilan-stat-value">${percent}%</div>
+                    <div class="bilan-stat-label">Accompli</div>
+                </div>
+                <div class="bilan-stat-card">
+                    <div class="bilan-stat-value">${weekHistory.length}</div>
+                    <div class="bilan-stat-label">Entrées journal</div>
+                </div>
+            `;
+            
+            // Fill form
+            document.getElementById('bilanFeeling').value = bilan.feeling || '';
+            document.getElementById('bilanWins').value = bilan.wins || '';
+            document.getElementById('bilanManifestations').value = bilan.manifestations || '';
+            document.getElementById('bilanNextFocus').value = bilan.nextFocus || '';
+            
+            document.getElementById('bilanModal').classList.add('show');
+            document.getElementById('bilanBtn').classList.remove('has-new');
+        }
+        
+        function closeBilan() {
+            document.getElementById('bilanModal').classList.remove('show');
+            currentBilanWeek = null;
+        }
+        
+        function saveBilan() {
+            if (!currentBilanWeek) return;
+            
+            const bilans = JSON.parse(localStorage.getItem('wutree_bilans') || '{}');
+            
+            // Calculate percent for storage
+            const weekStart = new Date(currentBilanWeek);
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekStart.getDate() + 6);
+            
+            const allHistory = JSON.parse(localStorage.getItem('wutree_objective_logs') || '[]');
+            const weekHistory = allHistory.filter(h => {
+                const d = new Date(h.date);
+                return d >= weekStart && d <= weekEnd;
+            });
+            
+            const allSessions = JSON.parse(localStorage.getItem('wutree_objective_sessions_templates') || '[]');
+            let totalTarget = 0;
+            let totalDone = 0;
+            
+            allSessions.forEach(session => {
+                let target = session.type === 'flexible' ? (session.frequency || 1) : (session.days || []).length;
+                totalTarget += target;
+                totalDone += Math.min(weekHistory.filter(h => h.sessionId === session.id).length, target);
+            });
+            
+            bilans[currentBilanWeek] = {
+                feeling: document.getElementById('bilanFeeling').value.trim(),
+                wins: document.getElementById('bilanWins').value.trim(),
+                manifestations: document.getElementById('bilanManifestations').value.trim(),
+                nextFocus: document.getElementById('bilanNextFocus').value.trim(),
+                percent: totalTarget > 0 ? Math.round((totalDone / totalTarget) * 100) : 0,
+                sessionsTotal: totalDone,
+                sessionsTarget: totalTarget,
+                createdAt: new Date().toISOString()
+            };
+            
+            localStorage.setItem('wutree_bilans', JSON.stringify(bilans));
+            closeBilan();
+            alert('✨ Bilan sauvegardé !');
         }
         
         function updateHeaderDate() {
