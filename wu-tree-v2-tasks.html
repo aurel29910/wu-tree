@@ -1535,6 +1535,11 @@
             
             const weekEnd = new Date(weekStart);
             weekEnd.setDate(weekStart.getDate() + 6); // Sunday
+            weekEnd.setHours(23, 59, 59, 999);
+            
+            // Get week date strings for comparison
+            const weekStartStr = weekStart.toISOString().split('T')[0];
+            const weekEndStr = weekEnd.toISOString().split('T')[0];
             
             // Update week range display
             const startStr = weekStart.getDate();
@@ -1547,13 +1552,17 @@
             const allDomains = JSON.parse(localStorage.getItem('wutree_domains') || '[]');
             const allHistory = JSON.parse(localStorage.getItem('wutree_objective_logs') || '[]');
             
-            // Filter history for this week
+            // Filter history for this week (compare date strings)
             const weekHistory = allHistory.filter(h => {
-                const d = new Date(h.date);
-                return d >= weekStart && d <= weekEnd;
+                return h.date >= weekStartStr && h.date <= weekEndStr;
             });
             
-            // Group by session
+            // Debug: log to check
+            console.log('Week:', weekStartStr, 'to', weekEndStr);
+            console.log('History entries this week:', weekHistory.length);
+            console.log('All history:', allHistory.map(h => h.date + ' - ' + h.sessionId));
+            
+            // Group by session - count unique dates per session
             const sessionProgress = {};
             let totalTarget = 0;
             let totalDone = 0;
@@ -1573,8 +1582,10 @@
                     target = (session.days || []).length;
                 }
                 
-                // Count completions this week
-                const done = weekHistory.filter(h => h.sessionId === session.id).length;
+                // Count completions this week - unique dates only
+                const sessionLogs = weekHistory.filter(h => h.sessionId === session.id);
+                const uniqueDates = [...new Set(sessionLogs.map(h => h.date))];
+                const done = uniqueDates.length;
                 
                 totalTarget += target;
                 totalDone += Math.min(done, target);
