@@ -1564,12 +1564,6 @@
                 return h.date >= weekStartStr && h.date <= weekEndStr;
             });
             
-            // Debug: log to check
-            console.log('=== WEEK PROGRESS DEBUG ===');
-            console.log('Week:', weekStartStr, 'to', weekEndStr);
-            console.log('Total history entries:', allHistory.length);
-            console.log('This week entries:', weekHistory.length);
-            
             // Group by session - count unique dates per session
             const sessionProgress = {};
             let totalTarget = 0;
@@ -1595,9 +1589,6 @@
                 const uniqueDates = [...new Set(sessionLogs.map(h => h.date))];
                 const done = uniqueDates.length;
                 
-                // Debug per session
-                console.log(`Session "${session.name}": ${done}/${target}`, uniqueDates);
-                
                 totalTarget += target;
                 totalDone += Math.min(done, target);
                 
@@ -1606,8 +1597,8 @@
                     objective,
                     domain,
                     target,
-                    done,
-                    percent: target > 0 ? Math.round((done / target) * 100) : 0
+                    done: Math.min(done, target), // Cap at target
+                    percent: target > 0 ? Math.min(100, Math.round((done / target) * 100)) : 0
                 };
             });
             
@@ -1631,6 +1622,7 @@
             }
             
             container.innerHTML = sessions.map(s => {
+                const displayDone = Math.min(s.done, s.target); // Never show more than target
                 const fillClass = s.percent >= 100 ? 'complete' : s.percent >= 50 ? 'partial' : 'low';
                 return `
                     <div class="week-progress-card">
@@ -1640,7 +1632,7 @@
                                 <div class="week-progress-name">${s.session.name}</div>
                                 <div class="week-progress-domain">${s.domain?.emoji || ''} ${s.objective.name}</div>
                             </div>
-                            <div class="week-progress-count">${s.done}/${s.target}</div>
+                            <div class="week-progress-count">${displayDone}/${s.target}</div>
                         </div>
                         <div class="week-progress-bar">
                             <div class="week-progress-fill ${fillClass}" style="width: ${Math.min(100, s.percent)}%"></div>
