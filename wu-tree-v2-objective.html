@@ -783,6 +783,22 @@
             font-size: 11px;
         }
         
+        .history-see-all {
+            text-align: center;
+            padding: 12px;
+            background: rgba(107, 78, 155, 0.1);
+            border-radius: 12px;
+            color: #6B4E9B;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        .history-see-all:active {
+            background: rgba(107, 78, 155, 0.2);
+        }
+        
         /* Add session button */
         .add-card {
             background: rgba(255,255,255,0.25);
@@ -2615,7 +2631,8 @@
             const energyEmojis = ['', '😴', '😔', '😐', '😊', '🔥'];
             const moodEmojis = ['', '😤', '😕', '😌', '😄', '🤩'];
             
-            container.innerHTML = history.slice(0, 5).map(log => {
+            // Show only last 2 items
+            let html = history.slice(0, 2).map(log => {
                 const rpeColor = getRpeColor(log.rpe || 5);
                 const energyEmoji = energyEmojis[log.energy || 4];
                 const moodEmoji = moodEmojis[log.mood || 4];
@@ -2639,6 +2656,17 @@
                     </div>
                 `;
             }).join('');
+            
+            // Add "see all" button if more than 2 items
+            if (history.length > 2) {
+                html += `
+                    <div class="history-see-all" onclick="openModal('history')">
+                        📜 Voir tout l'historique (${history.length} entrées)
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
         }
         
         let currentEditHistoryId = null;
