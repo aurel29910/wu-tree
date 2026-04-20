@@ -138,13 +138,47 @@
             margin-bottom: 12px;
             cursor: pointer;
             transition: transform 0.2s;
+            position: relative;
         }
         
         .objective-card:active {
             transform: scale(0.98);
         }
         
-        .objective-header { display: flex; align-items: center; gap: 12px; }
+        .objective-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 6px;
+        }
+        
+        .objective-action-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.6;
+        }
+        
+        .objective-action-btn:active {
+            opacity: 1;
+        }
+        
+        .objective-action-btn.edit {
+            background: rgba(107, 78, 155, 0.15);
+        }
+        
+        .objective-action-btn.delete {
+            background: rgba(244, 67, 54, 0.15);
+        }
+        
+        .objective-header { display: flex; align-items: center; gap: 12px; padding-right: 70px; }
         .objective-emoji { font-size: 28px; }
         .objective-content { flex: 1; }
         .objective-name { font-size: 14px; font-weight: 600; color: #333; margin-bottom: 4px; }
@@ -960,6 +994,10 @@
                 
                 return `
                     <div class="objective-card ${obj.completed ? 'completed' : ''}" onclick="openObjective('${obj.id}')">
+                        <div class="objective-actions">
+                            <button class="objective-action-btn edit" onclick="event.stopPropagation(); editObjective('${obj.id}')" title="Modifier">✏️</button>
+                            <button class="objective-action-btn delete" onclick="event.stopPropagation(); deleteObjective('${obj.id}')" title="Supprimer">🗑️</button>
+                        </div>
                         <div class="objective-header">
                             <div class="objective-emoji">${obj.emoji}</div>
                             <div class="objective-content">
@@ -992,22 +1030,86 @@
             
             if (!name || !deadline) { alert('Remplis tous les champs !'); return; }
             
-            const objectives = getObjectives();
-            objectives.push({ 
-                id: 'obj_' + Date.now(), 
-                activityId: currentActivityId, 
-                domainId: currentDomainId,
-                name, 
-                deadline, 
-                emoji, 
-                completed: false,
-                weekProgram: {},
-                createdAt: new Date().toISOString() 
-            });
+            let objectives = getObjectives();
+            
+            if (editingObjectiveId) {
+                // Edit mode
+                const index = objectives.findIndex(o => o.id === editingObjectiveId);
+                if (index !== -1) {
+                    objectives[index] = {
+                        ...objectives[index],
+                        name,
+                        deadline,
+                        emoji
+                    };
+                }
+                editingObjectiveId = null;
+                document.querySelector('#objectiveModal .modal-title').textContent = '🎯 Nouvel objectif';
+                document.querySelector('#objectiveModal .btn-primary').textContent = 'Ajouter';
+            } else {
+                // Create mode
+                objectives.push({ 
+                    id: 'obj_' + Date.now(), 
+                    activityId: currentActivityId, 
+                    domainId: currentDomainId,
+                    name, 
+                    deadline, 
+                    emoji, 
+                    completed: false,
+                    weekProgram: {},
+                    createdAt: new Date().toISOString() 
+                });
+            }
+            
             saveObjectives(objectives);
             closeModal('objective');
             document.getElementById('objectiveName').value = '';
             document.getElementById('objectiveDeadline').value = '';
+            renderObjectives();
+        }
+        
+        let editingObjectiveId = null;
+        
+        function editObjective(objectiveId) {
+            const objectives = getObjectives();
+            const obj = objectives.find(o => o.id === objectiveId);
+            if (!obj) return;
+            
+            editingObjectiveId = objectiveId;
+            
+            document.getElementById('objectiveName').value = obj.name;
+            document.getElementById('objectiveDeadline').value = obj.deadline;
+            
+            // Select emoji
+            const emojis = document.querySelectorAll('#objectiveEmojis .emoji-option');
+            emojis.forEach(e => {
+                e.classList.toggle('selected', e.textContent === obj.emoji);
+            });
+            
+            document.querySelector('#objectiveModal .modal-title').textContent = '✏️ Modifier l\'objectif';
+            document.querySelector('#objectiveModal .btn-primary').textContent = 'Enregistrer';
+            
+            openModal('objective');
+        }
+        
+        function deleteObjective(objectiveId) {
+            if (!confirm('Supprimer cet objectif et toutes ses données ?')) return;
+            
+            // Delete objective
+            let objectives = getObjectives();
+            objectives = objectives.filter(o => o.id !== objectiveId);
+            saveObjectives(objectives);
+            
+            // Delete associated sessions
+            let sessions = JSON.parse(localStorage.getItem('wutree_objective_sessions_templates') || '[]');
+            sessions = sessions.filter(s => s.objectiveId !== objectiveId);
+            localStorage.setItem('wutree_objective_sessions_templates', JSON.stringify(sessions));
+            
+            // Delete associated logs
+            let logs = JSON.parse(localStorage.getItem('wutree_objective_logs') || '[]');
+            logs = logs.filter(l => l.objectiveId !== objectiveId);
+            localStorage.setItem('wutree_objective_logs', JSON.stringify(logs));
+            
             renderObjectives();
         }
         
