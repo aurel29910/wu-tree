@@ -184,6 +184,10 @@
             color: #6B4E9B;
         }
         
+        .week-progress-count.complete {
+            color: #4CAF50;
+        }
+        
         .week-progress-bar {
             height: 8px;
             background: rgba(255,255,255,0.5);
@@ -1893,6 +1897,7 @@
             container.innerHTML = sessions.map(s => {
                 const displayDone = Math.min(s.done, s.target); // Never show more than target
                 const fillClass = s.percent >= 100 ? 'complete' : s.percent >= 50 ? 'partial' : 'low';
+                const percentDisplay = s.percent >= 100 ? '✓' : `${s.percent}%`;
                 return `
                     <div class="week-progress-card">
                         <div class="week-progress-header">
@@ -1901,7 +1906,7 @@
                                 <div class="week-progress-name">${s.session.name}</div>
                                 <div class="week-progress-domain">${s.domain?.emoji || ''} ${s.objective.name}</div>
                             </div>
-                            <div class="week-progress-count">${displayDone}/${s.target}</div>
+                            <div class="week-progress-count ${s.percent >= 100 ? 'complete' : ''}">${percentDisplay}</div>
                         </div>
                         <div class="week-progress-bar">
                             <div class="week-progress-fill ${fillClass}" style="width: ${Math.min(100, s.percent)}%"></div>
