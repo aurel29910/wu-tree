@@ -400,12 +400,30 @@
             align-items: center;
             gap: 12px;
             transition: all 0.2s;
+            position: relative;
         }
         
         .event-card.done {
             opacity: 0.5;
             background: rgba(76, 175, 80, 0.15);
             border-color: rgba(76, 175, 80, 0.3);
+        }
+        
+        .event-card.dragging {
+            opacity: 0.5;
+            transform: scale(1.02);
+        }
+        
+        .event-drag {
+            font-size: 16px;
+            color: rgba(0,0,0,0.3);
+            cursor: grab;
+            padding: 5px;
+            touch-action: none;
+        }
+        
+        .event-drag:active {
+            cursor: grabbing;
         }
         
         .event-emoji {
@@ -442,6 +460,29 @@
             margin-top: 2px;
         }
         
+        .event-duration {
+            font-size: 10px;
+            color: rgba(0,0,0,0.4);
+            margin-top: 2px;
+        }
+        
+        .event-play {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(76, 175, 80, 0.2);
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .event-play:active {
+            background: rgba(76, 175, 80, 0.4);
+        }
+        
         .event-check {
             width: 44px;
             height: 44px;
@@ -464,6 +505,177 @@
             background: #4CAF50;
             border-color: #4CAF50;
             color: white;
+        }
+        
+        /* Actions section */
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #6B4E9B;
+            margin: 20px 0 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .section-add-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        .action-card {
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.6);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .action-card.done {
+            opacity: 0.5;
+            text-decoration: line-through;
+        }
+        
+        .action-check {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            border: 2px solid rgba(76, 175, 80, 0.5);
+            background: rgba(255,255,255,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .action-check.checked {
+            background: #4CAF50;
+            border-color: #4CAF50;
+            color: white;
+        }
+        
+        .action-info {
+            flex: 1;
+        }
+        
+        .action-name {
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .action-time {
+            font-size: 10px;
+            color: rgba(0,0,0,0.4);
+        }
+        
+        .action-reminder {
+            font-size: 14px;
+            padding: 4px;
+            cursor: pointer;
+        }
+        
+        .action-reminder.active {
+            color: #FF9800;
+        }
+        
+        .action-delete {
+            font-size: 12px;
+            padding: 4px;
+            cursor: pointer;
+            opacity: 0.5;
+        }
+        
+        /* Timer Overlay */
+        .timer-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 300;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        
+        .timer-overlay.show { display: flex; }
+        
+        .timer-session-name {
+            font-size: 18px;
+            color: white;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .timer-session-emoji {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        
+        .timer-display {
+            font-size: 72px;
+            font-weight: 700;
+            color: white;
+            font-family: 'Comfortaa', monospace;
+            margin-bottom: 10px;
+        }
+        
+        .timer-display.overtime {
+            color: #ff6b6b;
+            animation: pulse-red 1s infinite;
+        }
+        
+        @keyframes pulse-red {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .timer-target {
+            font-size: 14px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 30px;
+        }
+        
+        .timer-controls {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .timer-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .timer-btn-play {
+            background: linear-gradient(135deg, #4CAF50, #66BB6A);
+            color: white;
+        }
+        
+        .timer-btn-stop {
+            background: linear-gradient(135deg, #f44336, #EF5350);
+            color: white;
+        }
+        
+        .timer-btn:active {
+            transform: scale(0.95);
         }
         
         /* Empty state */
@@ -1145,6 +1357,15 @@
                 <div id="weeklyContainer"></div>
             </div>
             
+            <!-- Actions du jour -->
+            <div class="section" id="actionsSection">
+                <div class="section-header">
+                    <div class="section-title">✅ Actions</div>
+                    <button class="section-add" onclick="openActionModal()">+</button>
+                </div>
+                <div id="actionsContainer"></div>
+            </div>
+            
             <!-- Tâches manuelles -->
             <div class="section">
                 <div class="section-header">
@@ -1418,6 +1639,53 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Action Modal -->
+        <div class="modal-overlay" id="actionModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <span class="modal-title">✅ Nouvelle action</span>
+                    <button class="modal-close" onclick="closeActionModal()">×</button>
+                </div>
+                <div class="modal-content">
+                    <div class="input-group">
+                        <label class="input-label">Action</label>
+                        <input type="text" class="input-field" id="actionName" placeholder="Ex: RDV médecin, acheter piano...">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Heure (optionnel)</label>
+                        <input type="time" class="input-field" id="actionTime">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Rappel</label>
+                        <select class="input-field" id="actionReminder">
+                            <option value="">Pas de rappel</option>
+                            <option value="0">À l'heure</option>
+                            <option value="5">5 min avant</option>
+                            <option value="15">15 min avant</option>
+                            <option value="30">30 min avant</option>
+                            <option value="60">1h avant</option>
+                        </select>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="closeActionModal()">Annuler</button>
+                        <button class="btn btn-primary" onclick="saveAction()">✨ Ajouter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Timer Overlay -->
+        <div class="timer-overlay" id="timerOverlay">
+            <div class="timer-session-emoji" id="timerEmoji">🏋️</div>
+            <div class="timer-session-name" id="timerName">Session</div>
+            <div class="timer-display" id="timerDisplay">00:00</div>
+            <div class="timer-target" id="timerTarget">Objectif : 45 min</div>
+            <div class="timer-controls">
+                <button class="timer-btn timer-btn-play" id="timerPlayBtn" onclick="toggleTimer()">▶️</button>
+                <button class="timer-btn timer-btn-stop" onclick="stopTimer()">⏹️</button>
+            </div>
+        </div>
     </div>
     
     <script>
@@ -1502,6 +1770,7 @@
             updateHeaderDate();
             loadTodayEvents();
             loadManualTasks();
+            renderActions();
             loadJournal();
             updateStats();
             setupVoiceRecognition();
@@ -1881,6 +2150,7 @@
             updateHeaderDate();
             loadTodayEvents();
             loadManualTasks();
+            renderActions();
             loadJournal();
             updateStats();
         }
@@ -1890,6 +2160,7 @@
             updateHeaderDate();
             loadTodayEvents();
             loadManualTasks();
+            renderActions();
             loadJournal();
             updateStats();
         }
@@ -1900,6 +2171,7 @@
             updateHeaderDate();
             loadTodayEvents();
             loadManualTasks();
+            renderActions();
             loadJournal();
             updateStats();
             closeCalendar();
@@ -1990,6 +2262,7 @@
             updateHeaderDate();
             loadTodayEvents();
             loadManualTasks();
+            renderActions();
             loadJournal();
             updateStats();
             closeCalendar();
@@ -2039,6 +2312,7 @@
                     objectiveName: objective.name,
                     sessionName: session.name,
                     sessionEmoji: session.emoji,
+                    duration: session.duration || null,
                     isDone,
                     type: session.type || 'fixed'
                 };
@@ -2105,22 +2379,41 @@
             
             section.style.display = 'block';
             
-            // Sort: not done first
-            events.sort((a, b) => a.isDone - b.isDone);
+            // Get custom order or use default
+            const customOrder = JSON.parse(localStorage.getItem('wutree_events_order_daily') || '[]');
+            if (customOrder.length > 0) {
+                events.sort((a, b) => {
+                    const aIndex = customOrder.indexOf(a.sessionId);
+                    const bIndex = customOrder.indexOf(b.sessionId);
+                    if (aIndex === -1 && bIndex === -1) return a.isDone - b.isDone;
+                    if (aIndex === -1) return 1;
+                    if (bIndex === -1) return -1;
+                    return aIndex - bIndex;
+                });
+            } else {
+                // Sort: not done first
+                events.sort((a, b) => a.isDone - b.isDone);
+            }
             
             container.innerHTML = events.map(event => `
-                <div class="event-card ${event.isDone ? 'done' : ''}" data-session-id="${event.sessionId}">
+                <div class="event-card ${event.isDone ? 'done' : ''}" data-session-id="${event.sessionId}" draggable="true">
+                    <div class="event-drag" title="Déplacer">⋮⋮</div>
                     <div class="event-emoji">${event.sessionEmoji}</div>
                     <div class="event-info">
                         <div class="event-domain">${event.domainEmoji} ${event.domainName}</div>
                         <div class="event-name">${event.sessionName}</div>
                         <div class="event-objective">${event.objectiveName}</div>
+                        ${event.duration ? `<div class="event-duration">⏱️ ${event.duration} min</div>` : ''}
                     </div>
+                    ${event.duration ? `<button class="event-play" onclick="startTimer('${event.sessionId}', '${event.sessionName}', '${event.sessionEmoji}', ${event.duration})" title="Lancer">▶️</button>` : ''}
                     <div class="event-check ${event.isDone ? 'checked' : ''}" onclick="toggleEvent('${event.sessionId}', '${event.domainId}', '${event.objectiveId}')">
                         ${event.isDone ? '✓' : ''}
                     </div>
                 </div>
             `).join('');
+            
+            // Setup drag and drop
+            setupDragAndDrop('dailyContainer', 'wutree_events_order_daily');
         }
         
         function renderWeeklyEvents(events) {
@@ -2138,22 +2431,41 @@
             
             section.style.display = 'block';
             
-            // Sort: not done first
-            events.sort((a, b) => a.isDone - b.isDone);
+            // Get custom order or use default
+            const customOrder = JSON.parse(localStorage.getItem('wutree_events_order_weekly') || '[]');
+            if (customOrder.length > 0) {
+                events.sort((a, b) => {
+                    const aIndex = customOrder.indexOf(a.sessionId);
+                    const bIndex = customOrder.indexOf(b.sessionId);
+                    if (aIndex === -1 && bIndex === -1) return a.isDone - b.isDone;
+                    if (aIndex === -1) return 1;
+                    if (bIndex === -1) return -1;
+                    return aIndex - bIndex;
+                });
+            } else {
+                // Sort: not done first
+                events.sort((a, b) => a.isDone - b.isDone);
+            }
             
             container.innerHTML = events.map(event => `
-                <div class="event-card ${event.isDone ? 'done' : ''}" data-session-id="${event.sessionId}">
+                <div class="event-card ${event.isDone ? 'done' : ''}" data-session-id="${event.sessionId}" draggable="true">
+                    <div class="event-drag" title="Déplacer">⋮⋮</div>
                     <div class="event-emoji">${event.sessionEmoji}</div>
                     <div class="event-info">
                         <div class="event-domain">${event.domainEmoji} ${event.domainName}</div>
                         <div class="event-name">${event.sessionName}</div>
                         <div class="event-objective">${event.objectiveName} • ${event.desc}</div>
+                        ${event.duration ? `<div class="event-duration">⏱️ ${event.duration} min</div>` : ''}
                     </div>
+                    ${event.duration ? `<button class="event-play" onclick="startTimer('${event.sessionId}', '${event.sessionName}', '${event.sessionEmoji}', ${event.duration})" title="Lancer">▶️</button>` : ''}
                     <div class="event-check ${event.isDone ? 'checked' : ''}" onclick="toggleEvent('${event.sessionId}', '${event.domainId}', '${event.objectiveId}')">
                         ${event.isDone ? '✓' : ''}
                     </div>
                 </div>
             `).join('');
+            
+            // Setup drag and drop
+            setupDragAndDrop('weeklyContainer', 'wutree_events_order_weekly');
         }
         
         // ========== OBJECTIVES ==========
@@ -2665,6 +2977,335 @@
             localStorage.setItem('wutree_manual_tasks', JSON.stringify(allTasks));
             loadManualTasks();
             updateStats();
+        }
+        
+        // ========== DRAG AND DROP ==========
+        function setupDragAndDrop(containerId, storageKey) {
+            const container = document.getElementById(containerId);
+            const cards = container.querySelectorAll('.event-card');
+            
+            cards.forEach(card => {
+                card.addEventListener('dragstart', (e) => {
+                    card.classList.add('dragging');
+                    e.dataTransfer.setData('text/plain', card.dataset.sessionId);
+                });
+                
+                card.addEventListener('dragend', () => {
+                    card.classList.remove('dragging');
+                    saveOrder(containerId, storageKey);
+                });
+                
+                card.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    const dragging = container.querySelector('.dragging');
+                    if (dragging && card !== dragging) {
+                        const rect = card.getBoundingClientRect();
+                        const midY = rect.top + rect.height / 2;
+                        if (e.clientY < midY) {
+                            container.insertBefore(dragging, card);
+                        } else {
+                            container.insertBefore(dragging, card.nextSibling);
+                        }
+                    }
+                });
+                
+                // Touch support
+                let touchStartY = 0;
+                card.addEventListener('touchstart', (e) => {
+                    if (e.target.closest('.event-drag')) {
+                        touchStartY = e.touches[0].clientY;
+                        card.classList.add('dragging');
+                    }
+                });
+                
+                card.addEventListener('touchmove', (e) => {
+                    if (card.classList.contains('dragging')) {
+                        e.preventDefault();
+                        const touch = e.touches[0];
+                        const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+                        const targetCard = elemBelow?.closest('.event-card');
+                        
+                        if (targetCard && targetCard !== card && targetCard.parentElement === container) {
+                            const rect = targetCard.getBoundingClientRect();
+                            const midY = rect.top + rect.height / 2;
+                            if (touch.clientY < midY) {
+                                container.insertBefore(card, targetCard);
+                            } else {
+                                container.insertBefore(card, targetCard.nextSibling);
+                            }
+                        }
+                    }
+                }, { passive: false });
+                
+                card.addEventListener('touchend', () => {
+                    if (card.classList.contains('dragging')) {
+                        card.classList.remove('dragging');
+                        saveOrder(containerId, storageKey);
+                    }
+                });
+            });
+        }
+        
+        function saveOrder(containerId, storageKey) {
+            const container = document.getElementById(containerId);
+            const cards = container.querySelectorAll('.event-card');
+            const order = Array.from(cards).map(c => c.dataset.sessionId);
+            localStorage.setItem(storageKey, JSON.stringify(order));
+        }
+        
+        // ========== TIMER ==========
+        let timerInterval = null;
+        let timerSeconds = 0;
+        let timerRunning = false;
+        let currentTimerSessionId = null;
+        let timerTargetMinutes = 0;
+        
+        function startTimer(sessionId, sessionName, sessionEmoji, duration) {
+            currentTimerSessionId = sessionId;
+            timerTargetMinutes = duration || 30;
+            timerSeconds = 0;
+            timerRunning = false;
+            
+            document.getElementById('timerEmoji').textContent = sessionEmoji;
+            document.getElementById('timerName').textContent = sessionName;
+            document.getElementById('timerTarget').textContent = `Objectif : ${timerTargetMinutes} min`;
+            document.getElementById('timerDisplay').textContent = '00:00';
+            document.getElementById('timerDisplay').classList.remove('overtime');
+            document.getElementById('timerPlayBtn').textContent = '▶️';
+            
+            document.getElementById('timerOverlay').classList.add('show');
+        }
+        
+        function toggleTimer() {
+            if (timerRunning) {
+                // Pause
+                clearInterval(timerInterval);
+                timerRunning = false;
+                document.getElementById('timerPlayBtn').textContent = '▶️';
+            } else {
+                // Play
+                timerRunning = true;
+                document.getElementById('timerPlayBtn').textContent = '⏸️';
+                timerInterval = setInterval(updateTimer, 1000);
+            }
+        }
+        
+        function updateTimer() {
+            timerSeconds++;
+            const minutes = Math.floor(timerSeconds / 60);
+            const seconds = timerSeconds % 60;
+            
+            document.getElementById('timerDisplay').textContent = 
+                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            
+            // Check if overtime
+            if (minutes >= timerTargetMinutes) {
+                document.getElementById('timerDisplay').classList.add('overtime');
+                
+                // Play alarm once when reaching target
+                if (minutes === timerTargetMinutes && seconds === 0) {
+                    playAlarm();
+                }
+            }
+        }
+        
+        function playAlarm() {
+            // Vibrate if supported
+            if (navigator.vibrate) {
+                navigator.vibrate([500, 200, 500, 200, 500]);
+            }
+            
+            // Play beep sound
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Play 3 beeps
+                for (let i = 0; i < 3; i++) {
+                    setTimeout(() => {
+                        const oscillator = audioCtx.createOscillator();
+                        const gainNode = audioCtx.createGain();
+                        
+                        oscillator.connect(gainNode);
+                        gainNode.connect(audioCtx.destination);
+                        
+                        oscillator.frequency.value = 880; // A5 note
+                        oscillator.type = 'sine';
+                        
+                        gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                        
+                        oscillator.start(audioCtx.currentTime);
+                        oscillator.stop(audioCtx.currentTime + 0.3);
+                    }, i * 400);
+                }
+            } catch (e) {
+                console.log('Audio not supported');
+            }
+        }
+        
+        function stopTimer() {
+            clearInterval(timerInterval);
+            timerRunning = false;
+            document.getElementById('timerOverlay').classList.remove('show');
+            
+            currentTimerSessionId = null;
+            timerSeconds = 0;
+        }
+        
+        // ========== ACTIONS ==========
+        function getActions() {
+            const dateStr = selectedDate.toISOString().split('T')[0];
+            const all = JSON.parse(localStorage.getItem('wutree_daily_actions') || '[]');
+            return all.filter(a => a.date === dateStr);
+        }
+        
+        function saveActions(actions) {
+            const dateStr = selectedDate.toISOString().split('T')[0];
+            const all = JSON.parse(localStorage.getItem('wutree_daily_actions') || '[]');
+            const others = all.filter(a => a.date !== dateStr);
+            localStorage.setItem('wutree_daily_actions', JSON.stringify([...others, ...actions]));
+        }
+        
+        function openActionModal() {
+            document.getElementById('actionName').value = '';
+            document.getElementById('actionTime').value = '';
+            document.getElementById('actionReminder').value = '';
+            document.getElementById('actionModal').classList.add('show');
+        }
+        
+        function closeActionModal() {
+            document.getElementById('actionModal').classList.remove('show');
+        }
+        
+        function saveAction() {
+            const name = document.getElementById('actionName').value.trim();
+            const time = document.getElementById('actionTime').value;
+            const reminder = document.getElementById('actionReminder').value;
+            
+            if (!name) {
+                alert('Entre une action !');
+                return;
+            }
+            
+            const actions = getActions();
+            const newAction = {
+                id: 'action_' + Date.now(),
+                name,
+                time: time || null,
+                reminder: reminder || null,
+                done: false,
+                date: selectedDate.toISOString().split('T')[0],
+                createdAt: new Date().toISOString()
+            };
+            
+            actions.push(newAction);
+            saveActions(actions);
+            
+            // Set reminder if needed
+            if (time && reminder) {
+                setReminder(newAction);
+            }
+            
+            closeActionModal();
+            renderActions();
+        }
+        
+        function toggleAction(actionId) {
+            const actions = getActions();
+            const action = actions.find(a => a.id === actionId);
+            if (action) {
+                action.done = !action.done;
+                saveActions(actions);
+                renderActions();
+            }
+        }
+        
+        function deleteAction(actionId) {
+            let actions = getActions();
+            actions = actions.filter(a => a.id !== actionId);
+            saveActions(actions);
+            renderActions();
+        }
+        
+        function renderActions() {
+            const container = document.getElementById('actionsContainer');
+            if (!container) return;
+            
+            const actions = getActions();
+            
+            if (actions.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 15px; color: rgba(0,0,0,0.4); font-size: 11px;">
+                        Pas d'actions prévues
+                    </div>
+                `;
+                return;
+            }
+            
+            // Sort by time, then by done status
+            actions.sort((a, b) => {
+                if (a.done !== b.done) return a.done ? 1 : -1;
+                if (a.time && b.time) return a.time.localeCompare(b.time);
+                if (a.time) return -1;
+                if (b.time) return 1;
+                return 0;
+            });
+            
+            container.innerHTML = actions.map(action => `
+                <div class="action-card ${action.done ? 'done' : ''}">
+                    <div class="action-check ${action.done ? 'checked' : ''}" onclick="toggleAction('${action.id}')">
+                        ${action.done ? '✓' : ''}
+                    </div>
+                    <div class="action-info">
+                        <div class="action-name">${action.name}</div>
+                        ${action.time ? `<div class="action-time">🕐 ${action.time}</div>` : ''}
+                    </div>
+                    ${action.reminder ? `<span class="action-reminder active">🔔</span>` : ''}
+                    <span class="action-delete" onclick="deleteAction('${action.id}')">🗑️</span>
+                </div>
+            `).join('');
+        }
+        
+        function setReminder(action) {
+            if (!action.time || !action.reminder) return;
+            
+            const [hours, minutes] = action.time.split(':').map(Number);
+            const reminderDate = new Date(action.date);
+            reminderDate.setHours(hours, minutes - parseInt(action.reminder), 0, 0);
+            
+            const now = new Date();
+            const delay = reminderDate.getTime() - now.getTime();
+            
+            if (delay > 0) {
+                setTimeout(() => {
+                    // Vibrate
+                    if (navigator.vibrate) {
+                        navigator.vibrate([300, 100, 300]);
+                    }
+                    
+                    // Play sound
+                    try {
+                        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                        const oscillator = audioCtx.createOscillator();
+                        const gainNode = audioCtx.createGain();
+                        
+                        oscillator.connect(gainNode);
+                        gainNode.connect(audioCtx.destination);
+                        
+                        oscillator.frequency.value = 660;
+                        oscillator.type = 'sine';
+                        
+                        gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                        
+                        oscillator.start(audioCtx.currentTime);
+                        oscillator.stop(audioCtx.currentTime + 0.5);
+                    } catch (e) {}
+                    
+                    // Show notification
+                    alert(`⏰ Rappel : ${action.name}`);
+                }, delay);
+            }
         }
         
         // Navigation
