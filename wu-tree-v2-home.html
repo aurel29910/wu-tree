@@ -13,6 +13,11 @@
     <meta name="apple-mobile-web-app-title" content="Wu Tree">
     <link rel="apple-touch-icon" href="icon-192.png">
     
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -386,6 +391,118 @@
             box-shadow: 0 6px 20px rgba(107, 78, 155, 0.5);
         }
         
+        /* Sync Button */
+        .sync-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 44px;
+            height: 44px;
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            border: 2px solid rgba(255,255,255,0.8);
+            z-index: 100;
+            transition: all 0.2s;
+        }
+        
+        .sync-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .sync-btn.syncing {
+            animation: spin 1s linear infinite;
+        }
+        
+        .sync-btn.logged-in {
+            background: rgba(76, 175, 80, 0.2);
+            border-color: rgba(76, 175, 80, 0.5);
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Sync Modal */
+        .sync-status {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .sync-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+        
+        .sync-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .sync-email {
+            font-size: 11px;
+            color: rgba(0,0,0,0.5);
+            margin-bottom: 15px;
+        }
+        
+        .sync-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .sync-action-btn {
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-family: 'Comfortaa', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        
+        .sync-action-btn.primary {
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            color: white;
+        }
+        
+        .sync-action-btn.google {
+            background: white;
+            border: 2px solid #ddd;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .sync-action-btn.danger {
+            background: rgba(244, 67, 54, 0.1);
+            color: #f44336;
+        }
+        
+        .sync-action-btn:active {
+            transform: scale(0.98);
+        }
+        
+        .sync-info {
+            font-size: 11px;
+            color: rgba(0,0,0,0.4);
+            margin-top: 15px;
+            line-height: 1.4;
+        }
+        
         .bubble.add-bubble {
             border: 3px dashed rgba(107, 78, 155, 0.4);
             background: rgba(255,255,255,0.3);
@@ -633,6 +750,9 @@
         
         <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
         
+        <!-- Sync Button -->
+        <div class="sync-btn" id="syncBtn" onclick="openSyncModal()">🔄</div>
+        
         <div class="header">
             <div class="header-title">🌳 Wu Tree</div>
             <div class="header-subtitle">Agis dans le flow</div>
@@ -694,6 +814,21 @@
                     <div class="modal-actions">
                         <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
                         <button class="btn btn-primary" onclick="saveDomain()">Ajouter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal Sync -->
+        <div class="modal-overlay" id="syncModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title">☁️ Synchronisation</div>
+                    <button class="modal-close" onclick="closeSyncModal()">×</button>
+                </div>
+                <div class="modal-content">
+                    <div class="sync-status" id="syncStatus">
+                        <!-- Filled by JS -->
                     </div>
                 </div>
             </div>
@@ -946,6 +1081,186 @@
         // ========== INIT ==========
         renderBubbles();
         updateHabitsBadge();
+        
+        // ========== FIREBASE ==========
+        const firebaseConfig = {
+            apiKey: "AIzaSyBmQjKJz6cIJMEatx0gw_IvYF2YO8DHJbg",
+            authDomain: "wu-tree.firebaseapp.com",
+            projectId: "wu-tree",
+            storageBucket: "wu-tree.firebasestorage.app",
+            messagingSenderId: "619805611546",
+            appId: "1:619805611546:web:9900c732bffb924b51a3a3"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        
+        // Clés localStorage à synchroniser
+        const SYNC_KEYS = [
+            'wutree_domains',
+            'wutree_activities',
+            'wutree_objectives',
+            'wutree_objective_sessions_templates',
+            'wutree_objective_logs',
+            'wutree_objective_habits',
+            'wutree_domain_habits',
+            'wutree_domain_tasks',
+            'wutree_daily_journals',
+            'wutree_manual_tasks',
+            'wutree_bilans',
+            'wutree_new_habits',
+            'wutree_daily_actions',
+            'wutree_habits',
+            'wutree_visualization_sessions',
+            'wutree_vision'
+        ];
+        
+        // Auth state listener
+        auth.onAuthStateChanged(user => {
+            updateSyncUI(user);
+            if (user) {
+                document.getElementById('syncBtn').classList.add('logged-in');
+            } else {
+                document.getElementById('syncBtn').classList.remove('logged-in');
+            }
+        });
+        
+        function openSyncModal() {
+            updateSyncUI(auth.currentUser);
+            document.getElementById('syncModal').classList.add('show');
+        }
+        
+        function closeSyncModal() {
+            document.getElementById('syncModal').classList.remove('show');
+        }
+        
+        function updateSyncUI(user) {
+            const container = document.getElementById('syncStatus');
+            
+            if (user) {
+                container.innerHTML = `
+                    <img src="${user.photoURL || ''}" class="sync-avatar" onerror="this.style.display='none'">
+                    <div class="sync-name">${user.displayName || 'Utilisateur'}</div>
+                    <div class="sync-email">${user.email}</div>
+                    <div class="sync-actions">
+                        <button class="sync-action-btn primary" onclick="syncToCloud()">
+                            ☁️ Sauvegarder vers le cloud
+                        </button>
+                        <button class="sync-action-btn primary" onclick="syncFromCloud()">
+                            📥 Récupérer depuis le cloud
+                        </button>
+                        <button class="sync-action-btn danger" onclick="signOutUser()">
+                            Déconnexion
+                        </button>
+                    </div>
+                    <div class="sync-info">
+                        Tes données seront synchronisées sur tous tes appareils connectés avec ce compte.
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div style="font-size: 40px; margin-bottom: 15px;">☁️</div>
+                    <div class="sync-name">Synchronise tes données</div>
+                    <div class="sync-email">Connecte-toi pour accéder à tes données sur tous tes appareils</div>
+                    <div class="sync-actions">
+                        <button class="sync-action-btn google" onclick="signInWithGoogle()">
+                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20" height="20">
+                            Continuer avec Google
+                        </button>
+                    </div>
+                    <div class="sync-info">
+                        Gratuit et sécurisé. Tes données restent privées.
+                    </div>
+                `;
+            }
+        }
+        
+        async function signInWithGoogle() {
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                await auth.signInWithPopup(provider);
+                closeSyncModal();
+            } catch (error) {
+                console.error('Erreur connexion:', error);
+                alert('Erreur de connexion. Réessaie.');
+            }
+        }
+        
+        async function signOutUser() {
+            try {
+                await auth.signOut();
+                closeSyncModal();
+            } catch (error) {
+                console.error('Erreur déconnexion:', error);
+            }
+        }
+        
+        async function syncToCloud() {
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            const btn = document.getElementById('syncBtn');
+            btn.classList.add('syncing');
+            
+            try {
+                const data = {};
+                SYNC_KEYS.forEach(key => {
+                    const value = localStorage.getItem(key);
+                    if (value) {
+                        data[key] = value;
+                    }
+                });
+                
+                data.lastSync = new Date().toISOString();
+                
+                await db.collection('users').doc(user.uid).set(data, { merge: true });
+                
+                alert('✅ Données sauvegardées !');
+            } catch (error) {
+                console.error('Erreur sync:', error);
+                alert('❌ Erreur de sauvegarde');
+            } finally {
+                btn.classList.remove('syncing');
+            }
+        }
+        
+        async function syncFromCloud() {
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            if (!confirm('Cela va remplacer tes données locales par celles du cloud. Continuer ?')) {
+                return;
+            }
+            
+            const btn = document.getElementById('syncBtn');
+            btn.classList.add('syncing');
+            
+            try {
+                const doc = await db.collection('users').doc(user.uid).get();
+                
+                if (doc.exists) {
+                    const data = doc.data();
+                    
+                    SYNC_KEYS.forEach(key => {
+                        if (data[key]) {
+                            localStorage.setItem(key, data[key]);
+                        }
+                    });
+                    
+                    alert('✅ Données récupérées ! La page va se recharger.');
+                    location.reload();
+                } else {
+                    alert('Aucune donnée trouvée dans le cloud.');
+                }
+            } catch (error) {
+                console.error('Erreur sync:', error);
+                alert('❌ Erreur de récupération');
+            } finally {
+                btn.classList.remove('syncing');
+            }
+        }
         
         // ========== PWA SERVICE WORKER ==========
         if ('serviceWorker' in navigator) {
