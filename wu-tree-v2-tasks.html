@@ -8,16 +8,27 @@
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Comfortaa', cursive;
+        
+        html, body { 
+            height: 100%; 
+            overflow: hidden;
+        }
+        
+        body { 
+            font-family: 'Comfortaa', cursive;
             background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
-            min-height: 100vh; min-height: -webkit-fill-available; }
-        .phone-frame { width: 100%; min-height: 100vh; min-height: -webkit-fill-available;
-            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
-            position: relative; overflow: hidden; }
+        }
+        
+        .phone-frame { 
+            width: 100%; 
+            height: 100%;
+            position: relative; 
+            overflow: hidden; 
+        }
         
         .petal { position: absolute; width: 10px; height: 10px;
             background: linear-gradient(135deg, rgba(255, 182, 193, 0.8), rgba(255, 105, 180, 0.6));
-            border-radius: 50% 0 50% 0; animation: fall linear infinite; pointer-events: none; z-index: 50; }
+            border-radius: 50% 0 50% 0; animation: fall linear infinite; pointer-events: none; z-index: 5; }
         .petal:nth-child(1) { left: 10%; animation-duration: 12s; }
         .petal:nth-child(2) { left: 30%; animation-duration: 14s; animation-delay: 2s; }
         .petal:nth-child(3) { left: 50%; animation-duration: 16s; animation-delay: 4s; }
@@ -25,14 +36,19 @@
         @keyframes fall { 0% { transform: translateY(-50px) rotate(0deg); opacity: 0.8; }
             100% { transform: translateY(100vh) rotate(360deg); opacity: 0; } }
         
-        .status-bar { display: none; }
-        
-        .header { position: fixed; top: 0; left: 0; right: 0; 
-            padding-top: max(10px, env(safe-area-inset-top, 10px));
+        .header { 
+            position: fixed; 
+            top: 0; left: 0; right: 0; 
+            padding-top: env(safe-area-inset-top, 10px);
+            padding-bottom: 10px;
+            padding-left: 15px; 
+            padding-right: 15px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding-left: 15px; padding-right: 15px; padding-bottom: 8px; z-index: 90;
-            background: rgba(255, 255, 255, 0.25); backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3); }
+            z-index: 90;
+            background: rgba(255, 255, 255, 0.25); 
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3); 
+        }
         
         .header-top {
             display: flex;
@@ -138,11 +154,15 @@
         }
         
         .content { 
-            position: absolute; 
-            top: calc(100px + env(safe-area-inset-top, 10px)); 
+            position: fixed; 
+            top: 110px; 
             left: 0; right: 0; 
-            bottom: calc(70px + env(safe-area-inset-bottom, 0px));
-            overflow-y: auto; padding: 15px 20px; z-index: 60; 
+            bottom: 70px;
+            overflow-y: auto; 
+            padding: 15px 20px; 
+            z-index: 60;
+            padding-bottom: 20px;
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
         }
         
         /* Week View */
