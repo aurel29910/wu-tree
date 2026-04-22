@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Wu Tree - Objectif</title>
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -524,67 +524,105 @@
             flex: 1;
         }
         
-        /* Timer Modal */
-        .timer-overlay {
+        /* Mini Timer flottant */
+        .mini-timer {
+            display: none;
+            position: fixed;
+            top: 80px;
+            right: 15px;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 16px;
+            padding: 10px 14px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            z-index: 200;
+            border: 2px solid rgba(107, 78, 155, 0.3);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .mini-timer.show { display: flex; align-items: center; gap: 10px; }
+        
+        .mini-timer:active { transform: scale(0.95); }
+        
+        .mini-timer-icon {
+            font-size: 18px;
+            animation: sandSpin 2s linear infinite;
+        }
+        
+        @keyframes sandSpin {
+            0% { transform: rotate(0deg); }
+            50% { transform: rotate(180deg); }
+            100% { transform: rotate(180deg); }
+        }
+        
+        .mini-timer-time {
+            font-size: 16px;
+            font-weight: 700;
+            color: #6B4E9B;
+            font-family: 'Comfortaa', monospace;
+        }
+        
+        .mini-timer-time.overtime {
+            color: #f44336;
+        }
+        
+        .mini-timer-session {
+            font-size: 11px;
+            color: rgba(0,0,0,0.5);
+            max-width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        /* Timer control panel */
+        .timer-panel-backdrop {
             display: none;
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.85);
+            background: rgba(0,0,0,0.4);
             z-index: 300;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
         }
         
-        .timer-overlay.show { display: flex; }
+        .timer-panel-backdrop.show { display: block; }
         
-        .timer-session-name {
-            font-size: 18px;
-            color: white;
-            margin-bottom: 10px;
+        .timer-panel {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            z-index: 350;
             text-align: center;
+            min-width: 280px;
         }
         
-        .timer-session-emoji {
-            font-size: 60px;
-            margin-bottom: 20px;
-        }
+        .timer-panel.show { display: block; }
         
-        .timer-display {
-            font-size: 72px;
-            font-weight: 700;
-            color: white;
-            font-family: 'Comfortaa', monospace;
-            margin-bottom: 10px;
-        }
+        .timer-panel-emoji { font-size: 50px; margin-bottom: 10px; }
+        .timer-panel-name { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 15px; }
+        .timer-panel-display { font-size: 48px; font-weight: 700; color: #6B4E9B; font-family: 'Comfortaa', monospace; }
+        .timer-panel-display.overtime { color: #f44336; }
+        .timer-panel-target { font-size: 12px; color: rgba(0,0,0,0.5); margin: 10px 0 20px; }
         
-        .timer-display.overtime {
-            color: #ff6b6b;
-            animation: pulse-red 1s infinite;
-        }
-        
-        @keyframes pulse-red {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-        
-        .timer-target {
-            font-size: 14px;
-            color: rgba(255,255,255,0.6);
-            margin-bottom: 30px;
-        }
-        
-        .timer-controls {
+        .timer-panel-controls {
             display: flex;
-            gap: 20px;
+            justify-content: center;
+            gap: 15px;
         }
         
         .timer-btn {
-            width: 70px;
-            height: 70px;
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
             border: none;
-            font-size: 28px;
+            font-size: 22px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -596,8 +634,10 @@
             color: white;
         }
         
-        .timer-btn-pause {
-            background: linear-gradient(135deg, #FF9800, #FFB74D);
+        .timer-btn-stop {
+            background: linear-gradient(135deg, #f44336, #EF5350);
+            color: white;
+        }
             color: white;
         }
         
@@ -1621,12 +1661,23 @@
         </div>
         
         <!-- Timer Overlay -->
-        <div class="timer-overlay" id="timerOverlay">
-            <div class="timer-session-emoji" id="timerEmoji">🏋️</div>
-            <div class="timer-session-name" id="timerName">Session</div>
-            <div class="timer-display" id="timerDisplay">00:00</div>
-            <div class="timer-target" id="timerTarget">Objectif : 45 min</div>
-            <div class="timer-controls">
+        <!-- Mini Timer flottant -->
+        <div class="mini-timer" id="miniTimer" onclick="openTimerPanel()">
+            <div class="mini-timer-icon">⏳</div>
+            <div>
+                <div class="mini-timer-time" id="miniTimerTime">00:00</div>
+                <div class="mini-timer-session" id="miniTimerSession">Session</div>
+            </div>
+        </div>
+        
+        <!-- Timer Panel (control) -->
+        <div class="timer-panel-backdrop" id="timerPanelBackdrop" onclick="closeTimerPanel()"></div>
+        <div class="timer-panel" id="timerPanel">
+            <div class="timer-panel-emoji" id="timerEmoji">🏋️</div>
+            <div class="timer-panel-name" id="timerName">Session</div>
+            <div class="timer-panel-display" id="timerDisplay">00:00</div>
+            <div class="timer-panel-target" id="timerTarget">Objectif : 45min</div>
+            <div class="timer-panel-controls">
                 <button class="timer-btn timer-btn-play" id="timerPlayBtn" onclick="toggleTimer()">▶️</button>
                 <button class="timer-btn timer-btn-stop" onclick="stopTimer()">⏹️</button>
             </div>
@@ -1640,6 +1691,16 @@
         
         const DAYS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
         const DAYS_SHORT = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+        
+        // Format duration in hours:minutes
+        function formatDuration(minutes) {
+            if (!minutes) return '';
+            const h = Math.floor(minutes / 60);
+            const m = minutes % 60;
+            if (h === 0) return `${m}min`;
+            if (m === 0) return `${h}h`;
+            return `${h}h${m.toString().padStart(2, '0')}`;
+        }
         
         // Domain-specific configuration
         const DOMAIN_CONFIG = {
@@ -2144,7 +2205,7 @@
             
             container.innerHTML = sessions.map(session => {
                 const isFlexible = session.type === 'flexible';
-                const durationHtml = session.duration ? `<div class="session-duration">⏱️ ${session.duration} min</div>` : '';
+                const durationHtml = session.duration ? `<div class="session-duration">⏱️ ${formatDuration(session.duration)}</div>` : '';
                 const playBtn = session.duration ? `<button class="session-play" onclick="startTimer('${session.id}')" title="Lancer">▶️</button>` : '';
                 
                 if (isFlexible) {
@@ -3075,14 +3136,34 @@
             timerSeconds = 0;
             timerRunning = false;
             
+            // Update panel
             document.getElementById('timerEmoji').textContent = session.emoji;
             document.getElementById('timerName').textContent = session.name;
-            document.getElementById('timerTarget').textContent = `Objectif : ${timerTargetMinutes} min`;
+            document.getElementById('timerTarget').textContent = `Objectif : ${formatDuration(timerTargetMinutes)}`;
             document.getElementById('timerDisplay').textContent = '00:00';
             document.getElementById('timerDisplay').classList.remove('overtime');
             document.getElementById('timerPlayBtn').textContent = '▶️';
             
-            document.getElementById('timerOverlay').classList.add('show');
+            // Update mini timer
+            document.getElementById('miniTimerTime').textContent = '00:00';
+            document.getElementById('miniTimerSession').textContent = session.name;
+            document.getElementById('miniTimerTime').classList.remove('overtime');
+            
+            // Show mini timer
+            document.getElementById('miniTimer').classList.add('show');
+            
+            // Auto-start
+            toggleTimer();
+        }
+        
+        function openTimerPanel() {
+            document.getElementById('timerPanel').classList.add('show');
+            document.getElementById('timerPanelBackdrop').classList.add('show');
+        }
+        
+        function closeTimerPanel() {
+            document.getElementById('timerPanel').classList.remove('show');
+            document.getElementById('timerPanelBackdrop').classList.remove('show');
         }
         
         function toggleTimer() {
@@ -3101,18 +3182,31 @@
         
         function updateTimer() {
             timerSeconds++;
-            const minutes = Math.floor(timerSeconds / 60);
+            const hours = Math.floor(timerSeconds / 3600);
+            const minutes = Math.floor((timerSeconds % 3600) / 60);
             const seconds = timerSeconds % 60;
             
-            document.getElementById('timerDisplay').textContent = 
-                `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            let timeStr;
+            if (hours > 0) {
+                timeStr = `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            } else {
+                timeStr = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            }
+            
+            // Update panel display
+            document.getElementById('timerDisplay').textContent = timeStr;
+            
+            // Update mini timer display
+            document.getElementById('miniTimerTime').textContent = timeStr;
             
             // Check if overtime
-            if (minutes >= timerTargetMinutes) {
+            const totalMinutes = Math.floor(timerSeconds / 60);
+            if (totalMinutes >= timerTargetMinutes) {
                 document.getElementById('timerDisplay').classList.add('overtime');
+                document.getElementById('miniTimerTime').classList.add('overtime');
                 
                 // Play alarm once when reaching target
-                if (minutes === timerTargetMinutes && seconds === 0) {
+                if (totalMinutes === timerTargetMinutes && seconds === 0) {
                     playAlarm();
                 }
             }
@@ -3155,7 +3249,10 @@
         function stopTimer() {
             clearInterval(timerInterval);
             timerRunning = false;
-            document.getElementById('timerOverlay').classList.remove('show');
+            
+            // Close panel and mini timer
+            closeTimerPanel();
+            document.getElementById('miniTimer').classList.remove('show');
             
             // Ask if session was completed
             if (timerSeconds > 60 && currentTimerSession) {
