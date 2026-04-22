@@ -229,35 +229,139 @@
         .week-progress-fill.partial { background: linear-gradient(90deg, #FF9800, #FFB74D); }
         .week-progress-fill.low { background: linear-gradient(90deg, #f44336, #EF5350); }
         
-        /* Intention hebdomadaire */
-        .week-intention {
+        /* Objectifs hebdomadaires - badge cliquable */
+        .week-goals-badge {
             margin-top: 10px;
             padding: 8px 12px;
-            background: rgba(107, 78, 155, 0.08);
+            background: rgba(107, 78, 155, 0.1);
             border-radius: 10px;
-            border: 1px dashed rgba(107, 78, 155, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             cursor: pointer;
             transition: all 0.2s;
         }
         
-        .week-intention:active {
+        .week-goals-badge:active {
             transform: scale(0.98);
+            background: rgba(107, 78, 155, 0.15);
         }
         
-        .week-intention-text {
+        .week-goals-label {
             font-size: 12px;
             color: #6B4E9B;
-            font-style: italic;
+            font-weight: 500;
         }
         
-        .week-intention-placeholder {
+        .week-goals-count {
             font-size: 11px;
-            color: rgba(107, 78, 155, 0.5);
+            color: rgba(107, 78, 155, 0.7);
+            background: rgba(255,255,255,0.5);
+            padding: 2px 8px;
+            border-radius: 10px;
         }
         
-        .week-intention-label {
-            font-size: 9px;
-            color: rgba(107, 78, 155, 0.6);
+        .week-goals-count.has-goals {
+            background: rgba(107, 78, 155, 0.2);
+            color: #6B4E9B;
+            font-weight: 600;
+        }
+        
+        /* Modal objectifs hebdo */
+        .goals-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+        
+        .goal-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+        
+        .goal-checkbox {
+            width: 22px;
+            height: 22px;
+            border: 2px solid #6B4E9B;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        
+        .goal-checkbox.checked {
+            background: #6B4E9B;
+            color: white;
+        }
+        
+        .goal-text {
+            flex: 1;
+            font-size: 13px;
+            color: #333;
+        }
+        
+        .goal-text.done {
+            text-decoration: line-through;
+            color: rgba(0,0,0,0.4);
+        }
+        
+        .goal-delete {
+            width: 28px;
+            height: 28px;
+            border: none;
+            background: rgba(244, 67, 54, 0.1);
+            border-radius: 50%;
+            color: #f44336;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .add-goal-row {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .add-goal-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid rgba(107, 78, 155, 0.3);
+            border-radius: 12px;
+            font-size: 13px;
+            font-family: 'Comfortaa', cursive;
+            background: rgba(255,255,255,0.7);
+        }
+        
+        .add-goal-input:focus {
+            outline: none;
+            border-color: #6B4E9B;
+        }
+        
+        .add-goal-btn {
+            width: 44px;
+            height: 44px;
+            border: none;
+            background: linear-gradient(135deg, #6B4E9B, #9B6B9B);
+            border-radius: 50%;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        .empty-goals {
+            text-align: center;
+            padding: 30px;
+            color: rgba(0,0,0,0.4);
+            font-size: 13px;
+        }
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 3px;
@@ -1737,24 +1841,26 @@
         </div>
         
         <!-- Modal Intention Hebdo -->
-        <div class="modal-overlay" id="intentionModal">
+        <div class="modal-overlay" id="weekGoalsModal">
             <div class="modal">
                 <div class="modal-header">
-                    <span class="modal-title">🎯 Intention de la semaine</span>
-                    <button class="modal-close" onclick="closeIntentionModal()">×</button>
+                    <span class="modal-title">🎯 Objectifs de la semaine</span>
+                    <button class="modal-close" onclick="closeWeekGoalsModal()">×</button>
                 </div>
                 <div class="modal-content">
-                    <div id="intentionSessionName" style="font-size: 14px; font-weight: 600; color: #6B4E9B; margin-bottom: 15px; text-align: center;"></div>
-                    <div class="input-group">
-                        <label class="input-label">Mon intention pour cette semaine</label>
-                        <textarea class="input-textarea" id="intentionText" placeholder="Ex: Passer aux poids de 7kg, courir 5km sans pause, méditer 15min/jour..." rows="3"></textarea>
+                    <div id="weekGoalsDomainName" style="font-size: 14px; font-weight: 600; color: #6B4E9B; margin-bottom: 15px; text-align: center;"></div>
+                    
+                    <div class="goals-list" id="goalsList">
+                        <!-- Rempli par JS -->
                     </div>
-                    <div style="font-size: 11px; color: rgba(0,0,0,0.4); margin-bottom: 15px; text-align: center;">
-                        💡 Sois précis et mesurable
+                    
+                    <div class="add-goal-row">
+                        <input type="text" class="add-goal-input" id="newGoalInput" placeholder="Nouvel objectif..." onkeypress="if(event.key==='Enter')addWeekGoal()">
+                        <button class="add-goal-btn" onclick="addWeekGoal()">+</button>
                     </div>
-                    <div class="modal-actions">
-                        <button class="btn btn-secondary" onclick="closeIntentionModal()">Annuler</button>
-                        <button class="btn btn-primary" onclick="saveIntention()">✨ Enregistrer</button>
+                    
+                    <div style="font-size: 10px; color: rgba(0,0,0,0.4); margin-top: 12px; text-align: center;">
+                        💡 Sois précis : "Passer aux poids de 7kg", "Courir 3x"
                     </div>
                 </div>
             </div>
@@ -1977,85 +2083,166 @@
             
             // Get current week key for intentions
             const weekKey = getWeekKey(new Date());
-            const intentions = JSON.parse(localStorage.getItem('wutree_weekly_intentions') || '{}');
+            const weeklyGoals = JSON.parse(localStorage.getItem('wutree_weekly_goals') || '{}');
             
-            container.innerHTML = sessions.map(s => {
-                const displayDone = Math.min(s.done, s.target); // Never show more than target
-                const fillClass = s.percent >= 100 ? 'complete' : s.percent >= 50 ? 'partial' : 'low';
-                const percentDisplay = s.percent >= 100 ? '✓' : `${s.percent}%`;
+            // Group sessions by domain
+            const byDomain = {};
+            sessions.forEach(s => {
+                const domainId = s.domain?.id || 'unknown';
+                if (!byDomain[domainId]) {
+                    byDomain[domainId] = {
+                        domain: s.domain,
+                        sessions: []
+                    };
+                }
+                byDomain[domainId].sessions.push(s);
+            });
+            
+            container.innerHTML = Object.entries(byDomain).map(([domainId, data]) => {
+                // Get goals for this domain this week
+                const goalsKey = `${domainId}_${weekKey}`;
+                const goals = weeklyGoals[goalsKey] || [];
+                const doneCount = goals.filter(g => g.done).length;
+                const totalCount = goals.length;
                 
-                // Get intention for this session this week
-                const intentionKey = `${s.session.id}_${weekKey}`;
-                const intention = intentions[intentionKey] || '';
+                // Render sessions for this domain
+                const sessionsHtml = data.sessions.map(s => {
+                    const fillClass = s.percent >= 100 ? 'complete' : s.percent >= 50 ? 'partial' : 'low';
+                    const percentDisplay = s.percent >= 100 ? '✓' : `${s.percent}%`;
+                    
+                    return `
+                        <div class="week-progress-card" style="margin-bottom: 8px;">
+                            <div class="week-progress-header">
+                                <div class="week-progress-emoji">${s.session.emoji}</div>
+                                <div class="week-progress-info">
+                                    <div class="week-progress-name">${s.session.name}</div>
+                                    <div class="week-progress-domain">${s.objective.name}</div>
+                                </div>
+                                <div class="week-progress-count ${s.percent >= 100 ? 'complete' : ''}">${percentDisplay}</div>
+                            </div>
+                            <div class="week-progress-bar">
+                                <div class="week-progress-fill ${fillClass}" style="width: ${Math.min(100, s.percent)}%"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
                 
                 return `
-                    <div class="week-progress-card">
-                        <div class="week-progress-header">
-                            <div class="week-progress-emoji">${s.session.emoji}</div>
-                            <div class="week-progress-info">
-                                <div class="week-progress-name">${s.session.name}</div>
-                                <div class="week-progress-domain">${s.domain?.emoji || ''} ${s.objective.name}</div>
+                    <div style="margin-bottom: 20px;">
+                        <div style="font-size: 16px; font-weight: 600; color: #333; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 20px;">${data.domain?.emoji || '📁'}</span>
+                            ${data.domain?.name || 'Domaine'}
+                        </div>
+                        ${sessionsHtml}
+                        <div class="week-goals-badge" onclick="openWeekGoals('${domainId}', '${weekKey}', '${(data.domain?.name || 'Domaine').replace(/'/g, "\\'")}')">
+                            <div class="week-goals-label">🎯 Objectifs de la semaine</div>
+                            <div class="week-goals-count ${totalCount > 0 ? 'has-goals' : ''}">
+                                ${totalCount > 0 ? `${doneCount}/${totalCount}` : '+ Ajouter'}
                             </div>
-                            <div class="week-progress-count ${s.percent >= 100 ? 'complete' : ''}">${percentDisplay}</div>
-                        </div>
-                        <div class="week-progress-bar">
-                            <div class="week-progress-fill ${fillClass}" style="width: ${Math.min(100, s.percent)}%"></div>
-                        </div>
-                        <div class="week-intention" onclick="editIntention('${s.session.id}', '${weekKey}', '${s.session.name.replace(/'/g, "\\'")}')">
-                            <div class="week-intention-label">🎯 Intention de la semaine</div>
-                            ${intention 
-                                ? `<div class="week-intention-text">${intention}</div>`
-                                : `<div class="week-intention-placeholder">+ Ajouter une intention...</div>`
-                            }
                         </div>
                     </div>
                 `;
             }).join('');
         }
         
-        // ========== INTENTIONS HEBDOMADAIRES ==========
-        let currentIntentionSessionId = null;
-        let currentIntentionWeekKey = null;
+        // ========== OBJECTIFS HEBDOMADAIRES ==========
+        let currentGoalsDomainId = null;
+        let currentGoalsWeekKey = null;
+        let currentGoalsDomainName = null;
         
-        function editIntention(sessionId, weekKey, sessionName) {
-            currentIntentionSessionId = sessionId;
-            currentIntentionWeekKey = weekKey;
+        function openWeekGoals(domainId, weekKey, domainName) {
+            currentGoalsDomainId = domainId;
+            currentGoalsWeekKey = weekKey;
+            currentGoalsDomainName = domainName;
             
-            document.getElementById('intentionSessionName').textContent = sessionName;
-            
-            // Load existing intention
-            const intentions = JSON.parse(localStorage.getItem('wutree_weekly_intentions') || '{}');
-            const intentionKey = `${sessionId}_${weekKey}`;
-            const existingIntention = intentions[intentionKey] || '';
-            
-            document.getElementById('intentionText').value = existingIntention;
-            document.getElementById('intentionModal').classList.add('show');
+            document.getElementById('weekGoalsDomainName').textContent = domainName;
+            renderGoalsList();
+            document.getElementById('weekGoalsModal').classList.add('show');
+            document.getElementById('newGoalInput').focus();
         }
         
-        function closeIntentionModal() {
-            document.getElementById('intentionModal').classList.remove('show');
-            currentIntentionSessionId = null;
-            currentIntentionWeekKey = null;
-        }
-        
-        function saveIntention() {
-            const text = document.getElementById('intentionText').value.trim();
-            const intentionKey = `${currentIntentionSessionId}_${currentIntentionWeekKey}`;
-            
-            const intentions = JSON.parse(localStorage.getItem('wutree_weekly_intentions') || '{}');
-            
-            if (text) {
-                intentions[intentionKey] = text;
-            } else {
-                delete intentions[intentionKey];
-            }
-            
-            localStorage.setItem('wutree_weekly_intentions', JSON.stringify(intentions));
-            
-            closeIntentionModal();
-            
+        function closeWeekGoalsModal() {
+            document.getElementById('weekGoalsModal').classList.remove('show');
+            currentGoalsDomainId = null;
+            currentGoalsWeekKey = null;
             // Re-render week view
             loadWeekProgress();
+        }
+        
+        function renderGoalsList() {
+            const goalsKey = `${currentGoalsDomainId}_${currentGoalsWeekKey}`;
+            const allGoals = JSON.parse(localStorage.getItem('wutree_weekly_goals') || '{}');
+            const goals = allGoals[goalsKey] || [];
+            
+            const container = document.getElementById('goalsList');
+            
+            if (goals.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-goals">
+                        Aucun objectif pour cette semaine.<br>
+                        Ajoute ta ligne directrice ! 🎯
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = goals.map((goal, index) => `
+                <div class="goal-item">
+                    <div class="goal-checkbox ${goal.done ? 'checked' : ''}" onclick="toggleGoal(${index})">
+                        ${goal.done ? '✓' : ''}
+                    </div>
+                    <div class="goal-text ${goal.done ? 'done' : ''}">${goal.text}</div>
+                    <button class="goal-delete" onclick="deleteGoal(${index})">×</button>
+                </div>
+            `).join('');
+        }
+        
+        function addWeekGoal() {
+            const input = document.getElementById('newGoalInput');
+            const text = input.value.trim();
+            if (!text) return;
+            
+            const goalsKey = `${currentGoalsDomainId}_${currentGoalsWeekKey}`;
+            const allGoals = JSON.parse(localStorage.getItem('wutree_weekly_goals') || '{}');
+            
+            if (!allGoals[goalsKey]) {
+                allGoals[goalsKey] = [];
+            }
+            
+            allGoals[goalsKey].push({
+                id: 'goal_' + Date.now(),
+                text: text,
+                done: false
+            });
+            
+            localStorage.setItem('wutree_weekly_goals', JSON.stringify(allGoals));
+            input.value = '';
+            renderGoalsList();
+        }
+        
+        function toggleGoal(index) {
+            const goalsKey = `${currentGoalsDomainId}_${currentGoalsWeekKey}`;
+            const allGoals = JSON.parse(localStorage.getItem('wutree_weekly_goals') || '{}');
+            
+            if (allGoals[goalsKey] && allGoals[goalsKey][index]) {
+                allGoals[goalsKey][index].done = !allGoals[goalsKey][index].done;
+                localStorage.setItem('wutree_weekly_goals', JSON.stringify(allGoals));
+                renderGoalsList();
+            }
+        }
+        
+        function deleteGoal(index) {
+            const goalsKey = `${currentGoalsDomainId}_${currentGoalsWeekKey}`;
+            const allGoals = JSON.parse(localStorage.getItem('wutree_weekly_goals') || '{}');
+            
+            if (allGoals[goalsKey]) {
+                allGoals[goalsKey].splice(index, 1);
+                if (allGoals[goalsKey].length === 0) {
+                    delete allGoals[goalsKey];
+                }
+                localStorage.setItem('wutree_weekly_goals', JSON.stringify(allGoals));
+                renderGoalsList();
+            }
         }
         
         // ========== BILAN ==========
