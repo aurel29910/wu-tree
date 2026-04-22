@@ -178,6 +178,13 @@
             border-radius: 16px;
             padding: 14px;
             margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .week-progress-card:active {
+            transform: scale(0.98);
+            background: rgba(255,255,255,0.75);
         }
         
         .week-progress-header {
@@ -1776,6 +1783,12 @@
                         <div class="bilan-stats" id="bilanStats"></div>
                     </div>
                     
+                    <!-- Objectifs hebdo -->
+                    <div class="bilan-section">
+                        <div class="bilan-section-title">🎯 Objectifs hebdomadaires</div>
+                        <div id="bilanGoalsReview" style="max-height: 200px; overflow-y: auto;"></div>
+                    </div>
+                    
                     <!-- Ressenti utilisateur -->
                     <div class="bilan-section">
                         <div class="bilan-section-title">💭 Mon ressenti</div>
@@ -2085,59 +2098,33 @@
             const weekKey = getWeekKey(new Date());
             const weeklyGoals = JSON.parse(localStorage.getItem('wutree_weekly_goals') || '{}');
             
-            // Group sessions by domain
-            const byDomain = {};
-            sessions.forEach(s => {
-                const domainId = s.domain?.id || 'unknown';
-                if (!byDomain[domainId]) {
-                    byDomain[domainId] = {
-                        domain: s.domain,
-                        sessions: []
-                    };
-                }
-                byDomain[domainId].sessions.push(s);
-            });
-            
-            container.innerHTML = Object.entries(byDomain).map(([domainId, data]) => {
-                // Get goals for this domain this week
-                const goalsKey = `${domainId}_${weekKey}`;
+            container.innerHTML = sessions.map(s => {
+                const fillClass = s.percent >= 100 ? 'complete' : s.percent >= 50 ? 'partial' : 'low';
+                const percentDisplay = s.percent >= 100 ? '✓' : `${s.percent}%`;
+                
+                // Get goals for this session this week
+                const goalsKey = `${s.session.id}_${weekKey}`;
                 const goals = weeklyGoals[goalsKey] || [];
                 const doneCount = goals.filter(g => g.done).length;
                 const totalCount = goals.length;
                 
-                // Render sessions for this domain
-                const sessionsHtml = data.sessions.map(s => {
-                    const fillClass = s.percent >= 100 ? 'complete' : s.percent >= 50 ? 'partial' : 'low';
-                    const percentDisplay = s.percent >= 100 ? '✓' : `${s.percent}%`;
-                    
-                    return `
-                        <div class="week-progress-card" style="margin-bottom: 8px;">
-                            <div class="week-progress-header">
-                                <div class="week-progress-emoji">${s.session.emoji}</div>
-                                <div class="week-progress-info">
-                                    <div class="week-progress-name">${s.session.name}</div>
-                                    <div class="week-progress-domain">${s.objective.name}</div>
-                                </div>
-                                <div class="week-progress-count ${s.percent >= 100 ? 'complete' : ''}">${percentDisplay}</div>
-                            </div>
-                            <div class="week-progress-bar">
-                                <div class="week-progress-fill ${fillClass}" style="width: ${Math.min(100, s.percent)}%"></div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-                
                 return `
-                    <div style="margin-bottom: 20px;">
-                        <div style="font-size: 16px; font-weight: 600; color: #333; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
-                            <span style="font-size: 20px;">${data.domain?.emoji || '📁'}</span>
-                            ${data.domain?.name || 'Domaine'}
+                    <div class="week-progress-card" onclick="openWeekGoals('${s.session.id}', '${weekKey}', '${s.session.emoji} ${s.session.name.replace(/'/g, "\\'")}')">
+                        <div class="week-progress-header">
+                            <div class="week-progress-emoji">${s.session.emoji}</div>
+                            <div class="week-progress-info">
+                                <div class="week-progress-name">${s.session.name}</div>
+                                <div class="week-progress-domain">${s.domain?.emoji || ''} ${s.objective.name}</div>
+                            </div>
+                            <div class="week-progress-count ${s.percent >= 100 ? 'complete' : ''}">${percentDisplay}</div>
                         </div>
-                        ${sessionsHtml}
-                        <div class="week-goals-badge" onclick="openWeekGoals('${domainId}', '${weekKey}', '${(data.domain?.name || 'Domaine').replace(/'/g, "\\'")}')">
-                            <div class="week-goals-label">🎯 Objectifs de la semaine</div>
+                        <div class="week-progress-bar">
+                            <div class="week-progress-fill ${fillClass}" style="width: ${Math.min(100, s.percent)}%"></div>
+                        </div>
+                        <div class="week-goals-badge">
+                            <div class="week-goals-label">🎯 Objectifs hebdo</div>
                             <div class="week-goals-count ${totalCount > 0 ? 'has-goals' : ''}">
-                                ${totalCount > 0 ? `${doneCount}/${totalCount}` : '+ Ajouter'}
+                                ${totalCount > 0 ? `${doneCount}/${totalCount}` : '+ Définir'}
                             </div>
                         </div>
                     </div>
@@ -2146,31 +2133,31 @@
         }
         
         // ========== OBJECTIFS HEBDOMADAIRES ==========
-        let currentGoalsDomainId = null;
+        let currentGoalsSessionId = null;
         let currentGoalsWeekKey = null;
-        let currentGoalsDomainName = null;
+        let currentGoalsSessionName = null;
         
-        function openWeekGoals(domainId, weekKey, domainName) {
-            currentGoalsDomainId = domainId;
+        function openWeekGoals(sessionId, weekKey, sessionName) {
+            currentGoalsSessionId = sessionId;
             currentGoalsWeekKey = weekKey;
-            currentGoalsDomainName = domainName;
+            currentGoalsSessionName = sessionName;
             
-            document.getElementById('weekGoalsDomainName').textContent = domainName;
+            document.getElementById('weekGoalsDomainName').innerHTML = sessionName;
             renderGoalsList();
             document.getElementById('weekGoalsModal').classList.add('show');
-            document.getElementById('newGoalInput').focus();
+            setTimeout(() => document.getElementById('newGoalInput').focus(), 100);
         }
         
         function closeWeekGoalsModal() {
             document.getElementById('weekGoalsModal').classList.remove('show');
-            currentGoalsDomainId = null;
+            currentGoalsSessionId = null;
             currentGoalsWeekKey = null;
             // Re-render week view
             loadWeekProgress();
         }
         
         function renderGoalsList() {
-            const goalsKey = `${currentGoalsDomainId}_${currentGoalsWeekKey}`;
+            const goalsKey = `${currentGoalsSessionId}_${currentGoalsWeekKey}`;
             const allGoals = JSON.parse(localStorage.getItem('wutree_weekly_goals') || '{}');
             const goals = allGoals[goalsKey] || [];
             
@@ -2180,7 +2167,7 @@
                 container.innerHTML = `
                     <div class="empty-goals">
                         Aucun objectif pour cette semaine.<br>
-                        Ajoute ta ligne directrice ! 🎯
+                        Définis ta ligne directrice ! 🎯
                     </div>
                 `;
                 return;
@@ -2188,11 +2175,11 @@
             
             container.innerHTML = goals.map((goal, index) => `
                 <div class="goal-item">
-                    <div class="goal-checkbox ${goal.done ? 'checked' : ''}" onclick="toggleGoal(${index})">
+                    <div class="goal-checkbox ${goal.done ? 'checked' : ''}" onclick="event.stopPropagation(); toggleGoal(${index})">
                         ${goal.done ? '✓' : ''}
                     </div>
                     <div class="goal-text ${goal.done ? 'done' : ''}">${goal.text}</div>
-                    <button class="goal-delete" onclick="deleteGoal(${index})">×</button>
+                    <button class="goal-delete" onclick="event.stopPropagation(); deleteGoal(${index})">×</button>
                 </div>
             `).join('');
         }
@@ -2202,7 +2189,7 @@
             const text = input.value.trim();
             if (!text) return;
             
-            const goalsKey = `${currentGoalsDomainId}_${currentGoalsWeekKey}`;
+            const goalsKey = `${currentGoalsSessionId}_${currentGoalsWeekKey}`;
             const allGoals = JSON.parse(localStorage.getItem('wutree_weekly_goals') || '{}');
             
             if (!allGoals[goalsKey]) {
@@ -2218,10 +2205,11 @@
             localStorage.setItem('wutree_weekly_goals', JSON.stringify(allGoals));
             input.value = '';
             renderGoalsList();
+            input.focus();
         }
         
         function toggleGoal(index) {
-            const goalsKey = `${currentGoalsDomainId}_${currentGoalsWeekKey}`;
+            const goalsKey = `${currentGoalsSessionId}_${currentGoalsWeekKey}`;
             const allGoals = JSON.parse(localStorage.getItem('wutree_weekly_goals') || '{}');
             
             if (allGoals[goalsKey] && allGoals[goalsKey][index]) {
@@ -2232,7 +2220,7 @@
         }
         
         function deleteGoal(index) {
-            const goalsKey = `${currentGoalsDomainId}_${currentGoalsWeekKey}`;
+            const goalsKey = `${currentGoalsSessionId}_${currentGoalsWeekKey}`;
             const allGoals = JSON.parse(localStorage.getItem('wutree_weekly_goals') || '{}');
             
             if (allGoals[goalsKey]) {
@@ -2394,6 +2382,51 @@
                     <div class="bilan-stat-label">Entrées journal</div>
                 </div>
             `;
+            
+            // Render weekly goals review
+            const weeklyGoals = JSON.parse(localStorage.getItem('wutree_weekly_goals') || '{}');
+            const goalsReviewContainer = document.getElementById('bilanGoalsReview');
+            
+            // Find all goals for this week
+            const sessionsWithGoals = allSessions.filter(session => {
+                const goalsKey = `${session.id}_${weekKey}`;
+                return weeklyGoals[goalsKey] && weeklyGoals[goalsKey].length > 0;
+            });
+            
+            if (sessionsWithGoals.length === 0) {
+                goalsReviewContainer.innerHTML = `
+                    <div style="text-align: center; color: rgba(0,0,0,0.4); padding: 15px; font-size: 12px;">
+                        Aucun objectif défini pour cette semaine
+                    </div>
+                `;
+            } else {
+                goalsReviewContainer.innerHTML = sessionsWithGoals.map(session => {
+                    const goalsKey = `${session.id}_${weekKey}`;
+                    const goals = weeklyGoals[goalsKey] || [];
+                    const doneCount = goals.filter(g => g.done).length;
+                    const allDone = doneCount === goals.length;
+                    
+                    return `
+                        <div style="background: rgba(255,255,255,0.5); border-radius: 12px; padding: 12px; margin-bottom: 10px;">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                <span style="font-size: 18px;">${session.emoji}</span>
+                                <span style="font-size: 13px; font-weight: 600; color: #333;">${session.name}</span>
+                                <span style="margin-left: auto; font-size: 11px; padding: 2px 8px; border-radius: 10px; background: ${allDone ? 'rgba(76,175,80,0.2)' : 'rgba(107,78,155,0.15)'}; color: ${allDone ? '#4CAF50' : '#6B4E9B'}; font-weight: 600;">
+                                    ${doneCount}/${goals.length}
+                                </span>
+                            </div>
+                            <div style="font-size: 11px; color: rgba(0,0,0,0.6);">
+                                ${goals.map(g => `
+                                    <div style="display: flex; align-items: center; gap: 6px; padding: 4px 0;">
+                                        <span style="color: ${g.done ? '#4CAF50' : 'rgba(0,0,0,0.3)'};">${g.done ? '✓' : '○'}</span>
+                                        <span style="${g.done ? 'text-decoration: line-through; color: rgba(0,0,0,0.4);' : ''}">${g.text}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
             
             // Fill form
             document.getElementById('bilanFeeling').value = bilan.feeling || '';
