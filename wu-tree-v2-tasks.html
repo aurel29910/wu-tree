@@ -2099,12 +2099,6 @@
         let currentView = 'day'; // 'day' or 'week'
         let currentBilanWeek = null;
         
-        // Goals state
-        let currentGoalsSessionId = null;
-        let currentGoalsDateKey = null; // For daily goals
-        let currentGoalsWeekKey = null; // For weekly goals
-        let currentGoalsType = null; // 'daily' or 'weekly'
-        
         const MANUAL_TASK_EMOJIS = ['✨', '🎯', '💡', '🧘', '📞', '✍️', '🎨', '🏃', '📚', '💪', '🧹', '🎵'];
         
         function init() {
@@ -3003,7 +2997,7 @@
                             ${allGoalsDone ? ' ✓' : ''}
                         </div>
                     </div>
-                    ${event.duration ? `<button class="event-play" onclick="event.stopPropagation(); startTimer('${event.sessionId}', '${event.sessionName}', '${event.sessionEmoji}', ${event.duration})" title="Lancer">▶️</button>` : ''}
+                    ${event.duration ? `<button class="event-play" onclick="event.stopPropagation(); startTimer('${event.sessionId}', '${event.sessionName.replace(/'/g, "\\'")}', '${event.sessionEmoji}', ${event.duration})" title="Lancer">▶️</button>` : ''}
                     <div class="event-check ${event.isDone ? 'checked' : ''}" onclick="event.stopPropagation(); toggleEvent('${event.sessionId}', '${event.domainId}', '${event.objectiveId}')">
                         ${event.isDone ? '✓' : ''}
                     </div>
@@ -3672,15 +3666,6 @@
         let currentTimerSessionId = null;
         let timerTargetMinutes = 0;
         let currentTimerName = '';
-        
-        function formatDuration(minutes) {
-            if (minutes >= 60) {
-                const h = Math.floor(minutes / 60);
-                const m = minutes % 60;
-                return m > 0 ? `${h}h ${m}min` : `${h}h`;
-            }
-            return `${minutes} min`;
-        }
         
         function startTimer(sessionId, sessionName, sessionEmoji, duration) {
             currentTimerSessionId = sessionId;
