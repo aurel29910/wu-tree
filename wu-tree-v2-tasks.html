@@ -229,6 +229,40 @@
         .week-progress-fill.partial { background: linear-gradient(90deg, #FF9800, #FFB74D); }
         .week-progress-fill.low { background: linear-gradient(90deg, #f44336, #EF5350); }
         
+        /* Intention hebdomadaire */
+        .week-intention {
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: rgba(107, 78, 155, 0.08);
+            border-radius: 10px;
+            border: 1px dashed rgba(107, 78, 155, 0.3);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .week-intention:active {
+            transform: scale(0.98);
+        }
+        
+        .week-intention-text {
+            font-size: 12px;
+            color: #6B4E9B;
+            font-style: italic;
+        }
+        
+        .week-intention-placeholder {
+            font-size: 11px;
+            color: rgba(107, 78, 155, 0.5);
+        }
+        
+        .week-intention-label {
+            font-size: 9px;
+            color: rgba(107, 78, 155, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 3px;
+        }
+        
         .week-summary {
             background: rgba(107,78,155,0.1);
             border: 2px solid rgba(107,78,155,0.3);
@@ -1702,6 +1736,30 @@
             </div>
         </div>
         
+        <!-- Modal Intention Hebdo -->
+        <div class="modal-overlay" id="intentionModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <span class="modal-title">🎯 Intention de la semaine</span>
+                    <button class="modal-close" onclick="closeIntentionModal()">×</button>
+                </div>
+                <div class="modal-content">
+                    <div id="intentionSessionName" style="font-size: 14px; font-weight: 600; color: #6B4E9B; margin-bottom: 15px; text-align: center;"></div>
+                    <div class="input-group">
+                        <label class="input-label">Mon intention pour cette semaine</label>
+                        <textarea class="input-textarea" id="intentionText" placeholder="Ex: Passer aux poids de 7kg, courir 5km sans pause, méditer 15min/jour..." rows="3"></textarea>
+                    </div>
+                    <div style="font-size: 11px; color: rgba(0,0,0,0.4); margin-bottom: 15px; text-align: center;">
+                        💡 Sois précis et mesurable
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-secondary" onclick="closeIntentionModal()">Annuler</button>
+                        <button class="btn btn-primary" onclick="saveIntention()">✨ Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Timer Overlay -->
         <div class="timer-overlay" id="timerOverlay">
             <div class="timer-session-emoji" id="timerEmoji">🏋️</div>
@@ -1917,10 +1975,19 @@
                 return;
             }
             
+            // Get current week key for intentions
+            const weekKey = getWeekKey(new Date());
+            const intentions = JSON.parse(localStorage.getItem('wutree_weekly_intentions') || '{}');
+            
             container.innerHTML = sessions.map(s => {
                 const displayDone = Math.min(s.done, s.target); // Never show more than target
                 const fillClass = s.percent >= 100 ? 'complete' : s.percent >= 50 ? 'partial' : 'low';
                 const percentDisplay = s.percent >= 100 ? '✓' : `${s.percent}%`;
+                
+                // Get intention for this session this week
+                const intentionKey = `${s.session.id}_${weekKey}`;
+                const intention = intentions[intentionKey] || '';
+                
                 return `
                     <div class="week-progress-card">
                         <div class="week-progress-header">
@@ -1934,9 +2001,61 @@
                         <div class="week-progress-bar">
                             <div class="week-progress-fill ${fillClass}" style="width: ${Math.min(100, s.percent)}%"></div>
                         </div>
+                        <div class="week-intention" onclick="editIntention('${s.session.id}', '${weekKey}', '${s.session.name.replace(/'/g, "\\'")}')">
+                            <div class="week-intention-label">🎯 Intention de la semaine</div>
+                            ${intention 
+                                ? `<div class="week-intention-text">${intention}</div>`
+                                : `<div class="week-intention-placeholder">+ Ajouter une intention...</div>`
+                            }
+                        </div>
                     </div>
                 `;
             }).join('');
+        }
+        
+        // ========== INTENTIONS HEBDOMADAIRES ==========
+        let currentIntentionSessionId = null;
+        let currentIntentionWeekKey = null;
+        
+        function editIntention(sessionId, weekKey, sessionName) {
+            currentIntentionSessionId = sessionId;
+            currentIntentionWeekKey = weekKey;
+            
+            document.getElementById('intentionSessionName').textContent = sessionName;
+            
+            // Load existing intention
+            const intentions = JSON.parse(localStorage.getItem('wutree_weekly_intentions') || '{}');
+            const intentionKey = `${sessionId}_${weekKey}`;
+            const existingIntention = intentions[intentionKey] || '';
+            
+            document.getElementById('intentionText').value = existingIntention;
+            document.getElementById('intentionModal').classList.add('show');
+        }
+        
+        function closeIntentionModal() {
+            document.getElementById('intentionModal').classList.remove('show');
+            currentIntentionSessionId = null;
+            currentIntentionWeekKey = null;
+        }
+        
+        function saveIntention() {
+            const text = document.getElementById('intentionText').value.trim();
+            const intentionKey = `${currentIntentionSessionId}_${currentIntentionWeekKey}`;
+            
+            const intentions = JSON.parse(localStorage.getItem('wutree_weekly_intentions') || '{}');
+            
+            if (text) {
+                intentions[intentionKey] = text;
+            } else {
+                delete intentions[intentionKey];
+            }
+            
+            localStorage.setItem('wutree_weekly_intentions', JSON.stringify(intentions));
+            
+            closeIntentionModal();
+            
+            // Re-render week view
+            loadWeekProgress();
         }
         
         // ========== BILAN ==========
