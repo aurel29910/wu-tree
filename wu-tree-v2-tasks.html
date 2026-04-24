@@ -853,14 +853,15 @@
         .mini-timer {
             display: none;
             position: fixed;
-            top: 120px;
+            top: calc(env(safe-area-inset-top, 10px) + 100px);
             right: 15px;
             background: rgba(255,255,255,0.95);
             backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             border-radius: 16px;
             padding: 10px 14px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            z-index: 200;
+            z-index: 9999;
             border: 2px solid rgba(107, 78, 155, 0.3);
             cursor: pointer;
             transition: all 0.2s;
@@ -910,10 +911,11 @@
             transform: translate(-50%, -50%);
             background: rgba(255,255,255,0.95);
             backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-radius: 24px;
             padding: 30px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            z-index: 350;
+            z-index: 10001;
             text-align: center;
             min-width: 280px;
         }
@@ -925,7 +927,7 @@
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.3);
-            z-index: 340;
+            z-index: 10000;
         }
         
         .timer-panel-backdrop.show { display: block; }
@@ -1989,27 +1991,27 @@
                 </div>
             </div>
         </div>
-        
-        <!-- Mini Timer flottant -->
-        <div class="mini-timer" id="miniTimer" onclick="openTimerPanel()">
-            <div class="mini-timer-icon">⏳</div>
-            <div>
-                <div class="mini-timer-time" id="miniTimerTime">00:00</div>
-                <div class="mini-timer-session" id="miniTimerSession">Session</div>
-            </div>
+    </div>
+    
+    <!-- Mini Timer flottant (HORS phone-frame pour mobile) -->
+    <div class="mini-timer" id="miniTimer" onclick="openTimerPanel()">
+        <div class="mini-timer-icon">⏳</div>
+        <div>
+            <div class="mini-timer-time" id="miniTimerTime">00:00</div>
+            <div class="mini-timer-session" id="miniTimerSession">Session</div>
         </div>
-        
-        <!-- Timer Panel (control) -->
-        <div class="timer-panel-backdrop" id="timerPanelBackdrop" onclick="closeTimerPanel()"></div>
-        <div class="timer-panel" id="timerPanel">
-            <div class="timer-panel-emoji" id="timerEmoji">🏋️</div>
-            <div class="timer-panel-name" id="timerName">Session</div>
-            <div class="timer-panel-display" id="timerDisplay">00:00</div>
-            <div class="timer-panel-target" id="timerTarget">Objectif : 45 min</div>
-            <div class="timer-panel-controls">
-                <button class="timer-btn timer-btn-play" id="timerPlayBtn" onclick="toggleTimer()">▶️</button>
-                <button class="timer-btn timer-btn-stop" onclick="stopTimer()">⏹️</button>
-            </div>
+    </div>
+    
+    <!-- Timer Panel (HORS phone-frame pour mobile) -->
+    <div class="timer-panel-backdrop" id="timerPanelBackdrop" onclick="closeTimerPanel()"></div>
+    <div class="timer-panel" id="timerPanel">
+        <div class="timer-panel-emoji" id="timerEmoji">🏋️</div>
+        <div class="timer-panel-name" id="timerName">Session</div>
+        <div class="timer-panel-display" id="timerDisplay">00:00</div>
+        <div class="timer-panel-target" id="timerTarget">Objectif : 45 min</div>
+        <div class="timer-panel-controls">
+            <button class="timer-btn timer-btn-play" id="timerPlayBtn" onclick="toggleTimer()">▶️</button>
+            <button class="timer-btn timer-btn-stop" onclick="stopTimer()">⏹️</button>
         </div>
     </div>
     
