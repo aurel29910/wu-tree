@@ -2110,6 +2110,7 @@
             updateStats();
             setupVoiceRecognition();
             checkBilanTime();
+            loadTimerState(); // Restore timer if it was running
         }
         
         // ========== VIEW TOGGLE ==========
@@ -3659,20 +3660,97 @@
             localStorage.setItem(storageKey, JSON.stringify(order));
         }
         
-        // ========== TIMER ==========
+        // ========== TIMER (Persistent - survives background) ==========
         let timerInterval = null;
-        let timerSeconds = 0;
         let timerRunning = false;
+        let timerStartTimestamp = null; // When timer started (persisted)
+        let timerPausedSeconds = 0; // Seconds accumulated before pause
         let currentTimerSessionId = null;
         let timerTargetMinutes = 0;
         let currentTimerName = '';
+        let currentTimerEmoji = '';
+        
+        // Load timer state from localStorage on page load
+        function loadTimerState() {
+            const saved = localStorage.getItem('wutree_active_timer');
+            if (!saved) return;
+            
+            try {
+                const state = JSON.parse(saved);
+                if (state.running && state.startTimestamp) {
+                    // Timer was running - restore it
+                    currentTimerSessionId = state.sessionId;
+                    timerTargetMinutes = state.targetMinutes;
+                    currentTimerName = state.sessionName;
+                    currentTimerEmoji = state.sessionEmoji;
+                    timerStartTimestamp = state.startTimestamp;
+                    timerPausedSeconds = state.pausedSeconds || 0;
+                    timerRunning = true;
+                    
+                    // Update UI
+                    document.getElementById('timerEmoji').textContent = currentTimerEmoji;
+                    document.getElementById('timerName').textContent = currentTimerName;
+                    document.getElementById('timerTarget').textContent = `Objectif : ${formatDuration(timerTargetMinutes)}`;
+                    document.getElementById('miniTimerSession').textContent = currentTimerName;
+                    document.getElementById('timerPlayBtn').textContent = '⏸️';
+                    document.getElementById('miniTimer').classList.add('show');
+                    
+                    // Start updating display
+                    timerInterval = setInterval(updateTimer, 1000);
+                    updateTimer(); // Immediate update
+                } else if (state.paused && state.pausedSeconds > 0) {
+                    // Timer was paused - restore paused state
+                    currentTimerSessionId = state.sessionId;
+                    timerTargetMinutes = state.targetMinutes;
+                    currentTimerName = state.sessionName;
+                    currentTimerEmoji = state.sessionEmoji;
+                    timerPausedSeconds = state.pausedSeconds;
+                    timerRunning = false;
+                    
+                    // Update UI
+                    document.getElementById('timerEmoji').textContent = currentTimerEmoji;
+                    document.getElementById('timerName').textContent = currentTimerName;
+                    document.getElementById('timerTarget').textContent = `Objectif : ${formatDuration(timerTargetMinutes)}`;
+                    document.getElementById('miniTimerSession').textContent = currentTimerName;
+                    document.getElementById('timerPlayBtn').textContent = '▶️';
+                    document.getElementById('miniTimer').classList.add('show');
+                    
+                    // Show paused time
+                    updateTimerDisplay(timerPausedSeconds);
+                }
+            } catch (e) {
+                console.log('Error loading timer state:', e);
+                localStorage.removeItem('wutree_active_timer');
+            }
+        }
+        
+        function saveTimerState() {
+            if (!currentTimerSessionId) {
+                localStorage.removeItem('wutree_active_timer');
+                return;
+            }
+            
+            const state = {
+                sessionId: currentTimerSessionId,
+                sessionName: currentTimerName,
+                sessionEmoji: currentTimerEmoji,
+                targetMinutes: timerTargetMinutes,
+                running: timerRunning,
+                paused: !timerRunning && timerPausedSeconds > 0,
+                startTimestamp: timerStartTimestamp,
+                pausedSeconds: timerPausedSeconds
+            };
+            localStorage.setItem('wutree_active_timer', JSON.stringify(state));
+        }
         
         function startTimer(sessionId, sessionName, sessionEmoji, duration) {
             currentTimerSessionId = sessionId;
             timerTargetMinutes = duration || 30;
-            timerSeconds = 0;
+            timerPausedSeconds = 0;
             timerRunning = false;
             currentTimerName = sessionName;
+            currentTimerEmoji = sessionEmoji;
+            timerStartTimestamp = null;
             
             // Update panel
             document.getElementById('timerEmoji').textContent = sessionEmoji;
@@ -3706,23 +3784,36 @@
         
         function toggleTimer() {
             if (timerRunning) {
-                // Pause
+                // Pause - save elapsed seconds
                 clearInterval(timerInterval);
+                timerPausedSeconds = getElapsedSeconds();
+                timerStartTimestamp = null;
                 timerRunning = false;
                 document.getElementById('timerPlayBtn').textContent = '▶️';
             } else {
-                // Play
+                // Play - start from current position
+                timerStartTimestamp = Date.now();
                 timerRunning = true;
                 document.getElementById('timerPlayBtn').textContent = '⏸️';
                 timerInterval = setInterval(updateTimer, 1000);
+                updateTimer(); // Immediate update
             }
+            saveTimerState();
         }
         
-        function updateTimer() {
-            timerSeconds++;
-            const hours = Math.floor(timerSeconds / 3600);
-            const minutes = Math.floor((timerSeconds % 3600) / 60);
-            const seconds = timerSeconds % 60;
+        function getElapsedSeconds() {
+            if (timerRunning && timerStartTimestamp) {
+                const now = Date.now();
+                const runningSeconds = Math.floor((now - timerStartTimestamp) / 1000);
+                return timerPausedSeconds + runningSeconds;
+            }
+            return timerPausedSeconds;
+        }
+        
+        function updateTimerDisplay(totalSeconds) {
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
             
             let timeStr;
             if (hours > 0) {
@@ -3735,17 +3826,32 @@
             document.getElementById('miniTimerTime').textContent = timeStr;
             
             // Check if overtime
-            const totalMinutes = Math.floor(timerSeconds / 60);
+            const totalMinutes = Math.floor(totalSeconds / 60);
             if (totalMinutes >= timerTargetMinutes) {
                 document.getElementById('timerDisplay').classList.add('overtime');
                 document.getElementById('miniTimerTime').classList.add('overtime');
-                
-                // Play alarm once when reaching target
-                if (totalMinutes === timerTargetMinutes && seconds === 0) {
-                    playAlarm();
-                }
             }
         }
+        
+        function updateTimer() {
+            const totalSeconds = getElapsedSeconds();
+            updateTimerDisplay(totalSeconds);
+            
+            // Play alarm when reaching target
+            const totalMinutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            if (totalMinutes === timerTargetMinutes && seconds === 0) {
+                playAlarm();
+            }
+        }
+        
+        // Handle visibility change (app goes to background/foreground)
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible' && timerRunning) {
+                // App came back to foreground - update display immediately
+                updateTimer();
+            }
+        });
         
         function playAlarm() {
             // Vibrate if supported
@@ -3789,8 +3895,11 @@
             document.getElementById('miniTimer').classList.remove('show');
             closeTimerPanel();
             
+            // Clear state
             currentTimerSessionId = null;
-            timerSeconds = 0;
+            timerPausedSeconds = 0;
+            timerStartTimestamp = null;
+            localStorage.removeItem('wutree_active_timer');
         }
         
         // ========== ACTIONS ==========
