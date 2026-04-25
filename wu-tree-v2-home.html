@@ -328,34 +328,68 @@
             color: white;
         }
         
-        .bubble-delete {
+        /* Menu contextuel long press */
+        .bubble-menu {
             position: absolute;
-            top: -5px;
-            right: -5px;
-            width: 24px;
-            height: 24px;
-            background: #ff4444;
-            border: 2px solid white;
-            border-radius: 50%;
-            font-size: 12px;
-            color: white;
-            cursor: pointer;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 16px;
+            padding: 8px;
             display: none;
+            flex-direction: row;
+            gap: 8px;
+            z-index: 20;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+        
+        .bubble-menu.show {
+            display: flex;
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+        
+        .bubble-menu-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 10;
-            animation: pulse-delete 0.5s ease-in-out infinite;
+            transition: transform 0.1s;
         }
         
-        .bubble-delete.show {
-            display: flex;
+        .bubble-menu-btn:active {
+            transform: scale(0.9);
         }
         
-        @keyframes pulse-delete {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+        .bubble-menu-btn.edit {
+            background: linear-gradient(135deg, #6B4E9B, #9B6E9B);
+            color: white;
         }
         
+        .bubble-menu-btn.delete {
+            background: linear-gradient(135deg, #ff4444, #ff6666);
+            color: white;
+        }
+        
+        @keyframes pulse-menu {
+            0%, 100% { box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+            50% { box-shadow: 0 4px 30px rgba(107, 78, 155, 0.4); }
+        }
+        
+        .bubble-menu.show {
+            animation: pulse-menu 1s ease-in-out infinite;
+        }
+
         /* FAB - Floating Action Button */
         .fab {
             position: fixed;
@@ -878,7 +912,10 @@
                          onmouseup="cancelLongPress()"
                          onmouseleave="cancelLongPress()"
                          onclick="handleBubbleClick('${domain.id}')">
-                        <button class="bubble-delete" id="delete-${domain.id}" onclick="event.stopPropagation(); deleteDomain('${domain.id}')">×</button>
+                        <div class="bubble-menu" id="menu-${domain.id}">
+                            <button class="bubble-menu-btn edit" onclick="event.stopPropagation(); editDomainName('${domain.id}')" title="Modifier">✏️</button>
+                            <button class="bubble-menu-btn delete" onclick="event.stopPropagation(); deleteDomain('${domain.id}')" title="Supprimer">🗑️</button>
+                        </div>
                         <div class="${priorityClass}">${index + 1}</div>
                         <div class="${badgeClass}">${taskCount}</div>
                         <div class="bubble-emoji">${domain.emoji}</div>
@@ -898,9 +935,9 @@
                 isLongPress = false;
                 return;
             }
-            // If delete button is showing, don't navigate
-            const deleteBtn = document.getElementById('delete-' + domainId);
-            if (deleteBtn && deleteBtn.classList.contains('show')) {
+            // If menu is showing, don't navigate
+            const menu = document.getElementById('menu-' + domainId);
+            if (menu && menu.classList.contains('show')) {
                 return;
             }
             openDomain(domainId);
@@ -1037,10 +1074,10 @@
             longPressDomainId = domainId;
             longPressTimer = setTimeout(() => {
                 isLongPress = true;
-                // Show delete button with animation
-                const deleteBtn = document.getElementById('delete-' + domainId);
-                if (deleteBtn) {
-                    deleteBtn.classList.add('show');
+                // Show context menu with animation
+                const menu = document.getElementById('menu-' + domainId);
+                if (menu) {
+                    menu.classList.add('show');
                     // Vibrate if supported
                     if (navigator.vibrate) {
                         navigator.vibrate(50);
@@ -1056,14 +1093,33 @@
             }
         }
         
-        // Hide all delete buttons when clicking elsewhere
+        // Hide all menus when clicking elsewhere
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('.bubble-delete') && !e.target.closest('.bubble')) {
-                document.querySelectorAll('.bubble-delete.show').forEach(btn => {
-                    btn.classList.remove('show');
+            if (!e.target.closest('.bubble-menu') && !e.target.closest('.bubble')) {
+                document.querySelectorAll('.bubble-menu.show').forEach(menu => {
+                    menu.classList.remove('show');
                 });
             }
         });
+        
+        // ========== EDIT DOMAIN NAME ==========
+        function editDomainName(domainId) {
+            const domains = JSON.parse(localStorage.getItem('wutree_domains') || '[]');
+            const domain = domains.find(d => d.id === domainId);
+            if (!domain) return;
+            
+            const newName = prompt('Nouveau nom du domaine :', domain.name);
+            if (newName && newName.trim()) {
+                domain.name = newName.trim();
+                localStorage.setItem('wutree_domains', JSON.stringify(domains));
+                renderDomains();
+            }
+            
+            // Hide menu
+            document.querySelectorAll('.bubble-menu.show').forEach(menu => {
+                menu.classList.remove('show');
+            });
+        }
         
         // ========== NAVIGATION ==========
         function goToWellbeing() {
