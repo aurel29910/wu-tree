@@ -297,33 +297,63 @@
             transform: scale(0.95);
         }
         
-        /* Delete button on bubbles */
-        .bubble-delete {
+        /* Menu contextuel long press */
+        .bubble-menu {
             position: absolute;
-            top: -5px;
-            right: -5px;
-            width: 24px;
-            height: 24px;
-            background: #ff4444;
-            border: 2px solid white;
-            border-radius: 50%;
-            font-size: 12px;
-            color: white;
-            cursor: pointer;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 16px;
+            padding: 8px;
             display: none;
+            flex-direction: row;
+            gap: 8px;
+            z-index: 20;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+        
+        .bubble-menu.show {
+            display: flex;
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+            animation: pulse-menu 1s ease-in-out infinite;
+        }
+        
+        .bubble-menu-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 10;
-            animation: pulse-delete 0.5s ease-in-out infinite;
+            transition: transform 0.1s;
         }
         
-        .bubble-delete.show {
-            display: flex;
+        .bubble-menu-btn:active {
+            transform: scale(0.9);
         }
         
-        @keyframes pulse-delete {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+        .bubble-menu-btn.edit {
+            background: linear-gradient(135deg, #6B4E9B, #9B6E9B);
+            color: white;
+        }
+        
+        .bubble-menu-btn.delete {
+            background: linear-gradient(135deg, #ff4444, #ff6666);
+            color: white;
+        }
+        
+        @keyframes pulse-menu {
+            0%, 100% { box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+            50% { box-shadow: 0 4px 30px rgba(107, 78, 155, 0.4); }
         }
         
         /* Bottom menu */
@@ -415,12 +445,13 @@
         
         const ACTIVITY_EMOJIS = {
             sante: ['🏋️', '🧘', '🥋', '🏃', '🚴', '🥗', '💊', '😴', '🧠', '💆', '🏊', '⚽', '🥊', '🎾', '🧗', '💪', '🏄', '⛹️', '🤸', '🚶', '🧖', '🛀', '🥤', '🍎', '🥑', '🍳', '💤', '🩺', '❤️‍🔥', '🦵'],
-            business: ['📈', '💻', '📊', '🎯', '📱', '💡', '📝', '🤝', '💵', '🏦', '📧', '🎤', '💰', '📉', '🖥️', '⚡', '🚀', '📞', '🗂️', '📋', '✅', '🔔', '💳', '🏢', '👔', '📣', '🎪', '🛒', '📦', '🌐'],
+            business: ['📈', '💻', '📊', '🎯', '📱', '💡', '📝', '🤝', '💵', '🏦', '📧', '🎤', '💰', '📉', '🖥️', '⚡', '🚀', '📞', '🗂️', '📋', '✅', '🔔', '💳', '🏢', '👔', '📣', '🎪', '🛒', '📦', '🌐', '₿', '💹', '🪙'],
             relations: ['👨‍👩‍👧', '💑', '👥', '🤝', '💬', '🎁', '📞', '❤️', '👋', '🫂', '🍽️', '☕', '🥂', '💌', '😊', '🤗', '👨‍👩‍👦', '👫', '💐', '🎂', '🎉', '💝', '😘', '🙏', '👪', '🧑‍🤝‍🧑', '💏', '🤱', '👶', '🐕'],
             connaissance: ['📖', '🎓', '💻', '🧪', '🎨', '🎵', '🌍', '🧩', '✍️', '🔬', '📚', '🎧', '🔭', '📐', '🧬', '💾', '📰', '🗞️', '🎙️', '📻', '🖊️', '📓', '🗃️', '🔍', '💎', '🏆', '🎯', '⚗️', '🧮', '🗣️'],
-            creativite: ['🎮', '🎬', '🎵', '📚', '🎨', '⚽', '🎯', '🎸', '📷', '🎭', '🧩', '🌿', '🎹', '🎺', '🥁', '🎻', '✏️', '🖌️', '🖼️', '🎪', '🎠', '🎡', '🎢', '🎲', '♟️', '🃏', '🎰', '🎳', '🎤', '📹'],
+            creativite: ['🎮', '🎬', '🎵', '📚', '🎨', '⚽', '🎯', '🎸', '📷', '🎭', '🧩', '🌿', '🎹', '🎺', '🥁', '🎻', '✏️', '🖌️', '🖼️', '🎪', '🎠', '🎡', '🎢', '🎲', '♟️', '🃏', '🎰', '🎳', '🎤', '📹', '💿', '🎧', '🎛️', '🎚️', '📀', '🎶'],
             maison: ['🧹', '🛠️', '🌱', '🍳', '🛋️', '🔧', '📦', '🏠', '🪴', '✨', '🧺', '🪑', '🧽', '🚿', '🛁', '🛏️', '💡', '🪟', '🚪', '🧰', '🔨', '🪚', '🔩', '🗑️', '🧴', '🪥', '🧼', '🥘', '🍲', '☕'],
-            voyages: ['✈️', '🏖️', '⛺', '🗺️', '🎒', '🚗', '🏔️', '🌴', '📸', '🧳', '🚂', '🛳️', '🚀', '🛫', '🛬', '🚁', '⛵', '🚤', '🏕️', '🌅', '🌄', '🗼', '🗽', '🏰', '🎡', '⛩️', '🕌', '🏛️', '🌉', '🎭']
+            voyages: ['✈️', '🏖️', '⛺', '🗺️', '🎒', '🚗', '🏔️', '🌴', '📸', '🧳', '🚂', '🛳️', '🚀', '🛫', '🛬', '🚁', '⛵', '🚤', '🏕️', '🌅', '🌄', '🗼', '🗽', '🏰', '🎡', '⛩️', '🕌', '🏛️', '🌉', '🎭'],
+            default: ['🎯', '💡', '⭐', '🔥', '💎', '🌟', '✨', '🚀', '💪', '🧠', '❤️', '🎵', '🎨', '📚', '💻', '📱', '🏠', '✈️', '💰', '📈', '₿', '💿', '🎧', '🎛️', '🎚️', '🎹', '🎸', '🥁', '🎤', '🎬', '📀', '🎶', '🪙', '💹', '📊', '💵', '🏆', '🎮', '🌍', '🔮']
         };
         
         function init() {
@@ -498,7 +529,10 @@
                          onmousedown="startLongPress('${activity.id}')"
                          onmouseup="cancelLongPress()"
                          onmouseleave="cancelLongPress()">
-                        <button class="bubble-delete" id="delete-${activity.id}" onclick="event.stopPropagation(); deleteActivity('${activity.id}')">×</button>
+                        <div class="bubble-menu" id="menu-${activity.id}">
+                            <button class="bubble-menu-btn edit" onclick="event.stopPropagation(); editActivityName('${activity.id}')" title="Modifier">✏️</button>
+                            <button class="bubble-menu-btn delete" onclick="event.stopPropagation(); deleteActivity('${activity.id}')" title="Supprimer">🗑️</button>
+                        </div>
                         <div class="${badgeClass}">${count}</div>
                         <div class="bubble-emoji">${activity.emoji}</div>
                         <div class="bubble-label">${activity.name}</div>
@@ -512,13 +546,14 @@
         // ========== LONG PRESS ==========
         let longPressTimer = null;
         let isLongPress = false;
-        let currentDeleteId = null;
         
         function startLongPress(activityId) {
             isLongPress = false;
             longPressTimer = setTimeout(() => {
                 isLongPress = true;
-                showDeleteButton(activityId);
+                // Show context menu
+                document.querySelectorAll('.bubble-menu').forEach(menu => menu.classList.remove('show'));
+                document.getElementById('menu-' + activityId).classList.add('show');
                 if (navigator.vibrate) navigator.vibrate(50);
             }, 500);
         }
@@ -530,25 +565,44 @@
             }
         }
         
-        function showDeleteButton(activityId) {
-            // Hide any other delete buttons
-            document.querySelectorAll('.bubble-delete').forEach(btn => btn.classList.remove('show'));
-            currentDeleteId = activityId;
-            document.getElementById('delete-' + activityId).classList.add('show');
-        }
-        
         function handleBubbleClick(activityId) {
             if (isLongPress) {
                 isLongPress = false;
                 return;
             }
-            if (currentDeleteId) {
-                // Click elsewhere to hide delete button
-                document.querySelectorAll('.bubble-delete').forEach(btn => btn.classList.remove('show'));
-                currentDeleteId = null;
+            // If menu is showing, don't navigate
+            const menu = document.getElementById('menu-' + activityId);
+            if (menu && menu.classList.contains('show')) {
                 return;
             }
             openActivity(activityId);
+        }
+        
+        // Hide menus when clicking elsewhere
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.bubble-menu') && !e.target.closest('.bubble')) {
+                document.querySelectorAll('.bubble-menu.show').forEach(menu => {
+                    menu.classList.remove('show');
+                });
+            }
+        });
+        
+        function editActivityName(activityId) {
+            const activities = JSON.parse(localStorage.getItem('wutree_activities') || '[]');
+            const activity = activities.find(a => a.id === activityId);
+            if (!activity) return;
+            
+            const newName = prompt('Nouveau nom de l\'activité :', activity.name);
+            if (newName && newName.trim()) {
+                activity.name = newName.trim();
+                localStorage.setItem('wutree_activities', JSON.stringify(activities));
+                renderActivities();
+            }
+            
+            // Hide menu
+            document.querySelectorAll('.bubble-menu.show').forEach(menu => {
+                menu.classList.remove('show');
+            });
         }
         
         function deleteActivity(activityId) {
