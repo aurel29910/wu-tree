@@ -1151,31 +1151,19 @@
         updateHabitsBadge();
         
         // ========== FIREBASE ==========
-        let auth = null;
-        let db = null;
+        const firebaseConfig = {
+            apiKey: "AIzaSyBmQjKJz6cIJMEatx0gw_IvYF2YO8DHJbg",
+            authDomain: "wu-tree.firebaseapp.com",
+            projectId: "wu-tree",
+            storageBucket: "wu-tree.firebasestorage.app",
+            messagingSenderId: "619805611546",
+            appId: "1:619805611546:web:9900c732bffb924b51a3a3"
+        };
         
-        try {
-            if (typeof firebase === 'undefined') {
-                console.warn('Firebase SDK non chargé - mode hors ligne');
-            } else {
-                const firebaseConfig = {
-                    apiKey: "AIzaSyBmQjKJz6cIJMEatx0gw_IvYF2YO8DHJbg",
-                    authDomain: "wu-tree.firebaseapp.com",
-                    projectId: "wu-tree",
-                    storageBucket: "wu-tree.firebasestorage.app",
-                    messagingSenderId: "619805611546",
-                    appId: "1:619805611546:web:9900c732bffb924b51a3a3"
-                };
-                
-                // Initialize Firebase
-                firebase.initializeApp(firebaseConfig);
-                auth = firebase.auth();
-                db = firebase.firestore();
-                console.log('Firebase initialisé avec succès');
-            }
-        } catch (e) {
-            console.error('Erreur Firebase:', e.message);
-        }
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
         
         // Clés localStorage à synchroniser
         const SYNC_KEYS = [
@@ -1200,22 +1188,16 @@
         ];
         
         // Auth state listener
-        if (auth) {
-            auth.onAuthStateChanged(user => {
-                updateSyncUI(user);
-                if (user) {
-                    document.getElementById('syncBtn').classList.add('logged-in');
-                } else {
-                    document.getElementById('syncBtn').classList.remove('logged-in');
-                }
-            });
-        }
+        auth.onAuthStateChanged(user => {
+            updateSyncUI(user);
+            if (user) {
+                document.getElementById('syncBtn').classList.add('logged-in');
+            } else {
+                document.getElementById('syncBtn').classList.remove('logged-in');
+            }
+        });
         
         function openSyncModal() {
-            if (!auth) {
-                alert('Firebase non disponible. Vérifiez votre connexion internet.');
-                return;
-            }
             updateSyncUI(auth.currentUser);
             document.getElementById('syncModal').classList.add('show');
         }
@@ -1266,10 +1248,6 @@
         }
         
         async function signInWithGoogle() {
-            if (!auth || typeof firebase === 'undefined') {
-                alert('Firebase non disponible. Vérifiez votre connexion internet.');
-                return;
-            }
             try {
                 const provider = new firebase.auth.GoogleAuthProvider();
                 await auth.signInWithPopup(provider);
@@ -1281,7 +1259,6 @@
         }
         
         async function signOutUser() {
-            if (!auth) return;
             try {
                 await auth.signOut();
                 closeSyncModal();
@@ -1291,10 +1268,6 @@
         }
         
         async function syncToCloud() {
-            if (!auth || !db) {
-                alert('Firebase non disponible');
-                return;
-            }
             const user = auth.currentUser;
             if (!user) return;
             
@@ -1324,10 +1297,6 @@
         }
         
         async function syncFromCloud() {
-            if (!auth || !db) {
-                alert('Firebase non disponible');
-                return;
-            }
             const user = auth.currentUser;
             if (!user) return;
             
