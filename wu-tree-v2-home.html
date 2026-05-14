@@ -1151,6 +1151,9 @@
         updateHabitsBadge();
         
         // ========== FIREBASE ==========
+        let auth = null;
+        let db = null;
+        
         const firebaseConfig = {
             apiKey: "AIzaSyBmQjKJz6cIJMEatx0gw_IvYF2YO8DHJbg",
             authDomain: "wu-tree.firebaseapp.com",
@@ -1160,10 +1163,14 @@
             appId: "1:619805611546:web:9900c732bffb924b51a3a3"
         };
         
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+        // Initialize Firebase (avec protection)
+        try {
+            firebase.initializeApp(firebaseConfig);
+            auth = firebase.auth();
+            db = firebase.firestore();
+        } catch (e) {
+            console.error('Firebase init error:', e);
+        }
         
         // Clés localStorage à synchroniser
         const SYNC_KEYS = [
@@ -1187,18 +1194,20 @@
             'wutree_daily_goals'
         ];
         
-        // Auth state listener
-        auth.onAuthStateChanged(user => {
-            updateSyncUI(user);
-            if (user) {
-                document.getElementById('syncBtn').classList.add('logged-in');
-            } else {
-                document.getElementById('syncBtn').classList.remove('logged-in');
-            }
-        });
+        // Auth state listener (si Firebase disponible)
+        if (auth) {
+            auth.onAuthStateChanged(user => {
+                updateSyncUI(user);
+                if (user) {
+                    document.getElementById('syncBtn').classList.add('logged-in');
+                } else {
+                    document.getElementById('syncBtn').classList.remove('logged-in');
+                }
+            });
+        }
         
         function openSyncModal() {
-            updateSyncUI(auth.currentUser);
+            updateSyncUI(auth ? auth.currentUser : null);
             document.getElementById('syncModal').classList.add('show');
         }
         
@@ -1248,6 +1257,10 @@
         }
         
         async function signInWithGoogle() {
+            if (!auth) {
+                alert('Firebase non disponible. Réessaie plus tard.');
+                return;
+            }
             try {
                 const provider = new firebase.auth.GoogleAuthProvider();
                 await auth.signInWithPopup(provider);
@@ -1259,6 +1272,7 @@
         }
         
         async function signOutUser() {
+            if (!auth) return;
             try {
                 await auth.signOut();
                 closeSyncModal();
@@ -1268,6 +1282,10 @@
         }
         
         async function syncToCloud() {
+            if (!auth || !db) {
+                alert('Firebase non disponible');
+                return;
+            }
             const user = auth.currentUser;
             if (!user) return;
             
@@ -1297,6 +1315,10 @@
         }
         
         async function syncFromCloud() {
+            if (!auth || !db) {
+                alert('Firebase non disponible');
+                return;
+            }
             const user = auth.currentUser;
             if (!user) return;
             
