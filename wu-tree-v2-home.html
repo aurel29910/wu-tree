@@ -863,6 +863,18 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
     
     <script>
+        // ========== SYNC MODAL (défini en premier pour éviter les erreurs) ==========
+        function openSyncModal() {
+            try {
+                updateSyncUI(auth ? auth.currentUser : null);
+            } catch(e) {}
+            document.getElementById('syncModal').classList.add('show');
+        }
+        
+        function closeSyncModal() {
+            document.getElementById('syncModal').classList.remove('show');
+        }
+        
         // ========== DOMAINES ==========
         const DEFAULT_DOMAINS = [
             { id: 'sante', emoji: '💪', name: 'Santé', order: 0 },
@@ -1204,15 +1216,6 @@
                     document.getElementById('syncBtn').classList.remove('logged-in');
                 }
             });
-        }
-        
-        function openSyncModal() {
-            updateSyncUI(auth ? auth.currentUser : null);
-            document.getElementById('syncModal').classList.add('show');
-        }
-        
-        function closeSyncModal() {
-            document.getElementById('syncModal').classList.remove('show');
         }
         
         function updateSyncUI(user) {
