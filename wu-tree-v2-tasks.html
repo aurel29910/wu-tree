@@ -846,6 +846,13 @@
             color: #FF9800;
         }
         
+        .action-edit {
+            font-size: 12px;
+            padding: 4px;
+            cursor: pointer;
+            opacity: 0.5;
+        }
+        
         .action-delete {
             font-size: 12px;
             padding: 4px;
@@ -1110,6 +1117,17 @@
         .manual-task-time {
             font-size: 10px;
             color: rgba(0,0,0,0.4);
+        }
+        
+        .manual-task-edit {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(107, 78, 155, 0.1);
+            border: none;
+            font-size: 12px;
+            cursor: pointer;
+            margin-right: 4px;
         }
         
         .manual-task-delete {
@@ -3525,13 +3543,27 @@
             container.innerHTML = tasks.map(task => `
                 <div class="manual-task-card">
                     <div class="manual-task-emoji">${task.emoji}</div>
-                    <div class="manual-task-info">
+                    <div class="manual-task-info" onclick="editManualTask('${task.id}')">
                         <div class="manual-task-name">${task.name}</div>
                         <div class="manual-task-time">${formatTime(task.createdAt)}</div>
                     </div>
+                    <button class="manual-task-edit" onclick="editManualTask('${task.id}')">✏️</button>
                     <button class="manual-task-delete" onclick="deleteManualTask('${task.id}')">🗑️</button>
                 </div>
             `).join('');
+        }
+        
+        function editManualTask(taskId) {
+            const tasks = JSON.parse(localStorage.getItem('wutree_manual_tasks') || '[]');
+            const task = tasks.find(t => t.id === taskId);
+            if (!task) return;
+            
+            const newName = prompt('Modifier le bonus :', task.name);
+            if (newName && newName.trim()) {
+                task.name = newName.trim();
+                localStorage.setItem('wutree_manual_tasks', JSON.stringify(tasks));
+                loadManualTasks();
+            }
         }
         
         function formatTime(isoString) {
@@ -4016,14 +4048,28 @@
                     <div class="action-check ${action.done ? 'checked' : ''}" onclick="toggleAction('${action.id}')">
                         ${action.done ? '✓' : ''}
                     </div>
-                    <div class="action-info">
+                    <div class="action-info" onclick="editAction('${action.id}')">
                         <div class="action-name">${action.name}</div>
                         ${action.time ? `<div class="action-time">🕐 ${action.time}</div>` : ''}
                     </div>
                     ${action.reminder ? `<span class="action-reminder active">🔔</span>` : ''}
+                    <span class="action-edit" onclick="editAction('${action.id}')">✏️</span>
                     <span class="action-delete" onclick="deleteAction('${action.id}')">🗑️</span>
                 </div>
             `).join('');
+        }
+        
+        function editAction(actionId) {
+            const actions = getActions();
+            const action = actions.find(a => a.id === actionId);
+            if (!action) return;
+            
+            const newName = prompt('Modifier l\'action :', action.name);
+            if (newName && newName.trim()) {
+                action.name = newName.trim();
+                localStorage.setItem('wutree_daily_actions', JSON.stringify(actions));
+                renderActions();
+            }
         }
         
         function setReminder(action) {
