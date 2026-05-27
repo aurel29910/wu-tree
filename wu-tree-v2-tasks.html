@@ -802,6 +802,10 @@
             color: #2E7D32;
         }
         
+        .action-card.carried-over {
+            border-left: 3px solid #FF9800;
+        }
+        
         .action-check {
             width: 24px;
             height: 24px;
@@ -1138,6 +1142,70 @@
             border: none;
             font-size: 12px;
             cursor: pointer;
+        }
+        
+        /* Day picker for week actions */
+        .day-picker {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        
+        .day-option {
+            padding: 10px 12px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        
+        .day-option.selected {
+            background: linear-gradient(135deg, #6B4E9B, #9B6E9B);
+            color: white;
+            border-color: #6B4E9B;
+        }
+        
+        /* Week action card */
+        .week-action-card {
+            background: rgba(255,255,255,0.7);
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .week-action-card.done {
+            background: rgba(76, 175, 80, 0.15);
+        }
+        
+        .week-action-day {
+            background: linear-gradient(135deg, #6B4E9B, #9B6E9B);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            min-width: 40px;
+            text-align: center;
+        }
+        
+        .week-action-info {
+            flex: 1;
+        }
+        
+        .week-action-name {
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .week-action-time {
+            font-size: 10px;
+            color: rgba(0,0,0,0.5);
         }
         
         /* Input styles for modal */
@@ -1731,6 +1799,15 @@
                     </div>
                 </div>
                 <div id="weekProgressContainer"></div>
+                
+                <!-- Actions de la semaine -->
+                <div class="section" style="margin-top: 15px;">
+                    <div class="section-header">
+                        <div class="section-title">📅 Actions de la semaine</div>
+                        <button class="section-add" onclick="openWeekActionModal()">+</button>
+                    </div>
+                    <div id="weekActionsContainer"></div>
+                </div>
             </div>
         </div>
         
@@ -1746,6 +1823,39 @@
             <div class="menu-item active">
                 <div class="menu-icon">📋</div>
                 <div class="menu-label">Aujourd'hui</div>
+            </div>
+        </div>
+        
+        <!-- Modal Action Semaine -->
+        <div class="modal-overlay" id="weekActionModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-title">📅 Nouvelle action</div>
+                    <button class="modal-close" onclick="closeWeekActionModal()">×</button>
+                </div>
+                <div class="modal-content">
+                    <div class="input-group">
+                        <label>Action à faire</label>
+                        <input type="text" class="input-field" id="weekActionName" placeholder="Ex: RDV médecin, Appeler banque...">
+                    </div>
+                    <div class="input-group">
+                        <label>Jour</label>
+                        <div class="day-picker" id="weekActionDays">
+                            <div class="day-option" data-day="0">Lun</div>
+                            <div class="day-option" data-day="1">Mar</div>
+                            <div class="day-option" data-day="2">Mer</div>
+                            <div class="day-option" data-day="3">Jeu</div>
+                            <div class="day-option" data-day="4">Ven</div>
+                            <div class="day-option" data-day="5">Sam</div>
+                            <div class="day-option" data-day="6">Dim</div>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Heure (optionnel)</label>
+                        <input type="time" class="input-field" id="weekActionTime">
+                    </div>
+                    <button class="btn btn-primary" onclick="saveWeekAction()">Ajouter</button>
+                </div>
             </div>
         </div>
         
@@ -2130,6 +2240,7 @@
         const MANUAL_TASK_EMOJIS = ['✨', '🎯', '💡', '🧘', '📞', '✍️', '🎨', '🏃', '📚', '💪', '🧹', '🎵'];
         
         function init() {
+            carryOverUnfinishedActions(); // Reporter les actions non accomplies
             updateHeaderDate();
             loadTodayEvents();
             loadManualTasks();
@@ -2157,6 +2268,7 @@
             
             if (view === 'week') {
                 loadWeekProgress();
+                renderWeekActions();
             }
         }
         
@@ -3951,6 +4063,27 @@
             return all.filter(a => a.date === dateStr);
         }
         
+        // Report automatique des actions non accomplies
+        function carryOverUnfinishedActions() {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const all = JSON.parse(localStorage.getItem('wutree_daily_actions') || '[]');
+            
+            let modified = false;
+            all.forEach(action => {
+                // Si l'action n'est pas faite ET date < aujourd'hui
+                if (!action.done && action.date < todayStr) {
+                    action.date = todayStr; // Reporter à aujourd'hui
+                    action.carriedOver = true; // Marquer comme reportée
+                    modified = true;
+                }
+            });
+            
+            if (modified) {
+                localStorage.setItem('wutree_daily_actions', JSON.stringify(all));
+                console.log('Actions non accomplies reportées à aujourd\'hui');
+            }
+        }
+        
         function saveActions(actions) {
             const dateStr = selectedDate.toISOString().split('T')[0];
             const all = JSON.parse(localStorage.getItem('wutree_daily_actions') || '[]');
@@ -4044,12 +4177,12 @@
             });
             
             container.innerHTML = actions.map(action => `
-                <div class="action-card ${action.done ? 'done' : ''}">
+                <div class="action-card ${action.done ? 'done' : ''} ${action.carriedOver ? 'carried-over' : ''}">
                     <div class="action-check ${action.done ? 'checked' : ''}" onclick="toggleAction('${action.id}')">
                         ${action.done ? '✓' : ''}
                     </div>
                     <div class="action-info" onclick="editAction('${action.id}')">
-                        <div class="action-name">${action.name}</div>
+                        <div class="action-name">${action.carriedOver ? '🔄 ' : ''}${action.name}</div>
                         ${action.time ? `<div class="action-time">🕐 ${action.time}</div>` : ''}
                     </div>
                     ${action.reminder ? `<span class="action-reminder active">🔔</span>` : ''}
@@ -4112,6 +4245,164 @@
                     alert(`⏰ Rappel : ${action.name}`);
                 }, delay);
             }
+        }
+        
+        // ========== WEEK ACTIONS ==========
+        function openWeekActionModal() {
+            document.getElementById('weekActionName').value = '';
+            document.getElementById('weekActionTime').value = '';
+            // Reset day selection
+            document.querySelectorAll('#weekActionDays .day-option').forEach(d => d.classList.remove('selected'));
+            document.getElementById('weekActionModal').classList.add('show');
+            
+            // Setup day click handlers
+            document.querySelectorAll('#weekActionDays .day-option').forEach(day => {
+                day.onclick = () => {
+                    document.querySelectorAll('#weekActionDays .day-option').forEach(d => d.classList.remove('selected'));
+                    day.classList.add('selected');
+                };
+            });
+        }
+        
+        function closeWeekActionModal() {
+            document.getElementById('weekActionModal').classList.remove('show');
+        }
+        
+        function saveWeekAction() {
+            const name = document.getElementById('weekActionName').value.trim();
+            const time = document.getElementById('weekActionTime').value;
+            const selectedDay = document.querySelector('#weekActionDays .day-option.selected');
+            
+            if (!name) {
+                alert('Entre une action !');
+                return;
+            }
+            
+            if (!selectedDay) {
+                alert('Choisis un jour !');
+                return;
+            }
+            
+            const dayIndex = parseInt(selectedDay.dataset.day);
+            const actionDate = getDateForDayIndex(dayIndex);
+            
+            const all = JSON.parse(localStorage.getItem('wutree_daily_actions') || '[]');
+            const newAction = {
+                id: 'action_' + Date.now(),
+                name,
+                time: time || null,
+                reminder: null,
+                done: false,
+                date: actionDate,
+                fromWeekView: true,
+                createdAt: new Date().toISOString()
+            };
+            
+            all.push(newAction);
+            localStorage.setItem('wutree_daily_actions', JSON.stringify(all));
+            
+            closeWeekActionModal();
+            renderWeekActions();
+            renderActions(); // Update day view too
+        }
+        
+        function getDateForDayIndex(dayIndex) {
+            // dayIndex: 0=Lun, 1=Mar, ..., 6=Dim
+            const today = new Date();
+            const currentDayOfWeek = today.getDay(); // 0=Dim, 1=Lun, ..., 6=Sam
+            const mondayOffset = currentDayOfWeek === 0 ? -6 : 1 - currentDayOfWeek;
+            
+            const monday = new Date(today);
+            monday.setDate(today.getDate() + mondayOffset);
+            
+            const targetDate = new Date(monday);
+            targetDate.setDate(monday.getDate() + dayIndex);
+            
+            return targetDate.toISOString().split('T')[0];
+        }
+        
+        function getWeekActions() {
+            const today = new Date();
+            const currentDayOfWeek = today.getDay();
+            const mondayOffset = currentDayOfWeek === 0 ? -6 : 1 - currentDayOfWeek;
+            
+            const monday = new Date(today);
+            monday.setDate(today.getDate() + mondayOffset);
+            
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+            
+            const mondayStr = monday.toISOString().split('T')[0];
+            const sundayStr = sunday.toISOString().split('T')[0];
+            
+            const all = JSON.parse(localStorage.getItem('wutree_daily_actions') || '[]');
+            return all.filter(a => a.date >= mondayStr && a.date <= sundayStr);
+        }
+        
+        function renderWeekActions() {
+            const container = document.getElementById('weekActionsContainer');
+            if (!container) return;
+            
+            const actions = getWeekActions();
+            const dayNames = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+            
+            if (actions.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 15px; color: rgba(0,0,0,0.4); font-size: 12px;">
+                        Planifie tes actions de la semaine 📅
+                    </div>
+                `;
+                return;
+            }
+            
+            // Sort by date then time
+            actions.sort((a, b) => {
+                if (a.date !== b.date) return a.date.localeCompare(b.date);
+                if (a.time && b.time) return a.time.localeCompare(b.time);
+                return 0;
+            });
+            
+            container.innerHTML = actions.map(action => {
+                const actionDate = new Date(action.date + 'T12:00:00');
+                const dayName = dayNames[actionDate.getDay()];
+                const dayNum = actionDate.getDate();
+                
+                return `
+                    <div class="week-action-card ${action.done ? 'done' : ''}">
+                        <div class="week-action-day">${dayName}<br>${dayNum}</div>
+                        <div class="week-action-info">
+                            <div class="week-action-name">${action.done ? '✓ ' : ''}${action.name}</div>
+                            ${action.time ? `<div class="week-action-time">🕐 ${action.time}</div>` : ''}
+                        </div>
+                        <span style="cursor:pointer; opacity:0.5;" onclick="editWeekAction('${action.id}')">✏️</span>
+                        <span style="cursor:pointer; opacity:0.5;" onclick="deleteWeekAction('${action.id}')">🗑️</span>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function editWeekAction(actionId) {
+            const all = JSON.parse(localStorage.getItem('wutree_daily_actions') || '[]');
+            const action = all.find(a => a.id === actionId);
+            if (!action) return;
+            
+            const newName = prompt('Modifier l\'action :', action.name);
+            if (newName && newName.trim()) {
+                action.name = newName.trim();
+                localStorage.setItem('wutree_daily_actions', JSON.stringify(all));
+                renderWeekActions();
+                renderActions();
+            }
+        }
+        
+        function deleteWeekAction(actionId) {
+            if (!confirm('Supprimer cette action ?')) return;
+            
+            let all = JSON.parse(localStorage.getItem('wutree_daily_actions') || '[]');
+            all = all.filter(a => a.id !== actionId);
+            localStorage.setItem('wutree_daily_actions', JSON.stringify(all));
+            renderWeekActions();
+            renderActions();
         }
         
         // Navigation
