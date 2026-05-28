@@ -2,7 +2,9 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Wu Tree - Visualisation</title>
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -10,327 +12,438 @@
         
         body {
             font-family: 'Comfortaa', sans-serif;
-            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             min-height: 100vh;
-            display: flex; justify-content: center; align-items: center;
-            padding: 20px;
-        }
-        
-        .phone-frame {
-            width: 100%; max-width: 390px;
-            height: 844px; max-height: 95vh;
-            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
-            border-radius: 45px;
-            position: relative;
+            min-height: -webkit-fill-available;
             overflow: hidden;
-            box-shadow: 0 25px 80px rgba(0,0,0,0.15);
-        }
-        
-        /* Pétales flottants */
-        .petal {
-            position: absolute;
-            width: 10px; height: 10px;
-            background: linear-gradient(135deg, rgba(255, 182, 193, 0.8), rgba(255, 105, 180, 0.6));
-            border-radius: 50% 0 50% 0;
-            animation: fall linear infinite;
-            pointer-events: none;
-            z-index: 10;
-        }
-        .petal:nth-child(1) { left: 10%; animation-duration: 12s; width: 8px; }
-        .petal:nth-child(2) { left: 25%; animation-duration: 14s; animation-delay: 2s; }
-        .petal:nth-child(3) { left: 40%; animation-duration: 16s; animation-delay: 4s; }
-        .petal:nth-child(4) { left: 55%; animation-duration: 13s; animation-delay: 1s; }
-        .petal:nth-child(5) { left: 70%; animation-duration: 15s; animation-delay: 3s; }
-        .petal:nth-child(6) { left: 85%; animation-duration: 17s; animation-delay: 5s; }
-        
-        @keyframes fall {
-            0% { transform: translateY(-50px) rotate(0deg); opacity: 0.8; }
-            100% { transform: translateY(900px) rotate(360deg); opacity: 0; }
-        }
-        
-        /* Nuages */
-        .cloud {
-            position: absolute;
             color: white;
-            font-size: 50px;
-            opacity: 0.5;
-            animation: float-cloud linear infinite;
-            pointer-events: none;
-            z-index: 5;
-        }
-        .cloud:nth-child(7) { top: 100px; animation-duration: 180s; }
-        .cloud:nth-child(8) { top: 200px; animation-duration: 220s; animation-delay: -60s; font-size: 40px; }
-        
-        @keyframes float-cloud {
-            0% { transform: translateX(-80px); }
-            100% { transform: translateX(470px); }
         }
         
-        .status-bar {
-            height: 47px;
-            padding: 15px 25px 0;
+        .container {
+            width: 100%;
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
             display: flex;
-            justify-content: space-between;
-            font-size: 14px;
-            font-weight: 600;
-            color: rgba(0,0,0,0.6);
+            flex-direction: column;
             position: relative;
-            z-index: 100;
+            padding: env(safe-area-inset-top, 20px) 20px env(safe-area-inset-bottom, 20px);
+        }
+        
+        /* Étoiles animées */
+        .stars {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .star {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 2s ease-in-out infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
         }
         
         .header {
-            padding: 10px 20px 20px;
             display: flex;
             align-items: center;
             gap: 15px;
-            position: relative;
-            z-index: 100;
+            padding: 15px 0;
+            z-index: 10;
         }
         
         .back-btn {
-            width: 44px; height: 44px;
-            background: rgba(255,255,255,0.5);
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255,255,255,0.6);
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            color: #333;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
             font-size: 20px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
         
         .header-title {
-            font-size: 22px;
-            font-weight: 700;
-            color: #333;
-        }
-        
-        /* Content */
-        .content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: calc(100% - 200px);
-            position: relative;
-            z-index: 50;
-        }
-        
-        .bubbles-container {
-            display: flex;
-            gap: 30px;
-            justify-content: center;
-            flex-wrap: wrap;
-            padding: 0 30px;
-        }
-        
-        /* Bulles flottantes */
-        .bubble {
-            width: 110px; height: 110px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(15px);
-            border: 3px solid rgba(255, 255, 255, 0.6);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 
-                0 8px 32px rgba(0,0,0,0.1),
-                inset 0 2px 10px rgba(255,255,255,0.4);
-            transition: transform 0.3s, box-shadow 0.3s;
-            position: relative;
-        }
-        
-        .bubble:hover {
-            box-shadow: 
-                0 15px 40px rgba(0,0,0,0.15),
-                inset 0 2px 10px rgba(255,255,255,0.4);
-        }
-        
-        .bubble:active {
-            transform: scale(0.95) !important;
-        }
-        
-        /* Animation flottante organique */
-        .bubble-1 {
-            animation: float1 6s ease-in-out infinite;
-        }
-        
-        .bubble-2 {
-            animation: float2 7s ease-in-out infinite;
-            animation-delay: -2s;
-        }
-        
-        .bubble-3 {
-            animation: float3 5.5s ease-in-out infinite;
-            animation-delay: -1s;
-        }
-        
-        @keyframes float1 {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(8px, -12px) rotate(2deg); }
-            50% { transform: translate(-5px, -8px) rotate(-1deg); }
-            75% { transform: translate(10px, -15px) rotate(1deg); }
-        }
-        
-        @keyframes float2 {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(-10px, -10px) rotate(-2deg); }
-            50% { transform: translate(6px, -18px) rotate(1deg); }
-            75% { transform: translate(-8px, -6px) rotate(-1deg); }
-        }
-        
-        @keyframes float3 {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(6px, -8px) rotate(1deg); }
-            50% { transform: translate(-8px, -14px) rotate(-2deg); }
-            75% { transform: translate(4px, -6px) rotate(0deg); }
-        }
-        
-        .bubble-emoji {
-            font-size: 38px;
-            margin-bottom: 6px;
-        }
-        
-        .bubble-label {
-            font-size: 10px;
+            font-size: 20px;
             font-weight: 600;
-            color: #333;
+        }
+        
+        /* Zone principale */
+        .main-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        
+        /* État: Accueil */
+        .welcome-view {
             text-align: center;
-            line-height: 1.3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
         }
         
-        /* Effet de brillance */
-        .bubble::before {
-            content: '';
-            position: absolute;
-            top: 10%; left: 15%;
-            width: 30%; height: 20%;
-            background: rgba(255,255,255,0.5);
-            border-radius: 50%;
-            filter: blur(5px);
+        .welcome-view.hidden { display: none; }
+        
+        .lotus {
+            font-size: 80px;
+            animation: float 4s ease-in-out infinite;
         }
         
-        /* Indicateur sur bulle Vision */
-        .bubble-indicator {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            width: 20px;
-            height: 20px;
-            background: #6B4E9B;
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        .welcome-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .welcome-subtitle {
+            font-size: 14px;
+            opacity: 0.7;
+            line-height: 1.6;
+            max-width: 280px;
+        }
+        
+        .start-btn {
+            background: linear-gradient(135deg, #6B4E9B, #9B6E9B);
+            border: none;
+            color: white;
+            padding: 18px 50px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            font-family: 'Comfortaa', sans-serif;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(107, 78, 155, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .start-btn:active {
+            transform: scale(0.95);
+        }
+        
+        /* Duration selector */
+        .duration-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .duration-option {
+            padding: 12px 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+        }
+        
+        .duration-option.selected {
+            background: rgba(107, 78, 155, 0.5);
+            border-color: #9B6E9B;
+        }
+        
+        /* État: Session en cours */
+        .session-view {
+            text-align: center;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+        
+        .session-view.active { display: flex; }
+        
+        .phase-indicator {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            opacity: 0.6;
+        }
+        
+        .phase-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .phase-instruction {
+            font-size: 14px;
+            opacity: 0.7;
+            line-height: 1.8;
+            max-width: 300px;
+        }
+        
+        /* Cercle de respiration / Timer */
+        .breath-circle {
+            width: 200px;
+            height: 200px;
             border-radius: 50%;
-            border: 2px solid white;
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent);
+            border: 3px solid rgba(255,255,255,0.3);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
+            flex-direction: column;
+            animation: breathe 8s ease-in-out infinite;
+        }
+        
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); border-color: rgba(255,255,255,0.3); }
+            50% { transform: scale(1.1); border-color: rgba(155, 110, 155, 0.8); }
+        }
+        
+        .timer-display {
+            font-size: 48px;
+            font-weight: 300;
+        }
+        
+        .timer-label {
+            font-size: 12px;
+            opacity: 0.5;
+            margin-top: 5px;
+        }
+        
+        /* Contrôles */
+        .controls {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .control-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .control-btn:active {
+            transform: scale(0.9);
+        }
+        
+        .control-btn.pause {
+            background: rgba(255,255,255,0.2);
             color: white;
         }
         
-        .bubble-indicator.empty {
-            background: rgba(200, 100, 100, 0.8);
+        .control-btn.stop {
+            background: rgba(244, 67, 54, 0.3);
+            color: #ff8a80;
         }
         
-        .bubble-indicator.done {
-            background: #4CAF50;
-        }
-        
-        /* Quote */
-        .quote-container {
-            position: absolute;
-            bottom: 100px;
-            left: 30px;
-            right: 30px;
+        /* État: Fin de session */
+        .end-view {
             text-align: center;
-            z-index: 50;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
         }
         
-        .quote-text {
-            font-size: 12px;
-            color: rgba(0,0,0,0.4);
-            font-style: italic;
-            line-height: 1.5;
+        .end-view.active { display: flex; }
+        
+        .end-emoji {
+            font-size: 80px;
         }
         
-        /* Connexion visuelle entre bulles */
-        .connection-hint {
+        .end-title {
+            font-size: 24px;
+            font-weight: 600;
+        }
+        
+        .end-stats {
+            display: flex;
+            gap: 30px;
+        }
+        
+        .end-stat {
             text-align: center;
-            margin-top: 30px;
+        }
+        
+        .end-stat-value {
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .end-stat-label {
             font-size: 11px;
-            color: rgba(0,0,0,0.4);
-            padding: 0 40px;
-            line-height: 1.5;
+            opacity: 0.5;
         }
         
-        /* Bottom menu */
+        .end-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-family: 'Comfortaa', sans-serif;
+            cursor: pointer;
+        }
+        
+        /* Menu bas */
         .bottom-menu {
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
             height: 70px;
-            background: rgba(255, 255, 255, 0.5);
+            background: rgba(255,255,255,0.1);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             display: flex;
             justify-content: space-around;
             align-items: center;
-            border-top: 1px solid rgba(255, 255, 255, 0.4);
+            padding-bottom: env(safe-area-inset-bottom, 0);
             z-index: 100;
         }
         
-        .menu-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 8px 16px; border-radius: 16px; }
-        .menu-item.active { background: rgba(255, 255, 255, 0.6); }
+        .menu-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 16px;
+            opacity: 0.6;
+        }
+        
+        .menu-item.active {
+            opacity: 1;
+            background: rgba(255,255,255,0.1);
+        }
+        
         .menu-icon { font-size: 24px; }
-        .menu-label { font-size: 10px; color: rgba(0,0,0,0.6); font-weight: 500; }
+        .menu-label { font-size: 10px; font-weight: 500; }
+        
+        /* Progress bar */
+        .progress-bar {
+            position: absolute;
+            bottom: 90px;
+            left: 20px;
+            right: 20px;
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6B4E9B, #9B6E9B);
+            width: 0%;
+            transition: width 1s linear;
+        }
+        
+        /* Link to vision */
+        .vision-link {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            background: rgba(255,255,255,0.1);
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
     </style>
 </head>
 <body>
-    <div class="phone-frame">
-        <!-- Pétales -->
-        <div class="petal"></div><div class="petal"></div><div class="petal"></div>
-        <div class="petal"></div><div class="petal"></div><div class="petal"></div>
-        <!-- Nuages -->
-        <div class="cloud">☁️</div><div class="cloud">☁️</div>
-        
-        <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
+    <div class="container">
+        <!-- Étoiles -->
+        <div class="stars" id="stars"></div>
         
         <div class="header">
             <button class="back-btn" onclick="goBack()">←</button>
             <div class="header-title">✨ Visualisation</div>
         </div>
         
-        <div class="content">
-            <div class="bubbles-container">
-                <div class="bubble bubble-1" onclick="goTo('vision')">
-                    <div class="bubble-indicator" id="visionIndicator">!</div>
-                    <div class="bubble-emoji">🔮</div>
-                    <div class="bubble-label">Ma Vision</div>
+        <div class="vision-link" onclick="goToVision()">
+            🔮 Ma Vision
+        </div>
+        
+        <div class="main-area">
+            <!-- Accueil -->
+            <div class="welcome-view" id="welcomeView">
+                <div class="lotus">🧘</div>
+                <div>
+                    <div class="welcome-title">Session Guidée</div>
+                    <div class="welcome-subtitle">
+                        Méditation • Lâcher-prise • Visualisation<br>
+                        Un son de bol tibétain te guidera entre chaque phase.
+                    </div>
                 </div>
-                
-                <div class="bubble bubble-2" onclick="goTo('session')">
-                    <div class="bubble-emoji">✨</div>
-                    <div class="bubble-label">Session</div>
+                <div class="duration-selector">
+                    <div class="duration-option" data-duration="5" onclick="selectDuration(this)">5 min</div>
+                    <div class="duration-option selected" data-duration="10" onclick="selectDuration(this)">10 min</div>
+                    <div class="duration-option" data-duration="15" onclick="selectDuration(this)">15 min</div>
                 </div>
-                
-                <div class="bubble bubble-3" onclick="goTo('progress')">
-                    <div class="bubble-emoji">📊</div>
-                    <div class="bubble-label">Progression</div>
+                <button class="start-btn" onclick="startSession()">Commencer</button>
+            </div>
+            
+            <!-- Session en cours -->
+            <div class="session-view" id="sessionView">
+                <div class="phase-indicator" id="phaseIndicator">PHASE 1/3</div>
+                <div class="phase-title" id="phaseTitle">Méditation</div>
+                <div class="breath-circle">
+                    <div class="timer-display" id="timerDisplay">5:00</div>
+                    <div class="timer-label">respire...</div>
+                </div>
+                <div class="phase-instruction" id="phaseInstruction">
+                    Ferme les yeux.<br>
+                    Concentre-toi sur ta respiration.<br>
+                    Laisse passer les pensées.
+                </div>
+                <div class="controls">
+                    <button class="control-btn pause" id="pauseBtn" onclick="togglePause()">⏸️</button>
+                    <button class="control-btn stop" onclick="stopSession()">⏹️</button>
                 </div>
             </div>
             
-            <div class="connection-hint">
-                Écris ta vision → Visualise-la chaque jour → Suis ta progression
+            <!-- Fin de session -->
+            <div class="end-view" id="endView">
+                <div class="end-emoji">🌟</div>
+                <div class="end-title">Session terminée</div>
+                <div class="end-stats">
+                    <div class="end-stat">
+                        <div class="end-stat-value" id="endDuration">10</div>
+                        <div class="end-stat-label">minutes</div>
+                    </div>
+                    <div class="end-stat">
+                        <div class="end-stat-value" id="endStreak">1</div>
+                        <div class="end-stat-label">jours de suite</div>
+                    </div>
+                </div>
+                <button class="end-btn" onclick="goToWelcome()">Nouvelle session</button>
             </div>
         </div>
         
-        <div class="quote-container">
-            <div class="quote-text">
-                « Vis depuis la fin,<br>comme si c'était déjà fait. »
-            </div>
+        <div class="progress-bar" id="progressBar" style="display: none;">
+            <div class="progress-fill" id="progressFill"></div>
         </div>
         
         <div class="bottom-menu">
@@ -338,7 +451,7 @@
                 <div class="menu-icon">🔮</div>
                 <div class="menu-label">Vision</div>
             </div>
-            <div class="menu-item" onclick="goBack()">
+            <div class="menu-item" onclick="goToHome()">
                 <div class="menu-icon">🌳</div>
                 <div class="menu-label">Home</div>
             </div>
@@ -350,46 +463,252 @@
     </div>
     
     <script>
-        // Check vision status
-        function updateVisionIndicator() {
-            const vision = JSON.parse(localStorage.getItem('wutree_vision') || 'null');
-            const indicator = document.getElementById('visionIndicator');
+        // Create stars
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 50; i++) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 100 + '%';
+            star.style.animationDelay = Math.random() * 2 + 's';
+            star.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+            starsContainer.appendChild(star);
+        }
+        
+        // State
+        let selectedDuration = 10; // minutes
+        let currentPhase = 0;
+        let timerInterval = null;
+        let remainingSeconds = 0;
+        let totalSeconds = 0;
+        let isPaused = false;
+        
+        // Phases configuration (3 phases)
+        const phases = [
+            {
+                name: 'Méditation',
+                instruction: 'Ferme les yeux.<br>Concentre-toi sur ta respiration.<br>Laisse passer les pensées.',
+                percent: 0.30 // 30% du temps
+            },
+            {
+                name: 'Lâcher-prise',
+                instruction: 'Relâche toutes les tensions.<br>Détends chaque partie de ton corps.<br>Tu es en paix.',
+                percent: 0.20 // 20% du temps
+            },
+            {
+                name: 'Visualisation',
+                instruction: 'Visualise ta vie idéale.<br>Ressens les émotions comme si c\'était réel.<br>Tu y es déjà.',
+                percent: 0.50 // 50% du temps
+            }
+        ];
+        
+        function selectDuration(el) {
+            document.querySelectorAll('.duration-option').forEach(d => d.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedDuration = parseInt(el.dataset.duration);
+        }
+        
+        function startSession() {
+            document.getElementById('welcomeView').classList.add('hidden');
+            document.getElementById('sessionView').classList.add('active');
+            document.getElementById('progressBar').style.display = 'block';
             
-            if (vision && vision.text) {
-                indicator.classList.remove('empty');
-                indicator.classList.add('done');
-                indicator.textContent = '✓';
-            } else {
-                indicator.classList.add('empty');
-                indicator.classList.remove('done');
-                indicator.textContent = '!';
+            totalSeconds = selectedDuration * 60;
+            currentPhase = 0;
+            
+            // Play initial ding
+            playBowlSound();
+            
+            // Start first phase
+            startPhase();
+        }
+        
+        function startPhase() {
+            if (currentPhase >= phases.length) {
+                endSession();
+                return;
+            }
+            
+            const phase = phases[currentPhase];
+            const phaseSeconds = Math.floor(totalSeconds * phase.percent);
+            remainingSeconds = phaseSeconds;
+            
+            document.getElementById('phaseIndicator').textContent = `PHASE ${currentPhase + 1}/${phases.length}`;
+            document.getElementById('phaseTitle').textContent = phase.name;
+            document.getElementById('phaseInstruction').innerHTML = phase.instruction;
+            
+            updateTimerDisplay();
+            
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(tick, 1000);
+        }
+        
+        function tick() {
+            if (isPaused) return;
+            
+            remainingSeconds--;
+            updateTimerDisplay();
+            updateProgress();
+            
+            if (remainingSeconds <= 0) {
+                clearInterval(timerInterval);
+                currentPhase++;
+                
+                if (currentPhase < phases.length) {
+                    // Play bowl sound for transition
+                    playBowlSound();
+                    setTimeout(startPhase, 1500);
+                } else {
+                    playBowlSound();
+                    setTimeout(endSession, 1000);
+                }
             }
         }
         
-        function goTo(page) {
-            switch(page) {
-                case 'vision':
-                    window.location.href = 'wu-tree-v2-vision.html';
-                    break;
-                case 'session':
-                    window.location.href = 'wu-tree-v2-session.html';
-                    break;
-                case 'progress':
-                    window.location.href = 'wu-tree-v2-progress.html';
-                    break;
+        function updateTimerDisplay() {
+            const mins = Math.floor(remainingSeconds / 60);
+            const secs = remainingSeconds % 60;
+            document.getElementById('timerDisplay').textContent = 
+                `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        function updateProgress() {
+            // Calculate total elapsed
+            let elapsed = 0;
+            for (let i = 0; i < currentPhase; i++) {
+                elapsed += totalSeconds * phases[i].percent;
+            }
+            elapsed += (totalSeconds * phases[currentPhase].percent) - remainingSeconds;
+            
+            const percent = (elapsed / totalSeconds) * 100;
+            document.getElementById('progressFill').style.width = percent + '%';
+        }
+        
+        function togglePause() {
+            isPaused = !isPaused;
+            document.getElementById('pauseBtn').textContent = isPaused ? '▶️' : '⏸️';
+        }
+        
+        function stopSession() {
+            if (confirm('Arrêter la session ?')) {
+                clearInterval(timerInterval);
+                goToWelcome();
             }
         }
         
-        function goBack() {
-            window.location.href = 'wu-tree-v2-home.html';
+        function endSession() {
+            clearInterval(timerInterval);
+            document.getElementById('sessionView').classList.remove('active');
+            document.getElementById('progressBar').style.display = 'none';
+            document.getElementById('endView').classList.add('active');
+            
+            document.getElementById('endDuration').textContent = selectedDuration;
+            
+            // Save session
+            saveSession();
+            
+            // Calculate streak
+            const streak = calculateStreak();
+            document.getElementById('endStreak').textContent = streak;
         }
         
-        function goToTasks() {
-            window.location.href = 'wu-tree-v2-tasks.html';
+        function saveSession() {
+            const sessions = JSON.parse(localStorage.getItem('wutree_visualization_sessions') || '[]');
+            sessions.push({
+                date: new Date().toISOString().split('T')[0],
+                duration: selectedDuration,
+                timestamp: new Date().toISOString()
+            });
+            localStorage.setItem('wutree_visualization_sessions', JSON.stringify(sessions));
         }
         
-        // Init
-        updateVisionIndicator();
+        function calculateStreak() {
+            const sessions = JSON.parse(localStorage.getItem('wutree_visualization_sessions') || '[]');
+            if (sessions.length === 0) return 1;
+            
+            // Get unique dates
+            const dates = [...new Set(sessions.map(s => s.date))].sort().reverse();
+            
+            let streak = 1;
+            const today = new Date().toISOString().split('T')[0];
+            
+            for (let i = 1; i < dates.length; i++) {
+                const prevDate = new Date(dates[i-1]);
+                const currDate = new Date(dates[i]);
+                const diffDays = Math.floor((prevDate - currDate) / (1000 * 60 * 60 * 24));
+                
+                if (diffDays === 1) {
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+            
+            return streak;
+        }
+        
+        function goToWelcome() {
+            document.getElementById('endView').classList.remove('active');
+            document.getElementById('sessionView').classList.remove('active');
+            document.getElementById('welcomeView').classList.remove('hidden');
+            document.getElementById('progressFill').style.width = '0%';
+        }
+        
+        // Tibetan bowl sound using Web Audio API
+        function playBowlSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Create multiple oscillators for rich bowl sound
+                const frequencies = [262, 330, 392, 523]; // C4, E4, G4, C5
+                
+                frequencies.forEach((freq, i) => {
+                    const oscillator = audioCtx.createOscillator();
+                    const gainNode = audioCtx.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    
+                    oscillator.frequency.value = freq;
+                    oscillator.type = 'sine';
+                    
+                    // Envelope for bowl-like decay
+                    const now = audioCtx.currentTime;
+                    const delay = i * 0.05;
+                    gainNode.gain.setValueAtTime(0, now + delay);
+                    gainNode.gain.linearRampToValueAtTime(0.15, now + delay + 0.1);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + delay + 3);
+                    
+                    oscillator.start(now + delay);
+                    oscillator.stop(now + delay + 3);
+                });
+                
+                // Add a subtle low frequency for warmth
+                const subOsc = audioCtx.createOscillator();
+                const subGain = audioCtx.createGain();
+                subOsc.connect(subGain);
+                subGain.connect(audioCtx.destination);
+                subOsc.frequency.value = 130; // C3
+                subOsc.type = 'sine';
+                
+                const now = audioCtx.currentTime;
+                subGain.gain.setValueAtTime(0, now);
+                subGain.gain.linearRampToValueAtTime(0.1, now + 0.15);
+                subGain.gain.exponentialRampToValueAtTime(0.001, now + 4);
+                
+                subOsc.start(now);
+                subOsc.stop(now + 4);
+                
+            } catch (e) {
+                console.log('Audio not supported');
+            }
+        }
+        
+        // Navigation
+        function goBack() { window.location.href = 'wu-tree-v2-home.html'; }
+        function goToHome() { window.location.href = 'wu-tree-v2-home.html'; }
+        function goToTasks() { window.location.href = 'wu-tree-v2-tasks.html'; }
+        function goToVision() { window.location.href = 'wu-tree-v2-vision.html'; }
     </script>
 </body>
 </html>
