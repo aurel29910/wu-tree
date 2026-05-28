@@ -12,11 +12,10 @@
         
         body {
             font-family: 'Comfortaa', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background: linear-gradient(135deg, #B4E1D4 0%, #D4B4E1 50%, #F5C5D4 100%);
             min-height: 100vh;
             min-height: -webkit-fill-available;
-            overflow: hidden;
-            color: white;
+            overflow-x: hidden;
         }
         
         .container {
@@ -27,28 +26,30 @@
             flex-direction: column;
             position: relative;
             padding: env(safe-area-inset-top, 20px) 20px env(safe-area-inset-bottom, 20px);
+            padding-bottom: 90px;
         }
         
-        /* Étoiles animées */
-        .stars {
+        /* Pétales flottants */
+        .petal {
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 182, 193, 0.6);
+            border-radius: 50% 50% 50% 0;
+            top: -20px;
+            z-index: 1;
+            animation: fall linear infinite;
             pointer-events: none;
-            overflow: hidden;
         }
+        .petal:nth-child(1) { left: 10%; animation-duration: 12s; }
+        .petal:nth-child(2) { left: 30%; animation-duration: 14s; animation-delay: 2s; }
+        .petal:nth-child(3) { left: 50%; animation-duration: 16s; animation-delay: 4s; }
+        .petal:nth-child(4) { left: 70%; animation-duration: 13s; animation-delay: 1s; }
+        .petal:nth-child(5) { left: 90%; animation-duration: 15s; animation-delay: 3s; }
         
-        .star {
-            position: absolute;
-            width: 3px;
-            height: 3px;
-            background: white;
-            border-radius: 50%;
-            animation: twinkle 2s ease-in-out infinite;
-        }
-        
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.2); }
+        @keyframes fall {
+            0% { transform: translateY(-20px) rotate(0deg); opacity: 0.8; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
         }
         
         .header {
@@ -63,9 +64,10 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(10px);
             border: none;
-            color: white;
+            color: #333;
             font-size: 20px;
             cursor: pointer;
         }
@@ -73,9 +75,76 @@
         .header-title {
             font-size: 20px;
             font-weight: 600;
+            color: #333;
         }
         
-        /* Zone principale */
+        /* ========== HUB VIEW ========== */
+        .hub-view {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        
+        .hub-view.hidden { display: none; }
+        
+        .bubbles-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+            padding: 20px;
+        }
+        
+        .bubble {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(15px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .bubble:nth-child(2) { animation-delay: -2s; }
+        .bubble:nth-child(3) { animation-delay: -4s; }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .bubble:active { transform: scale(0.95); }
+        
+        .bubble-emoji { font-size: 36px; margin-bottom: 5px; }
+        .bubble-label { font-size: 11px; font-weight: 600; color: #333; text-align: center; }
+        
+        .hub-quote {
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 14px;
+            color: rgba(0,0,0,0.5);
+            font-style: italic;
+            line-height: 1.6;
+        }
+        
+        /* ========== SESSION VIEW ========== */
+        .session-container {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+        }
+        
+        .session-container.active { display: flex; }
+        
         .main-area {
             flex: 1;
             display: flex;
@@ -85,36 +154,28 @@
             z-index: 10;
         }
         
-        /* État: Accueil */
+        /* État: Accueil session */
         .welcome-view {
             text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 30px;
+            gap: 25px;
         }
         
         .welcome-view.hidden { display: none; }
         
-        .lotus {
-            font-size: 80px;
-            animation: float 4s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-        }
+        .lotus { font-size: 70px; }
         
         .welcome-title {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 600;
-            margin-bottom: 10px;
+            color: #333;
         }
         
         .welcome-subtitle {
-            font-size: 14px;
-            opacity: 0.7;
+            font-size: 13px;
+            color: rgba(0,0,0,0.6);
             line-height: 1.6;
             max-width: 280px;
         }
@@ -123,80 +184,75 @@
             background: linear-gradient(135deg, #6B4E9B, #9B6E9B);
             border: none;
             color: white;
-            padding: 18px 50px;
+            padding: 16px 45px;
             border-radius: 30px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             font-family: 'Comfortaa', sans-serif;
             cursor: pointer;
-            box-shadow: 0 10px 30px rgba(107, 78, 155, 0.4);
-            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 8px 25px rgba(107, 78, 155, 0.4);
         }
         
-        .start-btn:active {
-            transform: scale(0.95);
-        }
+        .start-btn:active { transform: scale(0.95); }
         
-        /* Duration selector */
         .duration-selector {
             display: flex;
             gap: 10px;
-            margin-bottom: 20px;
         }
         
         .duration-option {
-            padding: 12px 20px;
-            background: rgba(255,255,255,0.1);
+            padding: 10px 18px;
+            background: rgba(255,255,255,0.7);
             border-radius: 20px;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
-            transition: all 0.2s;
             border: 2px solid transparent;
+            color: #333;
         }
         
         .duration-option.selected {
-            background: rgba(107, 78, 155, 0.5);
-            border-color: #9B6E9B;
+            background: linear-gradient(135deg, #6B4E9B, #9B6E9B);
+            color: white;
         }
         
-        /* État: Session en cours */
-        .session-view {
+        /* Session en cours */
+        .active-session {
             text-align: center;
             display: none;
             flex-direction: column;
             align-items: center;
-            gap: 30px;
+            gap: 25px;
         }
         
-        .session-view.active { display: flex; }
+        .active-session.active { display: flex; }
         
         .phase-indicator {
-            font-size: 14px;
+            font-size: 12px;
             text-transform: uppercase;
-            letter-spacing: 3px;
-            opacity: 0.6;
+            letter-spacing: 2px;
+            color: rgba(0,0,0,0.5);
         }
         
         .phase-title {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 600;
-            margin-bottom: 10px;
+            color: #333;
         }
         
         .phase-instruction {
-            font-size: 14px;
-            opacity: 0.7;
+            font-size: 13px;
+            color: rgba(0,0,0,0.6);
             line-height: 1.8;
-            max-width: 300px;
+            max-width: 280px;
         }
         
-        /* Cercle de respiration / Timer */
         .breath-circle {
-            width: 200px;
-            height: 200px;
+            width: 180px;
+            height: 180px;
             border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.2), transparent);
-            border: 3px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+            border: 3px solid rgba(107, 78, 155, 0.3);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -205,100 +261,142 @@
         }
         
         @keyframes breathe {
-            0%, 100% { transform: scale(1); border-color: rgba(255,255,255,0.3); }
-            50% { transform: scale(1.1); border-color: rgba(155, 110, 155, 0.8); }
+            0%, 100% { transform: scale(1); border-color: rgba(107, 78, 155, 0.3); }
+            50% { transform: scale(1.08); border-color: rgba(107, 78, 155, 0.8); }
         }
         
         .timer-display {
-            font-size: 48px;
+            font-size: 42px;
             font-weight: 300;
+            color: #333;
         }
         
         .timer-label {
-            font-size: 12px;
-            opacity: 0.5;
-            margin-top: 5px;
+            font-size: 11px;
+            color: rgba(0,0,0,0.4);
         }
         
-        /* Contrôles */
         .controls {
             display: flex;
-            gap: 20px;
+            gap: 15px;
         }
         
         .control-btn {
-            width: 60px;
-            height: 60px;
+            width: 55px;
+            height: 55px;
             border-radius: 50%;
             border: none;
-            font-size: 24px;
+            font-size: 22px;
             cursor: pointer;
-            transition: transform 0.2s;
-        }
-        
-        .control-btn:active {
-            transform: scale(0.9);
         }
         
         .control-btn.pause {
-            background: rgba(255,255,255,0.2);
-            color: white;
+            background: rgba(255,255,255,0.7);
         }
         
         .control-btn.stop {
-            background: rgba(244, 67, 54, 0.3);
-            color: #ff8a80;
+            background: rgba(244, 67, 54, 0.2);
         }
         
-        /* État: Fin de session */
+        /* Fin de session */
         .end-view {
             text-align: center;
             display: none;
             flex-direction: column;
             align-items: center;
-            gap: 25px;
+            gap: 20px;
         }
         
         .end-view.active { display: flex; }
         
-        .end-emoji {
-            font-size: 80px;
-        }
+        .end-emoji { font-size: 70px; }
+        .end-title { font-size: 22px; font-weight: 600; color: #333; }
         
-        .end-title {
-            font-size: 24px;
-            font-weight: 600;
-        }
-        
-        .end-stats {
-            display: flex;
-            gap: 30px;
-        }
-        
-        .end-stat {
-            text-align: center;
-        }
-        
-        .end-stat-value {
-            font-size: 28px;
-            font-weight: 600;
-        }
-        
-        .end-stat-label {
-            font-size: 11px;
-            opacity: 0.5;
-        }
+        .end-stats { display: flex; gap: 30px; }
+        .end-stat { text-align: center; }
+        .end-stat-value { font-size: 26px; font-weight: 600; color: #6B4E9B; }
+        .end-stat-label { font-size: 10px; color: rgba(0,0,0,0.5); }
         
         .end-btn {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.3);
-            color: white;
-            padding: 15px 40px;
+            background: rgba(255,255,255,0.7);
+            border: none;
+            color: #333;
+            padding: 14px 35px;
             border-radius: 25px;
-            font-size: 14px;
+            font-size: 13px;
             font-family: 'Comfortaa', sans-serif;
             cursor: pointer;
         }
+        
+        /* Progress bar */
+        .progress-bar {
+            position: fixed;
+            bottom: 80px;
+            left: 20px;
+            right: 20px;
+            height: 4px;
+            background: rgba(255,255,255,0.5);
+            border-radius: 2px;
+            overflow: hidden;
+            display: none;
+            z-index: 50;
+        }
+        
+        .progress-bar.active { display: block; }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6B4E9B, #9B6E9B);
+            width: 0%;
+            transition: width 1s linear;
+        }
+        
+        /* ========== PROGRESS VIEW ========== */
+        .progress-view {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+            padding: 10px;
+        }
+        
+        .progress-view.active { display: flex; }
+        
+        .stats-card {
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .stats-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .stats-row {
+            display: flex;
+            justify-content: space-around;
+        }
+        
+        .stat-item { text-align: center; }
+        .stat-value { font-size: 28px; font-weight: 600; color: #6B4E9B; }
+        .stat-label { font-size: 10px; color: rgba(0,0,0,0.5); }
+        
+        .history-item {
+            background: rgba(255,255,255,0.5);
+            border-radius: 12px;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .history-date { font-size: 13px; color: #333; }
+        .history-duration { font-size: 12px; color: rgba(0,0,0,0.5); }
         
         /* Menu bas */
         .bottom-menu {
@@ -307,7 +405,7 @@
             left: 0;
             right: 0;
             height: 70px;
-            background: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.5);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             display: flex;
@@ -325,124 +423,134 @@
             cursor: pointer;
             padding: 8px 16px;
             border-radius: 16px;
-            opacity: 0.6;
         }
         
-        .menu-item.active {
-            opacity: 1;
-            background: rgba(255,255,255,0.1);
-        }
-        
+        .menu-item.active { background: rgba(255,255,255,0.6); }
         .menu-icon { font-size: 24px; }
-        .menu-label { font-size: 10px; font-weight: 500; }
-        
-        /* Progress bar */
-        .progress-bar {
-            position: absolute;
-            bottom: 90px;
-            left: 20px;
-            right: 20px;
-            height: 4px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #6B4E9B, #9B6E9B);
-            width: 0%;
-            transition: width 1s linear;
-        }
-        
-        /* Link to vision */
-        .vision-link {
-            position: absolute;
-            top: 80px;
-            right: 20px;
-            background: rgba(255,255,255,0.1);
-            padding: 10px 15px;
-            border-radius: 20px;
-            font-size: 12px;
-            cursor: pointer;
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+        .menu-label { font-size: 10px; color: rgba(0,0,0,0.6); font-weight: 500; }
     </style>
 </head>
 <body>
+    <!-- Pétales -->
+    <div class="petal"></div><div class="petal"></div><div class="petal"></div>
+    <div class="petal"></div><div class="petal"></div>
+    
     <div class="container">
-        <!-- Étoiles -->
-        <div class="stars" id="stars"></div>
-        
         <div class="header">
             <button class="back-btn" onclick="goBack()">←</button>
             <div class="header-title">✨ Visualisation</div>
         </div>
         
-        <div class="vision-link" onclick="goToVision()">
-            🔮 Ma Vision
+        <!-- ========== HUB ========== -->
+        <div class="hub-view" id="hubView">
+            <div class="bubbles-container">
+                <div class="bubble" onclick="goToVision()">
+                    <div class="bubble-emoji">🔮</div>
+                    <div class="bubble-label">Ma Vision</div>
+                </div>
+                
+                <div class="bubble" onclick="showSession()">
+                    <div class="bubble-emoji">🧘</div>
+                    <div class="bubble-label">Session<br>Guidée</div>
+                </div>
+                
+                <div class="bubble" onclick="showProgress()">
+                    <div class="bubble-emoji">📊</div>
+                    <div class="bubble-label">Progression</div>
+                </div>
+            </div>
+            
+            <div class="hub-quote">
+                « Vis depuis la fin,<br>comme si c'était déjà fait. »
+            </div>
         </div>
         
-        <div class="main-area">
-            <!-- Accueil -->
-            <div class="welcome-view" id="welcomeView">
-                <div class="lotus">🧘</div>
-                <div>
+        <!-- ========== SESSION ========== -->
+        <div class="session-container" id="sessionContainer">
+            <div class="main-area">
+                <!-- Accueil -->
+                <div class="welcome-view" id="welcomeView">
+                    <div class="lotus">🧘</div>
                     <div class="welcome-title">Session Guidée</div>
                     <div class="welcome-subtitle">
                         Méditation • Lâcher-prise • Visualisation<br>
-                        Un son de bol tibétain te guidera entre chaque phase.
+                        Un son de bol tibétain te guidera.
+                    </div>
+                    <div class="duration-selector">
+                        <div class="duration-option" data-duration="5" onclick="selectDuration(this)">5 min</div>
+                        <div class="duration-option selected" data-duration="10" onclick="selectDuration(this)">10 min</div>
+                        <div class="duration-option" data-duration="15" onclick="selectDuration(this)">15 min</div>
+                    </div>
+                    <button class="start-btn" onclick="startSession()">Commencer</button>
+                    <button class="end-btn" onclick="backToHub()" style="margin-top: 10px;">← Retour</button>
+                </div>
+                
+                <!-- Session active -->
+                <div class="active-session" id="activeSession">
+                    <div class="phase-indicator" id="phaseIndicator">PHASE 1/3</div>
+                    <div class="phase-title" id="phaseTitle">Méditation</div>
+                    <div class="breath-circle">
+                        <div class="timer-display" id="timerDisplay">5:00</div>
+                        <div class="timer-label">respire...</div>
+                    </div>
+                    <div class="phase-instruction" id="phaseInstruction">
+                        Ferme les yeux.<br>
+                        Concentre-toi sur ta respiration.
+                    </div>
+                    <div class="controls">
+                        <button class="control-btn pause" id="pauseBtn" onclick="togglePause()">⏸️</button>
+                        <button class="control-btn stop" onclick="stopSession()">⏹️</button>
                     </div>
                 </div>
-                <div class="duration-selector">
-                    <div class="duration-option" data-duration="5" onclick="selectDuration(this)">5 min</div>
-                    <div class="duration-option selected" data-duration="10" onclick="selectDuration(this)">10 min</div>
-                    <div class="duration-option" data-duration="15" onclick="selectDuration(this)">15 min</div>
-                </div>
-                <button class="start-btn" onclick="startSession()">Commencer</button>
-            </div>
-            
-            <!-- Session en cours -->
-            <div class="session-view" id="sessionView">
-                <div class="phase-indicator" id="phaseIndicator">PHASE 1/3</div>
-                <div class="phase-title" id="phaseTitle">Méditation</div>
-                <div class="breath-circle">
-                    <div class="timer-display" id="timerDisplay">5:00</div>
-                    <div class="timer-label">respire...</div>
-                </div>
-                <div class="phase-instruction" id="phaseInstruction">
-                    Ferme les yeux.<br>
-                    Concentre-toi sur ta respiration.<br>
-                    Laisse passer les pensées.
-                </div>
-                <div class="controls">
-                    <button class="control-btn pause" id="pauseBtn" onclick="togglePause()">⏸️</button>
-                    <button class="control-btn stop" onclick="stopSession()">⏹️</button>
-                </div>
-            </div>
-            
-            <!-- Fin de session -->
-            <div class="end-view" id="endView">
-                <div class="end-emoji">🌟</div>
-                <div class="end-title">Session terminée</div>
-                <div class="end-stats">
-                    <div class="end-stat">
-                        <div class="end-stat-value" id="endDuration">10</div>
-                        <div class="end-stat-label">minutes</div>
+                
+                <!-- Fin -->
+                <div class="end-view" id="endView">
+                    <div class="end-emoji">🌟</div>
+                    <div class="end-title">Session terminée</div>
+                    <div class="end-stats">
+                        <div class="end-stat">
+                            <div class="end-stat-value" id="endDuration">10</div>
+                            <div class="end-stat-label">minutes</div>
+                        </div>
+                        <div class="end-stat">
+                            <div class="end-stat-value" id="endStreak">1</div>
+                            <div class="end-stat-label">jours de suite</div>
+                        </div>
                     </div>
-                    <div class="end-stat">
-                        <div class="end-stat-value" id="endStreak">1</div>
-                        <div class="end-stat-label">jours de suite</div>
-                    </div>
+                    <button class="end-btn" onclick="backToHub()">Terminer</button>
                 </div>
-                <button class="end-btn" onclick="goToWelcome()">Nouvelle session</button>
             </div>
         </div>
         
-        <div class="progress-bar" id="progressBar" style="display: none;">
+        <!-- ========== PROGRESSION ========== -->
+        <div class="progress-view" id="progressView">
+            <div class="stats-card">
+                <div class="stats-title">📊 Tes statistiques</div>
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalSessions">0</div>
+                        <div class="stat-label">sessions</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalMinutes">0</div>
+                        <div class="stat-label">minutes</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="currentStreak">0</div>
+                        <div class="stat-label">jours de suite</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stats-card">
+                <div class="stats-title">📅 Historique</div>
+                <div id="historyContainer"></div>
+            </div>
+            
+            <button class="end-btn" onclick="backToHub()" style="margin-top: 15px; align-self: center;">← Retour</button>
+        </div>
+        
+        <div class="progress-bar" id="progressBar">
             <div class="progress-fill" id="progressFill"></div>
         </div>
         
@@ -463,44 +571,44 @@
     </div>
     
     <script>
-        // Create stars
-        const starsContainer = document.getElementById('stars');
-        for (let i = 0; i < 50; i++) {
-            const star = document.createElement('div');
-            star.className = 'star';
-            star.style.left = Math.random() * 100 + '%';
-            star.style.top = Math.random() * 100 + '%';
-            star.style.animationDelay = Math.random() * 2 + 's';
-            star.style.animationDuration = (1.5 + Math.random() * 2) + 's';
-            starsContainer.appendChild(star);
-        }
-        
         // State
-        let selectedDuration = 10; // minutes
+        let selectedDuration = 10;
         let currentPhase = 0;
         let timerInterval = null;
         let remainingSeconds = 0;
         let totalSeconds = 0;
         let isPaused = false;
         
-        // Phases configuration (3 phases)
         const phases = [
-            {
-                name: 'Méditation',
-                instruction: 'Ferme les yeux.<br>Concentre-toi sur ta respiration.<br>Laisse passer les pensées.',
-                percent: 0.30 // 30% du temps
-            },
-            {
-                name: 'Lâcher-prise',
-                instruction: 'Relâche toutes les tensions.<br>Détends chaque partie de ton corps.<br>Tu es en paix.',
-                percent: 0.20 // 20% du temps
-            },
-            {
-                name: 'Visualisation',
-                instruction: 'Visualise ta vie idéale.<br>Ressens les émotions comme si c\'était réel.<br>Tu y es déjà.',
-                percent: 0.50 // 50% du temps
-            }
+            { name: 'Méditation', instruction: 'Ferme les yeux.<br>Concentre-toi sur ta respiration.<br>Laisse passer les pensées.', percent: 0.30 },
+            { name: 'Lâcher-prise', instruction: 'Relâche toutes les tensions.<br>Détends chaque partie de ton corps.<br>Tu es en paix.', percent: 0.20 },
+            { name: 'Visualisation', instruction: 'Visualise ta vie idéale.<br>Ressens les émotions comme si c\'était réel.<br>Tu y es déjà.', percent: 0.50 }
         ];
+        
+        // Navigation
+        function showSession() {
+            document.getElementById('hubView').classList.add('hidden');
+            document.getElementById('sessionContainer').classList.add('active');
+            document.getElementById('progressView').classList.remove('active');
+        }
+        
+        function showProgress() {
+            document.getElementById('hubView').classList.add('hidden');
+            document.getElementById('sessionContainer').classList.remove('active');
+            document.getElementById('progressView').classList.add('active');
+            loadProgressStats();
+        }
+        
+        function backToHub() {
+            document.getElementById('hubView').classList.remove('hidden');
+            document.getElementById('sessionContainer').classList.remove('active');
+            document.getElementById('progressView').classList.remove('active');
+            document.getElementById('welcomeView').classList.remove('hidden');
+            document.getElementById('activeSession').classList.remove('active');
+            document.getElementById('endView').classList.remove('active');
+            document.getElementById('progressBar').classList.remove('active');
+            if (timerInterval) clearInterval(timerInterval);
+        }
         
         function selectDuration(el) {
             document.querySelectorAll('.duration-option').forEach(d => d.classList.remove('selected'));
@@ -510,16 +618,14 @@
         
         function startSession() {
             document.getElementById('welcomeView').classList.add('hidden');
-            document.getElementById('sessionView').classList.add('active');
-            document.getElementById('progressBar').style.display = 'block';
+            document.getElementById('activeSession').classList.add('active');
+            document.getElementById('progressBar').classList.add('active');
             
             totalSeconds = selectedDuration * 60;
             currentPhase = 0;
+            isPaused = false;
             
-            // Play initial ding
             playBowlSound();
-            
-            // Start first phase
             startPhase();
         }
         
@@ -530,8 +636,7 @@
             }
             
             const phase = phases[currentPhase];
-            const phaseSeconds = Math.floor(totalSeconds * phase.percent);
-            remainingSeconds = phaseSeconds;
+            remainingSeconds = Math.floor(totalSeconds * phase.percent);
             
             document.getElementById('phaseIndicator').textContent = `PHASE ${currentPhase + 1}/${phases.length}`;
             document.getElementById('phaseTitle').textContent = phase.name;
@@ -555,7 +660,6 @@
                 currentPhase++;
                 
                 if (currentPhase < phases.length) {
-                    // Play bowl sound for transition
                     playBowlSound();
                     setTimeout(startPhase, 1500);
                 } else {
@@ -568,20 +672,16 @@
         function updateTimerDisplay() {
             const mins = Math.floor(remainingSeconds / 60);
             const secs = remainingSeconds % 60;
-            document.getElementById('timerDisplay').textContent = 
-                `${mins}:${secs.toString().padStart(2, '0')}`;
+            document.getElementById('timerDisplay').textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
         }
         
         function updateProgress() {
-            // Calculate total elapsed
             let elapsed = 0;
             for (let i = 0; i < currentPhase; i++) {
                 elapsed += totalSeconds * phases[i].percent;
             }
             elapsed += (totalSeconds * phases[currentPhase].percent) - remainingSeconds;
-            
-            const percent = (elapsed / totalSeconds) * 100;
-            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('progressFill').style.width = (elapsed / totalSeconds * 100) + '%';
         }
         
         function togglePause() {
@@ -592,24 +692,20 @@
         function stopSession() {
             if (confirm('Arrêter la session ?')) {
                 clearInterval(timerInterval);
-                goToWelcome();
+                backToHub();
             }
         }
         
         function endSession() {
             clearInterval(timerInterval);
-            document.getElementById('sessionView').classList.remove('active');
-            document.getElementById('progressBar').style.display = 'none';
+            document.getElementById('activeSession').classList.remove('active');
+            document.getElementById('progressBar').classList.remove('active');
             document.getElementById('endView').classList.add('active');
             
             document.getElementById('endDuration').textContent = selectedDuration;
             
-            // Save session
             saveSession();
-            
-            // Calculate streak
-            const streak = calculateStreak();
-            document.getElementById('endStreak').textContent = streak;
+            document.getElementById('endStreak').textContent = calculateStreak();
         }
         
         function saveSession() {
@@ -626,82 +722,63 @@
             const sessions = JSON.parse(localStorage.getItem('wutree_visualization_sessions') || '[]');
             if (sessions.length === 0) return 1;
             
-            // Get unique dates
             const dates = [...new Set(sessions.map(s => s.date))].sort().reverse();
-            
             let streak = 1;
-            const today = new Date().toISOString().split('T')[0];
             
             for (let i = 1; i < dates.length; i++) {
-                const prevDate = new Date(dates[i-1]);
-                const currDate = new Date(dates[i]);
-                const diffDays = Math.floor((prevDate - currDate) / (1000 * 60 * 60 * 24));
-                
-                if (diffDays === 1) {
-                    streak++;
-                } else {
-                    break;
-                }
+                const diff = (new Date(dates[i-1]) - new Date(dates[i])) / (1000 * 60 * 60 * 24);
+                if (diff === 1) streak++;
+                else break;
             }
-            
             return streak;
         }
         
-        function goToWelcome() {
-            document.getElementById('endView').classList.remove('active');
-            document.getElementById('sessionView').classList.remove('active');
-            document.getElementById('welcomeView').classList.remove('hidden');
-            document.getElementById('progressFill').style.width = '0%';
+        function loadProgressStats() {
+            const sessions = JSON.parse(localStorage.getItem('wutree_visualization_sessions') || '[]');
+            
+            document.getElementById('totalSessions').textContent = sessions.length;
+            document.getElementById('totalMinutes').textContent = sessions.reduce((sum, s) => sum + (s.duration || 10), 0);
+            document.getElementById('currentStreak').textContent = calculateStreak();
+            
+            // History
+            const container = document.getElementById('historyContainer');
+            const last10 = sessions.slice(-10).reverse();
+            
+            if (last10.length === 0) {
+                container.innerHTML = '<div style="text-align:center;color:rgba(0,0,0,0.4);font-size:12px;padding:15px;">Aucune session</div>';
+            } else {
+                container.innerHTML = last10.map(s => {
+                    const date = new Date(s.date);
+                    const dateStr = date.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' });
+                    return `<div class="history-item"><span class="history-date">${dateStr}</span><span class="history-duration">${s.duration || 10} min</span></div>`;
+                }).join('');
+            }
         }
         
-        // Tibetan bowl sound using Web Audio API
+        // Tibetan bowl sound
         function playBowlSound() {
             try {
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                
-                // Create multiple oscillators for rich bowl sound
-                const frequencies = [262, 330, 392, 523]; // C4, E4, G4, C5
+                const frequencies = [262, 330, 392, 523];
                 
                 frequencies.forEach((freq, i) => {
-                    const oscillator = audioCtx.createOscillator();
-                    const gainNode = audioCtx.createGain();
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.frequency.value = freq;
+                    osc.type = 'sine';
                     
-                    oscillator.connect(gainNode);
-                    gainNode.connect(audioCtx.destination);
-                    
-                    oscillator.frequency.value = freq;
-                    oscillator.type = 'sine';
-                    
-                    // Envelope for bowl-like decay
                     const now = audioCtx.currentTime;
                     const delay = i * 0.05;
-                    gainNode.gain.setValueAtTime(0, now + delay);
-                    gainNode.gain.linearRampToValueAtTime(0.15, now + delay + 0.1);
-                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + delay + 3);
+                    gain.gain.setValueAtTime(0, now + delay);
+                    gain.gain.linearRampToValueAtTime(0.12, now + delay + 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 3);
                     
-                    oscillator.start(now + delay);
-                    oscillator.stop(now + delay + 3);
+                    osc.start(now + delay);
+                    osc.stop(now + delay + 3);
                 });
-                
-                // Add a subtle low frequency for warmth
-                const subOsc = audioCtx.createOscillator();
-                const subGain = audioCtx.createGain();
-                subOsc.connect(subGain);
-                subGain.connect(audioCtx.destination);
-                subOsc.frequency.value = 130; // C3
-                subOsc.type = 'sine';
-                
-                const now = audioCtx.currentTime;
-                subGain.gain.setValueAtTime(0, now);
-                subGain.gain.linearRampToValueAtTime(0.1, now + 0.15);
-                subGain.gain.exponentialRampToValueAtTime(0.001, now + 4);
-                
-                subOsc.start(now);
-                subOsc.stop(now + 4);
-                
-            } catch (e) {
-                console.log('Audio not supported');
-            }
+            } catch (e) {}
         }
         
         // Navigation
