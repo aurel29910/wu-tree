@@ -264,9 +264,11 @@
         .input-field { width: 100%; padding: 12px 14px; border: 2px solid rgba(255,255,255,0.5); border-radius: 12px; font-size: 14px; font-family: 'Comfortaa', sans-serif; background: rgba(255,255,255,0.4); color: #333; }
         .input-field:focus { outline: none; border-color: #6B4E9B; }
         
-        .emoji-picker { display: flex; flex-wrap: wrap; gap: 8px; }
+        .emoji-picker { display: flex; flex-wrap: wrap; gap: 8px; max-height: 180px; overflow-y: auto; padding-right: 5px; }
+        .emoji-picker.collapsed { max-height: 100px; overflow: hidden; }
         .emoji-option { width: 42px; height: 42px; background: rgba(255,255,255,0.4); border: 2px solid transparent; border-radius: 10px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .emoji-option.selected { border-color: #6B4E9B; background: rgba(255,255,255,0.7); }
+        .emoji-see-more { width: 100%; padding: 10px; background: rgba(107, 78, 155, 0.1); border: none; border-radius: 10px; color: #6B4E9B; font-size: 12px; font-family: 'Comfortaa', sans-serif; cursor: pointer; margin-top: 5px; }
         
         .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
         .btn { flex: 1; padding: 14px; border: none; border-radius: 14px; font-family: 'Comfortaa', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; }
@@ -398,7 +400,7 @@
         </div>
         
         <!-- FAB pour ajouter une activité -->
-        <button class="fab" onclick="openModal()">+</button>
+        <button class="fab" onclick="openAddModal()">+</button>
         
         <div class="bottom-menu">
             <div class="menu-item" onclick="goToVision()">
@@ -415,11 +417,11 @@
             </div>
         </div>
         
-        <!-- Modal ajout activité -->
+        <!-- Modal ajout/modification activité -->
         <div class="modal-overlay" id="addModal">
             <div class="modal">
                 <div class="modal-header">
-                    <div class="modal-title">Nouvelle activité</div>
+                    <div class="modal-title" id="activityModalTitle">➕ Nouvelle activité</div>
                     <button class="modal-close" onclick="closeModal()">×</button>
                 </div>
                 <div class="modal-content">
@@ -429,11 +431,12 @@
                     </div>
                     <div class="input-group">
                         <label class="input-label">Emoji</label>
-                        <div class="emoji-picker" id="emojiPicker"></div>
+                        <div class="emoji-picker collapsed" id="emojiPicker"></div>
+                        <button class="emoji-see-more" id="emojiSeeMore" onclick="toggleEmojiPicker()">Voir plus d'emojis ▼</button>
                     </div>
                     <div class="modal-actions">
                         <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
-                        <button class="btn btn-primary" onclick="saveActivity()">Ajouter</button>
+                        <button class="btn btn-primary" id="activitySaveBtn" onclick="saveActivity()">Ajouter</button>
                     </div>
                 </div>
             </div>
@@ -464,10 +467,11 @@
             '❤️', '👨‍👩‍👧', '🤝', '👥', '💬'
         ];
         
+        let editingActivityId = null;
+        
         function init() {
             loadDomainInfo();
             renderActivities();
-            setupEmojiPicker();
         }
         
         function loadDomainInfo() {
@@ -479,15 +483,65 @@
             }
         }
         
-        function setupEmojiPicker() {
-            document.getElementById('emojiPicker').innerHTML = ACTIVITY_EMOJIS.map((e, i) => 
-                `<div class="emoji-option ${i === 0 ? 'selected' : ''}" onclick="selectEmoji(this)">${e}</div>`
-            ).join('');
+        function setupEmojiPicker(selectedEmoji = null) {
+            document.getElementById('emojiPicker').innerHTML = ACTIVITY_EMOJIS.map((e, i) => {
+                const isSelected = selectedEmoji ? e === selectedEmoji : i === 0;
+                return `<div class="emoji-option ${isSelected ? 'selected' : ''}" onclick="selectEmoji(this)">${e}</div>`;
+            }).join('');
         }
         
         function selectEmoji(el) {
             document.querySelectorAll('.emoji-option').forEach(e => e.classList.remove('selected'));
             el.classList.add('selected');
+        }
+        
+        function toggleEmojiPicker() {
+            const picker = document.getElementById('emojiPicker');
+            const btn = document.getElementById('emojiSeeMore');
+            
+            if (picker.classList.contains('collapsed')) {
+                picker.classList.remove('collapsed');
+                btn.textContent = 'Voir moins ▲';
+            } else {
+                picker.classList.add('collapsed');
+                btn.textContent = 'Voir plus d\'emojis ▼';
+            }
+        }
+        
+        function openAddModal() {
+            editingActivityId = null;
+            document.getElementById('activityModalTitle').textContent = '➕ Nouvelle activité';
+            document.getElementById('activitySaveBtn').textContent = 'Ajouter';
+            document.getElementById('activityName').value = '';
+            document.getElementById('emojiPicker').classList.add('collapsed');
+            document.getElementById('emojiSeeMore').textContent = 'Voir plus d\'emojis ▼';
+            setupEmojiPicker();
+            document.getElementById('addModal').classList.add('show');
+        }
+        
+        function openEditActivityModal(activityId) {
+            const activities = JSON.parse(localStorage.getItem('wutree_activities') || '[]');
+            const activity = activities.find(a => a.id === activityId);
+            if (!activity) return;
+            
+            editingActivityId = activityId;
+            document.getElementById('activityModalTitle').textContent = '✏️ Modifier l\'activité';
+            document.getElementById('activitySaveBtn').textContent = 'Enregistrer';
+            document.getElementById('activityName').value = activity.name;
+            document.getElementById('emojiPicker').classList.add('collapsed');
+            document.getElementById('emojiSeeMore').textContent = 'Voir plus d\'emojis ▼';
+            setupEmojiPicker(activity.emoji);
+            document.getElementById('addModal').classList.add('show');
+            
+            // Hide bubble menu
+            document.querySelectorAll('.bubble-menu.show').forEach(menu => {
+                menu.classList.remove('show');
+            });
+        }
+        
+        function closeModal() {
+            document.getElementById('addModal').classList.remove('show');
+            editingActivityId = null;
         }
         
         // ========== ACTIVITIES ==========
@@ -519,7 +573,7 @@
                             Aucune activité dans ce domaine.<br>
                             Ajoute ta première activité !
                         </div>
-                        <button class="empty-btn" onclick="openModal()">+ Ajouter une activité</button>
+                        <button class="empty-btn" onclick="openAddModal()">+ Ajouter une activité</button>
                     </div>
                 `;
                 return;
@@ -597,21 +651,7 @@
         });
         
         function editActivityName(activityId) {
-            const activities = JSON.parse(localStorage.getItem('wutree_activities') || '[]');
-            const activity = activities.find(a => a.id === activityId);
-            if (!activity) return;
-            
-            const newName = prompt('Nouveau nom de l\'activité :', activity.name);
-            if (newName && newName.trim()) {
-                activity.name = newName.trim();
-                localStorage.setItem('wutree_activities', JSON.stringify(activities));
-                renderActivities();
-            }
-            
-            // Hide menu
-            document.querySelectorAll('.bubble-menu.show').forEach(menu => {
-                menu.classList.remove('show');
-            });
+            openEditActivityModal(activityId);
         }
         
         function deleteActivity(activityId) {
@@ -641,32 +681,34 @@
         }
         
         // ========== MODAL ==========
-        function openModal() {
-            document.getElementById('activityName').value = '';
-            setupEmojiPicker();
-            document.getElementById('addModal').classList.add('show');
-        }
-        
-        function closeModal() {
-            document.getElementById('addModal').classList.remove('show');
-        }
-        
         function saveActivity() {
             const name = document.getElementById('activityName').value.trim();
             const emoji = document.querySelector('.emoji-option.selected')?.textContent || '⭐';
             
             if (!name) { alert('Entre un nom !'); return; }
             
-            const activities = getActivities();
-            activities.push({
-                id: 'activity_' + Date.now(),
-                domainId: currentDomainId,
-                name,
-                emoji,
-                createdAt: new Date().toISOString()
-            });
+            if (editingActivityId) {
+                // Mode édition
+                const all = JSON.parse(localStorage.getItem('wutree_activities') || '[]');
+                const activity = all.find(a => a.id === editingActivityId);
+                if (activity) {
+                    activity.name = name;
+                    activity.emoji = emoji;
+                    localStorage.setItem('wutree_activities', JSON.stringify(all));
+                }
+            } else {
+                // Mode création
+                const activities = getActivities();
+                activities.push({
+                    id: 'activity_' + Date.now(),
+                    domainId: currentDomainId,
+                    name,
+                    emoji,
+                    createdAt: new Date().toISOString()
+                });
+                saveActivities(activities);
+            }
             
-            saveActivities(activities);
             closeModal();
             renderActivities();
         }
