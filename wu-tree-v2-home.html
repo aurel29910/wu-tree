@@ -616,6 +616,27 @@
             display: flex;
             flex-wrap: wrap;
             gap: 8px;
+            max-height: 180px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        
+        .emoji-picker.collapsed {
+            max-height: 100px;
+            overflow: hidden;
+        }
+        
+        .emoji-see-more {
+            width: 100%;
+            padding: 10px;
+            background: rgba(107, 78, 155, 0.1);
+            border: none;
+            border-radius: 10px;
+            color: #6B4E9B;
+            font-size: 12px;
+            font-family: 'Comfortaa', sans-serif;
+            cursor: pointer;
+            margin-top: 5px;
         }
         
         .emoji-option {
@@ -822,11 +843,11 @@
             </div>
         </div>
         
-        <!-- Modal Ajouter Domaine -->
+        <!-- Modal Ajouter/Modifier Domaine -->
         <div class="modal-overlay" id="domainModal">
             <div class="modal">
                 <div class="modal-header">
-                    <div class="modal-title">➕ Nouveau domaine</div>
+                    <div class="modal-title" id="domainModalTitle">➕ Nouveau domaine</div>
                     <button class="modal-close" onclick="closeModal()">×</button>
                 </div>
                 <div class="modal-content">
@@ -836,11 +857,12 @@
                     </div>
                     <div class="input-group">
                         <label class="input-label">Emoji</label>
-                        <div class="emoji-picker" id="emojiPicker"></div>
+                        <div class="emoji-picker collapsed" id="emojiPicker"></div>
+                        <button class="emoji-see-more" id="emojiSeeMore" onclick="toggleEmojiPicker()">Voir plus d'emojis ▼</button>
                     </div>
                     <div class="modal-actions">
                         <button class="btn btn-secondary" onclick="closeModal()">Annuler</button>
-                        <button class="btn btn-primary" onclick="saveDomain()">Ajouter</button>
+                        <button class="btn btn-primary" id="domainSaveBtn" onclick="saveDomain()">Ajouter</button>
                     </div>
                 </div>
             </div>
@@ -1003,21 +1025,63 @@
             '❤️', '👨‍👩‍👧', '🤝', '👥', '💬'
         ];
         
+        let editingDomainId = null;
+        
         function openAddDomainModal() {
+            editingDomainId = null;
+            document.getElementById('domainModalTitle').textContent = '➕ Nouveau domaine';
+            document.getElementById('domainSaveBtn').textContent = 'Ajouter';
             document.getElementById('domainName').value = '';
+            document.getElementById('emojiPicker').classList.add('collapsed');
+            document.getElementById('emojiSeeMore').textContent = 'Voir plus d\'emojis ▼';
             setupEmojiPicker();
             document.getElementById('domainModal').classList.add('show');
         }
         
-        function closeModal() {
-            document.getElementById('domainModal').classList.remove('show');
+        function openEditDomainModal(domainId) {
+            const domains = JSON.parse(localStorage.getItem('wutree_domains') || '[]');
+            const domain = domains.find(d => d.id === domainId);
+            if (!domain) return;
+            
+            editingDomainId = domainId;
+            document.getElementById('domainModalTitle').textContent = '✏️ Modifier le domaine';
+            document.getElementById('domainSaveBtn').textContent = 'Enregistrer';
+            document.getElementById('domainName').value = domain.name;
+            document.getElementById('emojiPicker').classList.add('collapsed');
+            document.getElementById('emojiSeeMore').textContent = 'Voir plus d\'emojis ▼';
+            setupEmojiPicker(domain.emoji);
+            document.getElementById('domainModal').classList.add('show');
+            
+            // Hide bubble menu
+            document.querySelectorAll('.bubble-menu.show').forEach(menu => {
+                menu.classList.remove('show');
+            });
         }
         
-        function setupEmojiPicker() {
+        function toggleEmojiPicker() {
+            const picker = document.getElementById('emojiPicker');
+            const btn = document.getElementById('emojiSeeMore');
+            
+            if (picker.classList.contains('collapsed')) {
+                picker.classList.remove('collapsed');
+                btn.textContent = 'Voir moins ▲';
+            } else {
+                picker.classList.add('collapsed');
+                btn.textContent = 'Voir plus d\'emojis ▼';
+            }
+        }
+        
+        function closeModal() {
+            document.getElementById('domainModal').classList.remove('show');
+            editingDomainId = null;
+        }
+        
+        function setupEmojiPicker(selectedEmoji = null) {
             const container = document.getElementById('emojiPicker');
-            container.innerHTML = DOMAIN_EMOJIS.map((e, i) => 
-                `<div class="emoji-option ${i === 0 ? 'selected' : ''}" onclick="selectEmoji(this)">${e}</div>`
-            ).join('');
+            container.innerHTML = DOMAIN_EMOJIS.map((e, i) => {
+                const isSelected = selectedEmoji ? e === selectedEmoji : i === 0;
+                return `<div class="emoji-option ${isSelected ? 'selected' : ''}" onclick="selectEmoji(this)">${e}</div>`;
+            }).join('');
         }
         
         function selectEmoji(el) {
@@ -1035,20 +1099,31 @@
             }
             
             const domains = loadDomains();
-            const maxOrder = Math.max(...domains.map(d => d.order), -1);
             
-            // Generate unique ID
-            const id = name.toLowerCase()
-                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-                .replace(/[^a-z0-9]/g, '_')
-                .substring(0, 20) + '_' + Date.now();
-            
-            domains.push({
-                id,
-                emoji,
-                name,
-                order: maxOrder + 1
-            });
+            if (editingDomainId) {
+                // Mode édition
+                const domain = domains.find(d => d.id === editingDomainId);
+                if (domain) {
+                    domain.name = name;
+                    domain.emoji = emoji;
+                }
+            } else {
+                // Mode création
+                const maxOrder = Math.max(...domains.map(d => d.order), -1);
+                
+                // Generate unique ID
+                const id = name.toLowerCase()
+                    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                    .replace(/[^a-z0-9]/g, '_')
+                    .substring(0, 20) + '_' + Date.now();
+                
+                domains.push({
+                    id,
+                    emoji,
+                    name,
+                    order: maxOrder + 1
+                });
+            }
             
             saveDomains(domains);
             closeModal();
@@ -1121,21 +1196,7 @@
         
         // ========== EDIT DOMAIN NAME ==========
         function editDomainName(domainId) {
-            const domains = JSON.parse(localStorage.getItem('wutree_domains') || '[]');
-            const domain = domains.find(d => d.id === domainId);
-            if (!domain) return;
-            
-            const newName = prompt('Nouveau nom du domaine :', domain.name);
-            if (newName && newName.trim()) {
-                domain.name = newName.trim();
-                localStorage.setItem('wutree_domains', JSON.stringify(domains));
-                renderBubbles();
-            }
-            
-            // Hide menu
-            document.querySelectorAll('.bubble-menu.show').forEach(menu => {
-                menu.classList.remove('show');
-            });
+            openEditDomainModal(domainId);
         }
         
         // ========== NAVIGATION ==========
