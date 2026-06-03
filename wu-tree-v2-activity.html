@@ -25,6 +25,8 @@
             position: relative;
             overflow-x: hidden;
             padding-top: env(safe-area-inset-top, 0);
+            display: flex;
+            flex-direction: column;
         }
         
         .petal {
@@ -88,8 +90,8 @@
         }
         
         .content {
-            padding: 0 20px 100px;
-            height: calc(100% - 120px);
+            padding: 0 20px 90px;
+            flex: 1;
             overflow-y: auto;
             position: relative;
             z-index: 50;
@@ -548,16 +550,18 @@
         
         /* Bottom menu */
         .bottom-menu {
-            position: absolute;
+            position: fixed;
             bottom: 0; left: 0; right: 0;
             height: 70px;
             background: rgba(255, 255, 255, 0.5);
             backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             display: flex;
             justify-content: space-around;
             align-items: center;
             border-top: 1px solid rgba(255, 255, 255, 0.4);
-            z-index: 90;
+            padding-bottom: env(safe-area-inset-bottom, 0);
+            z-index: 100;
         }
         .menu-item { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; padding: 8px 16px; border-radius: 16px; }
         .menu-item.active { background: rgba(255, 255, 255, 0.6); }
